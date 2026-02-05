@@ -83,7 +83,12 @@ public class LoginFrame extends JFrame {
         if (authService.authenticate(username, password)) {
             statusLabel.setForeground(Color.GREEN);
             statusLabel.setText("Login successful! Welcome, " + username);
-            // TODO: Open main application window
+            // Open main application window
+            SwingUtilities.invokeLater(() -> {
+                MainFrame mainFrame = new MainFrame();
+                mainFrame.setVisible(true);
+                dispose(); // Close login window
+            });
         } else {
             statusLabel.setForeground(Color.RED);
             statusLabel.setText("Invalid username or password.");
