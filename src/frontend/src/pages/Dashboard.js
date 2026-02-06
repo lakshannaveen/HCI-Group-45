@@ -1,0 +1,86 @@
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Typography, Grid, Card, CardContent, CardActions } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+const Dashboard = () => {
+  const [designs, setDesigns] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchDesigns();
+  }, []);
+
+  const fetchDesigns = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/designs', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setDesigns(res.data);
+    } catch (err) {
+      console.error('Failed to fetch designs', err);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
+  const handleNewDesign = () => {
+    navigate('/design');
+  };
+
+  return (
+    <Box sx={{ p: 3, backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" sx={{ color: '#6b4f35' }}>
+          Furniture Designer Dashboard
+        </Typography>
+        <Button
+          variant="outlined"
+          onClick={handleLogout}
+          sx={{ borderColor: '#6b4f35', color: '#6b4f35', '&:hover': { borderColor: '#5a4230', backgroundColor: '#f9f6f0' } }}
+        >
+          Logout
+        </Button>
+      </Box>
+
+      <Button
+        variant="contained"
+        onClick={handleNewDesign}
+        sx={{ mb: 3, backgroundColor: '#6b4f35', '&:hover': { backgroundColor: '#5a4230' } }}
+      >
+        Create New Design
+      </Button>
+
+      <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+        Your Designs
+      </Typography>
+
+      <Grid container spacing={3}>
+        {designs.map((design) => (
+          <Grid item xs={12} sm={6} md={4} key={design._id}>
+            <Card sx={{ backgroundColor: '#f9f6f0' }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ color: '#6b4f35' }}>
+                  {design.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Created: {new Date(design.createdAt).toLocaleDateString()}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small" sx={{ color: '#6b4f35' }}>Edit</Button>
+                <Button size="small" sx={{ color: '#6b4f35' }}>Delete</Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
+};
+
+export default Dashboard;

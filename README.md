@@ -1,55 +1,111 @@
-# Furniture Designer App
+# Furniture Designer - MERN Stack
 
-A Java Swing application for designing furniture.
+A web application for designing furniture layouts in rooms using 2D and 3D visualization.
+
+## Features
+
+- User authentication (register/login)
+- Room setup with customizable dimensions, colors, and shapes
+- Furniture placement (chairs, tables, etc.)
+- 2D and 3D visualization
+- Design saving and management
+- Responsive UI with brown/white theme
+
+## Tech Stack
+
+- **Frontend**: React.js with Material-UI
+- **Backend**: Node.js with Express.js
+- **Database**: MongoDB
+- **Authentication**: JWT tokens
 
 ## Project Structure
 
 ```
-FurnitureDesignerApp/
- ├─ src/
- │   ├─ frontend/          ← Java Swing (UI)
- │   │   └─ LoginFrame.java
- │   │
- │   ├─ backend/           ← Logic / validation / data
- │   │   └─ AuthService.java
- │   │
- │   └─ main/
- │       └─ App.java       ← Entry point
- │
- ├─ out/                   ← compiled files (auto-created)
- ├─ README.md
- └─ .gitignore
+furniture-designer-mern/
+├── src/
+│   ├── backend/          # Express.js server
+│   │   ├── models/       # MongoDB schemas
+│   │   ├── routes/       # API endpoints
+│   │   ├── middleware/   # Authentication middleware
+│   │   └── server.js     # Main server file
+│   └── frontend/         # React application
+│       ├── src/
+│       │   ├── components/  # Reusable components
+│       │   ├── pages/       # Page components
+│       │   └── App.js       # Main app component
+│       └── package.json
+├── package.json          # Root package.json for running both
+└── README.md
 ```
 
-## Requirements
+## Setup Instructions
 
-- Java JDK 11 or higher
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd furniture-designer-mern
+   ```
 
-## How to Compile
+2. **Install dependencies**
+   ```bash
+   npm run install-all
+   ```
 
-```bash
-# Create output directory
-mkdir out
+3. **Set up MongoDB**
+   - Install MongoDB locally or use MongoDB Atlas
+   - Create a database named `furniture-designer`
+   - Update the connection string in `src/backend/server.js` if needed
 
-# Compile all Java files
-javac -d out src/backend/*.java src/frontend/*.java src/main/*.java
-```
+4. **Environment Variables**
+   Create a `.env` file in `src/backend/`:
+   ```
+   MONGODB_URI=mongodb://localhost:27017/furniture-designer
+   JWT_SECRET=your-secret-key
+   PORT=5000
+   ```
 
-## How to Run
+5. **Run the application**
+   ```bash
+   npm start
+   ```
 
-```bash
-# Run the application
-java -cp out main.App
-```
+   This will start both the backend server (http://localhost:5000) and React frontend (http://localhost:3000).
 
-## Default Login Credentials
+## API Endpoints
 
-For testing purposes:
-- Username: `admin` | Password: `admin123`
-- Username: `designer` | Password: `design456`
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
 
-## Features
+### Designs
+- `GET /api/designs` - Get user's designs
+- `POST /api/designs` - Create new design
+- `PUT /api/designs/:id` - Update design
+- `DELETE /api/designs/:id` - Delete design
 
-- User authentication with login form
-- Clean and simple UI using Java Swing
-- Modular architecture separating frontend and backend
+## Usage
+
+1. Register a new account or login with existing credentials
+2. Access the dashboard to view saved designs
+3. Create a new design to start furniture layout
+4. Set up room dimensions, colors, and shapes
+5. Add furniture items and position them
+6. Switch between 2D and 3D views
+7. Save the design for later access
+
+## Development
+
+- Backend: `npm run server` (from root) or `cd src/backend && npm start`
+- Frontend: `npm run client` (from root) or `cd src/frontend && npm start`
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the ISC License.

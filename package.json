@@ -1,0 +1,19 @@
+{
+  "name": "furniture-designer-mern",
+  "version": "1.0.0",
+  "description": "Furniture Designer MERN Stack Application",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd src/backend && npm start",
+    "client": "cd src/frontend && npm start",
+    "install-server": "cd src/backend && npm install",
+    "install-client": "cd src/frontend && npm install",
+    "install-all": "npm run install-server && npm run install-client"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": ["mern", "furniture", "design", "react", "nodejs"],
+  "author": "",
+  "license": "ISC"
+}
