@@ -18,8 +18,14 @@ public class MainFrame extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null);
 
+        Color brown = new Color(107, 79, 58);
+        Color cream = new Color(247, 241, 231);
+
         // Create menu bar
-        setJMenuBar(createMenuBar());
+        JMenuBar menuBar = createMenuBar();
+        menuBar.setBackground(cream);
+        menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, brown));
+        setJMenuBar(menuBar);
 
         // Create canvas for drawing
         canvas = new DesignCanvas();
@@ -27,6 +33,8 @@ public class MainFrame extends JFrame {
 
         // Add toolbar
         JToolBar toolBar = createToolBar();
+        toolBar.setBackground(cream);
+        toolBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, brown));
         add(toolBar, BorderLayout.NORTH);
     }
 
@@ -89,33 +97,53 @@ public class MainFrame extends JFrame {
     private JToolBar createToolBar() {
         JToolBar toolBar = new JToolBar();
 
+        Color brown = new Color(107, 79, 58);
+        Color cream = new Color(247, 241, 231);
+        Color buttonBg = new Color(242, 235, 226);
+
         JButton addRoomBtn = new JButton("Add Room");
+        styleToolButton(addRoomBtn, brown, buttonBg);
         addRoomBtn.addActionListener(e -> canvas.addRoom());
         toolBar.add(addRoomBtn);
 
         JButton addChairBtn = new JButton("Add Chair");
+        styleToolButton(addChairBtn, brown, buttonBg);
         addChairBtn.addActionListener(e -> canvas.addFurniture("Chair"));
         toolBar.add(addChairBtn);
 
         JButton addTableBtn = new JButton("Add Table");
+        styleToolButton(addTableBtn, brown, buttonBg);
         addTableBtn.addActionListener(e -> canvas.addFurniture("Table"));
         toolBar.add(addTableBtn);
 
         toolBar.addSeparator();
 
         JButton scaleBtn = new JButton("Scale");
+        styleToolButton(scaleBtn, brown, buttonBg);
         scaleBtn.addActionListener(e -> canvas.scaleSelected());
         toolBar.add(scaleBtn);
 
         JButton colorBtn = new JButton("Change Color");
+        styleToolButton(colorBtn, brown, buttonBg);
         colorBtn.addActionListener(e -> canvas.changeColor());
         toolBar.add(colorBtn);
 
         JButton shadeBtn = new JButton("Add Shade");
+        styleToolButton(shadeBtn, brown, buttonBg);
         shadeBtn.addActionListener(e -> canvas.addShade());
         toolBar.add(shadeBtn);
 
         return toolBar;
+    }
+
+    private void styleToolButton(JButton button, Color textColor, Color background) {
+        button.setBackground(background);
+        button.setForeground(textColor);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(textColor),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
     }
 
     // Inner class for the drawing canvas
@@ -123,7 +151,7 @@ public class MainFrame extends JFrame {
         private ViewMode viewMode = ViewMode.VIEW_2D;
 
         public DesignCanvas() {
-            setBackground(Color.WHITE);
+            setBackground(new Color(249, 244, 238));
             // Add mouse listeners for interaction (basic placeholder)
             addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
@@ -141,19 +169,19 @@ public class MainFrame extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             // Draw room outline (placeholder)
-            g2d.setColor(Color.LIGHT_GRAY);
+            g2d.setColor(new Color(231, 222, 214));
             g2d.fillRect(50, 50, 400, 300);
-            g2d.setColor(Color.BLACK);
+            g2d.setColor(new Color(107, 79, 58));
             g2d.drawRect(50, 50, 400, 300);
 
             // Draw sample furniture (placeholder)
-            g2d.setColor(Color.BLUE);
+            g2d.setColor(new Color(153, 111, 79));
             g2d.fillRect(100, 100, 50, 50); // Chair
-            g2d.setColor(Color.GREEN);
+            g2d.setColor(new Color(120, 82, 58));
             g2d.fillRect(200, 150, 80, 40); // Table
 
             // Display view mode
-            g2d.setColor(Color.BLACK);
+            g2d.setColor(new Color(53, 39, 28));
             g2d.drawString("View Mode: " + viewMode, 10, 20);
         }
 
