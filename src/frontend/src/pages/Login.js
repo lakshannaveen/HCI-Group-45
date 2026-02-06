@@ -15,11 +15,12 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', formData);
-      localStorage.setItem('token', res.data.token);
+      await axios.post('http://localhost:5007/api/auth/login', formData, { withCredentials: true });
+      // Token is now in httpOnly cookie, no need to store in localStorage
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const errorMessage = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Login failed';
+      setError(errorMessage);
     }
   };
 

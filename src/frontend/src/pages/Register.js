@@ -21,15 +21,16 @@ const Register = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/auth/register', {
+      await axios.post('http://localhost:5007/api/auth/register', {
         username: formData.username,
         password: formData.password
-      });
+      }, { withCredentials: true });
       setSuccess('Account created successfully! Please log in.');
       setError('');
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const errorMessage = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Registration failed';
+      setError(errorMessage);
     }
   };
 

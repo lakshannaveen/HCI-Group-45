@@ -13,18 +13,19 @@ const Dashboard = () => {
 
   const fetchDesigns = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/designs', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get('http://localhost:5007/api/designs', { withCredentials: true });
       setDesigns(res.data);
     } catch (err) {
       console.error('Failed to fetch designs', err);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:5007/api/auth/logout', {}, { withCredentials: true });
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
     navigate('/');
   };
 
