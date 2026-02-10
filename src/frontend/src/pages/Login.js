@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5007/api/auth/login', formData, { withCredentials: true });
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, formData, { withCredentials: true });
       // Token is now in httpOnly cookie, no need to store in localStorage
       navigate('/dashboard');
     } catch (err) {

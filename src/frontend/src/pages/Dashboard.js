@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   const fetchDesigns = async () => {
     try {
-      const res = await axios.get('http://localhost:5007/api/designs', { withCredentials: true });
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/designs`, { withCredentials: true });
       setDesigns(res.data);
     } catch (err) {
       console.error('Failed to fetch designs', err);
@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5007/api/auth/logout', {}, { withCredentials: true });
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (err) {
       console.error('Logout failed', err);
     }
