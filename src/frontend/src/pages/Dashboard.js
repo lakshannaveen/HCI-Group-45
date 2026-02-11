@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Cube from '../components/Cube';
 
 const Dashboard = () => {
   const [designs, setDesigns] = useState([]);
@@ -46,6 +47,13 @@ const Dashboard = () => {
         >
           Logout
         </Button>
+      </Box>
+
+      <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+        3D Hello World - Cube
+      </Typography>
+      <Box sx={{ height: '400px', mb: 3 }}>
+        <Cube />
       </Box>
 
       <Button
