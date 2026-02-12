@@ -12,10 +12,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  email: {
+    type: String,
+    required: false,
+    unique: true,
+    sparse: true
   }
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('User', userSchema);
