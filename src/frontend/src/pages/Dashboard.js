@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Cube from '../components/Cube';
+import FurnitureItem from '../components/FurnitureItem';
 
 const Dashboard = () => {
   const [designs, setDesigns] = useState([]);
@@ -50,10 +50,10 @@ const Dashboard = () => {
       </Box>
 
       <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
-        3D Hello World - Cube
+        Furniture Designer - Interactive 3D Scene
       </Typography>
       <Box sx={{ height: '400px', mb: 3 }}>
-        <Cube />
+        <FurnitureItem />
       </Box>
 
       <Button
