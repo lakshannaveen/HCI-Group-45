@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 
 const Dashboard = () => {
@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   const fetchDesigns = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/designs`, { withCredentials: true });
+      const res = await axios.get('/api/designs');
       setDesigns(res.data);
     } catch (err) {
       console.error('Failed to fetch designs', err);
@@ -23,7 +23,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {}, { withCredentials: true });
+      await axios.post('/api/auth/logout');
     } catch (err) {
       console.error('Logout failed', err);
     }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Typography, Box, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, formData, { withCredentials: true });
+      await axios.post('/api/auth/login', formData);
       // Token is now in httpOnly cookie, no need to store in localStorage
       navigate('/dashboard');
     } catch (err) {

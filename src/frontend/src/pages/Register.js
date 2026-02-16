@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Typography, Box, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({ username: '', password: '', confirmPassword: '' });
@@ -21,10 +21,10 @@ const Register = () => {
     }
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
+      await axios.post('/api/auth/register', {
         username: formData.username,
         password: formData.password
-      }, { withCredentials: true });
+      });
       setSuccess('Account created successfully! Please log in.');
       setError('');
       setTimeout(() => navigate('/'), 2000);
