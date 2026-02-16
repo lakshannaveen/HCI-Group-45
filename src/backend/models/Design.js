@@ -11,35 +11,61 @@ const designSchema = new mongoose.Schema({
     required: true
   },
   roomData: {
-    width: Number,
-    height: Number,
-    color: String,
-    shape: String
+    width: {
+      type: Number,
+      required: true
+    },
+    length: {
+      type: Number,
+      required: true
+    },
+    wallColor: {
+      type: String,
+      default: '#FFFFFF'
+    },
+    shape: {
+      type: String,
+      enum: ['rectangular', 'square', 'L-shaped'],
+      default: 'rectangular'
+    }
   },
   furniture: [{
+    id: {
+      type: String,
+      required: true
+    },
     type: {
-      type: String, // 'chair', 'table', etc.
+      type: String,
       required: true
     },
     position: {
-      x: Number,
-      y: Number
+      x: {
+        type: Number,
+        required: true,
+        default: 0
+      },
+      y: {
+        type: Number,
+        required: true,
+        default: 0
+      },
+      z: {
+        type: Number,
+        required: true,
+        default: 0
+      }
     },
-    size: {
-      width: Number,
-      height: Number
+    rotation: {
+      type: Number,
+      default: 0
     },
-    color: String,
-    scale: Number
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+    scale: {
+      type: Number,
+      default: 1
+    }
+  }]
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('Design', designSchema);
