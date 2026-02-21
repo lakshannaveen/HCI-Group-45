@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, Paper, TextField, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,73 @@ const Design = () => {
   // Room configuration state
   const [roomData, setRoomData] = useState({ width: 10, height: 10, color: '#ffffff' });
   const [furnitureList, setFurnitureList] = useState([]); // This will eventually hold the 3D items
+  const [currentDesignId, setCurrentDesignId] = useState(null);
+
+  // Load design on page load
+  useEffect(() => {
+    const loadDesign = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/designs', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const designs = await response.json();
+          if (designs.length > 0) {
+            const design = designs[0]; // Load first design
+            setCurrentDesignId(design._id);
+            setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
+            setFurnitureList(design.furniture || []);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading design:', error);
+      }
+    };
+
+    loadDesign();
+  }, []);
+
+  // Handle save design
+  const handleSave = async () => {
+    try {
+      const designData = {
+        name: 'My Design', // You can add a name input field later
+        roomData: {
+          width: roomData.width,
+          height: roomData.height,
+          color: roomData.color
+        },
+        furniture: furnitureList
+      };
+
+      const response = await fetch('http://localhost:5000/api/designs', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(designData)
+      });
+
+      if (response.ok) {
+        const savedDesign = await response.json();
+        setCurrentDesignId(savedDesign._id);
+        console.log('Design saved successfully:', savedDesign);
+        alert('Design saved successfully!');
+      } else {
+        console.error('Failed to save design');
+        alert('Failed to save design. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error saving design:', error);
+      alert('Error saving design. Please try again.');
+    }
+  };
 
   // Handle room data changes
   const handleRoomDataChange = (field, value) => {
