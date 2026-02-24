@@ -4,6 +4,7 @@ import {
   Divider, Slider, InputAdornment,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 
 // ─── Palette ────────────────────────────────────────────────────────────────
@@ -73,13 +74,9 @@ const Design = () => {
   useEffect(() => {
     const loadDesign = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/designs', {
-          method: 'GET', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (response.ok) {
-          const designs = await response.json();
-          if (designs.length > 0) {
+        const response = await axiosInstance.get('/api/designs');
+        const designs = response.data;
+        if (designs.length > 0) {
             const design = designs[0];
             setCurrentDesignId(design._id);
             setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
@@ -93,7 +90,6 @@ const Design = () => {
               })));
             }
           }
-        }
       } catch (error) {
         console.error('Error loading design:', error);
       }
@@ -115,18 +111,9 @@ const Design = () => {
           scale: item.scale[0],
         })),
       };
-      const response = await fetch('http://localhost:5000/api/designs', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(designData),
-      });
-      if (response.ok) {
-        const saved = await response.json();
-        setCurrentDesignId(saved._id);
-        alert('Design saved successfully!');
-      } else {
-        alert('Failed to save design. Please try again.');
-      }
+      const response = await axiosInstance.post('/api/designs', designData);
+      setCurrentDesignId(response.data._id);
+      alert('Design saved successfully!');
     } catch (error) {
       console.error('Error saving design:', error);
       alert('Error saving design. Please try again.');
