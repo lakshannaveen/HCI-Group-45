@@ -1,73 +1,129 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, Paper, TextField, Grid } from '@mui/material';
+import {
+  Box, Button, Typography, Paper, TextField, Grid,
+  Divider, Slider, InputAdornment,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import FurnitureItem from '../components/FurnitureItem';
 
+// ─── Palette ────────────────────────────────────────────────────────────────
+const BROWN       = '#6b4f35';
+const BROWN_DARK  = '#5a4230';
+const TAN         = '#8b6f47';
+const BG_PAGE     = '#f7f1e3';
+const BG_PAPER    = '#f9f6f0';
+const BG_PANEL    = '#f2ece0';
+const BORDER      = '#d4c5a9';
+
+// Pre-defined colour swatches for the Properties Panel colour picker
+const COLOR_SWATCHES = [
+  '#4a90e2', '#6b4f35', '#5a9e6f', '#e2844a',
+  '#9b59b6', '#e24a4a', '#2ecc71', '#e2c94a',
+  '#1abc9c', '#e74c3c', '#3498db', '#95a5a6',
+];
+
+// Default furniture items
+const DEFAULT_ITEMS = [
+  { id: 1, position: [-2, -1.25, 0], scale: [1, 1, 1], color: '#4a90e2', name: 'Object 1' },
+  { id: 2, position: [2,  -1.25, 0], scale: [1, 1, 1], color: '#6b4f35', name: 'Object 2' },
+  { id: 3, position: [0,  -1.25, 0], scale: [1, 1, 1], color: '#5a9e6f', name: 'Object 3' },
+];
+
+// ─── Small numeric field used in the Properties Panel ───────────────────────
+function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
+  return (
+    <TextField
+      label={label}
+      type="number"
+      value={parseFloat(value.toFixed(2))}
+      onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+      size="small"
+      inputProps={{ step, ...(min !== undefined ? { min } : {}) }}
+      InputProps={adornment ? { endAdornment: <InputAdornment position="end">{adornment}</InputAdornment> } : {}}
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          '& fieldset': { borderColor: BORDER },
+          '&:hover fieldset': { borderColor: TAN },
+          '&.Mui-focused fieldset': { borderColor: BROWN },
+        },
+        '& .MuiInputLabel-root': { color: TAN },
+        '& .MuiInputLabel-root.Mui-focused': { color: BROWN },
+      }}
+    />
+  );
+}
+
+// ─── Main component ──────────────────────────────────────────────────────────
 const Design = () => {
   const navigate = useNavigate();
 
-  // Room configuration state
+  // ── Room state ──────────────────────────────────────────────────────────────
   const [roomData, setRoomData] = useState({ width: 10, height: 10, color: '#ffffff' });
-  const [furnitureList, setFurnitureList] = useState([]); // This will eventually hold the 3D items
   const [currentDesignId, setCurrentDesignId] = useState(null);
 
-  // Load design on page load
+  // ── Furniture + selection state ─────────────────────────────────────────────
+  const [items, setItems]               = useState(DEFAULT_ITEMS);
+  const [selectedId, setSelectedId]     = useState(null);
+  const [snapToGridEnabled, setSnapToGridEnabled] = useState(true);
+
+  const selectedItem = items.find((i) => i.id === selectedId) ?? null;
+
+  // ── Load design on mount ─────────────────────────────────────────────────────
   useEffect(() => {
     const loadDesign = async () => {
       try {
         const response = await fetch('http://localhost:5000/api/designs', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          method: 'GET', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
         });
-
         if (response.ok) {
           const designs = await response.json();
           if (designs.length > 0) {
-            const design = designs[0]; // Load first design
+            const design = designs[0];
             setCurrentDesignId(design._id);
             setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
-            setFurnitureList(design.furniture || []);
+            if (design.furniture?.length) {
+              setItems(design.furniture.map((f, idx) => ({
+                id: f.id || idx + 1,
+                position: [f.position?.x ?? 0, f.position?.y ?? -1.25, f.position?.z ?? 0],
+                scale: [f.scale ?? 1, f.scale ?? 1, f.scale ?? 1],
+                color: f.color || COLOR_SWATCHES[idx % COLOR_SWATCHES.length],
+                name: f.name || `Object ${idx + 1}`,
+              })));
+            }
           }
         }
       } catch (error) {
         console.error('Error loading design:', error);
       }
     };
-
     loadDesign();
   }, []);
 
-  // Handle save design
+  // ── Save design ──────────────────────────────────────────────────────────────
   const handleSave = async () => {
     try {
       const designData = {
-        name: 'My Design', // You can add a name input field later
-        roomData: {
-          width: roomData.width,
-          height: roomData.height,
-          color: roomData.color
-        },
-        furniture: furnitureList
+        name: 'My Design',
+        roomData: { width: roomData.width, height: roomData.height, color: roomData.color },
+        furniture: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          color: item.color,
+          position: { x: item.position[0], y: item.position[1], z: item.position[2] },
+          scale: item.scale[0],
+        })),
       };
-
       const response = await fetch('http://localhost:5000/api/designs', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(designData)
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(designData),
       });
-
       if (response.ok) {
-        const savedDesign = await response.json();
-        setCurrentDesignId(savedDesign._id);
-        console.log('Design saved successfully:', savedDesign);
+        const saved = await response.json();
+        setCurrentDesignId(saved._id);
         alert('Design saved successfully!');
       } else {
-        console.error('Failed to save design');
         alert('Failed to save design. Please try again.');
       }
     } catch (error) {
@@ -76,84 +132,285 @@ const Design = () => {
     }
   };
 
-  // Handle room data changes
-  const handleRoomDataChange = (field, value) => {
-    setRoomData(prev => ({ ...prev, [field]: value }));
+  // ── Handlers ─────────────────────────────────────────────────────────────────
+  const handleRoomDataChange = (field, value) =>
+    setRoomData((prev) => ({ ...prev, [field]: value }));
+
+  /** Called by FurnitureItem when user drags a 3D object → push new pos/scale into state */
+  const handleTransformChange = (id, data) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, ...data } : item))
+    );
   };
 
+  /** Update any scalar property of the selected item from the Properties Panel */
+  const updateSelected = (patch) => {
+    if (!selectedId) return;
+    setItems((prev) =>
+      prev.map((item) => (item.id === selectedId ? { ...item, ...patch } : item))
+    );
+  };
+
+  const handlePositionChange = (axis, value) => {
+    if (!selectedItem) return;
+    const idx = { x: 0, y: 1, z: 2 }[axis];
+    const newPos = [...selectedItem.position];
+    newPos[idx] = value;
+    updateSelected({ position: newPos });
+  };
+
+  const handleScaleChange = (axis, value) => {
+    if (!selectedItem) return;
+    const idx = { x: 0, y: 1, z: 2 }[axis];
+    const newScale = [...selectedItem.scale];
+    newScale[idx] = Math.max(0.1, value);
+    updateSelected({ scale: newScale });
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────────
   return (
-    <Box sx={{ p: 3, backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ color: '#6b4f35' }}>
+    <Box sx={{ p: 2, backgroundColor: BG_PAGE, minHeight: '100vh' }}>
+
+      {/* ── Top bar ── */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4" sx={{ color: BROWN, fontWeight: 600 }}>
           Design Studio
         </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => navigate('/dashboard')}
-          sx={{ borderColor: '#6b4f35', color: '#6b4f35', '&:hover': { borderColor: '#5a4230', backgroundColor: '#f9f6f0' } }}
-        >
-          Back to Dashboard
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            sx={{ backgroundColor: BROWN, '&:hover': { backgroundColor: BROWN_DARK } }}
+          >
+            Save Design
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/dashboard')}
+            sx={{ borderColor: BROWN, color: BROWN, '&:hover': { borderColor: BROWN_DARK, backgroundColor: BG_PAPER } }}
+          >
+            ← Dashboard
+          </Button>
+        </Box>
       </Box>
 
-      <Grid container spacing={3} sx={{ minHeight: '60vh' }}>
-        {/* Room Configuration Panel */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, backgroundColor: '#f9f6f0', height: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 2, color: '#8b6f47' }}>
-              Room Configuration
+      {/* ── Three-column layout ── */}
+      <Grid container spacing={2} sx={{ height: 'calc(100vh - 100px)' }}>
+
+        {/* ── LEFT: Room Configuration ── */}
+        <Grid item xs={12} md={2.5}>
+          <Paper sx={{ p: 2.5, backgroundColor: BG_PAPER, height: '100%', border: `1px solid ${BORDER}`, overflowY: 'auto' }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, color: BROWN, fontWeight: 700, letterSpacing: 0.5 }}>
+              ROOM CONFIG
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <TextField
-                label="Width"
+                label="Width (m)"
                 type="number"
                 value={roomData.width}
                 onChange={(e) => handleRoomDataChange('width', parseFloat(e.target.value) || 0)}
+                size="small"
                 fullWidth
+                sx={{ '& .MuiOutlinedInput-root fieldset': { borderColor: BORDER } }}
               />
               <TextField
-                label="Height"
+                label="Depth (m)"
                 type="number"
                 value={roomData.height}
                 onChange={(e) => handleRoomDataChange('height', parseFloat(e.target.value) || 0)}
+                size="small"
                 fullWidth
+                sx={{ '& .MuiOutlinedInput-root fieldset': { borderColor: BORDER } }}
               />
-              <TextField
-                label="Room Color"
-                type="color"
-                value={roomData.color}
-                onChange={(e) => handleRoomDataChange('color', e.target.value)}
-                fullWidth
-                sx={{ '& input': { height: 56 } }}
+              <Box>
+                <Typography variant="caption" sx={{ color: TAN, mb: 0.5, display: 'block' }}>
+                  Wall Colour
+                </Typography>
+                <input
+                  type="color"
+                  value={roomData.color}
+                  onChange={(e) => handleRoomDataChange('color', e.target.value)}
+                  style={{ width: '100%', height: 40, border: `1px solid ${BORDER}`, borderRadius: 4, cursor: 'pointer', padding: 2 }}
+                />
+              </Box>
+
+              <Divider sx={{ borderColor: BORDER, my: 1 }} />
+
+              <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
+                SNAP TO GRID
+              </Typography>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: BROWN }}>
+                <input
+                  type="checkbox"
+                  checked={snapToGridEnabled}
+                  onChange={(e) => setSnapToGridEnabled(e.target.checked)}
+                  style={{ cursor: 'pointer', accentColor: BROWN, width: 16, height: 16 }}
+                />
+                Enable (0.5 unit grid)
+              </label>
+            </Box>
+          </Paper>
+        </Grid>
+
+        {/* ── CENTRE: 3-D Canvas ── */}
+        <Grid item xs={12} md={7}>
+          <Paper
+            sx={{
+              height: '100%',
+              backgroundColor: '#e8e0d4',
+              border: `1px solid ${BORDER}`,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Box sx={{ px: 2, py: 1, borderBottom: `1px solid ${BORDER}`, backgroundColor: BG_PANEL, flexShrink: 0 }}>
+              <Typography variant="caption" sx={{ color: TAN, fontWeight: 600 }}>
+                3D CANVAS — click an object to select it, drag to move
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <FurnitureItem
+                externalItems={items}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onTransformChange={handleTransformChange}
+                snapToGridEnabled={snapToGridEnabled}
               />
             </Box>
           </Paper>
         </Grid>
 
-        {/* Design Canvas */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, backgroundColor: '#f9f6f0', height: '100%' }}>
-            <Typography variant="h6" sx={{ mb: 2, color: '#8b6f47' }}>
-              Design Canvas (2D/3D View)
+        {/* ── RIGHT: Properties Panel ── */}
+        <Grid item xs={12} md={2.5}>
+          <Paper
+            sx={{
+              p: 2.5,
+              backgroundColor: BG_PAPER,
+              height: '100%',
+              border: `1px solid ${BORDER}`,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ mb: 2, color: BROWN, fontWeight: 700, letterSpacing: 0.5 }}>
+              PROPERTIES
             </Typography>
-            {/* Placeholder for 3D Canvas - passing props */}
-            <Box sx={{ 
-              border: '2px dashed #8b6f47', 
-              height: '400px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              backgroundColor: roomData.color,
-              color: '#6b4f35'
-            }}>
-              <Typography variant="body1">
-                3D Canvas Placeholder<br/>
-                Room Size: {roomData.width} x {roomData.height}<br/>
-                Furniture Items: {furnitureList.length}
-              </Typography>
-            </Box>
+
+            {!selectedItem ? (
+              <Box
+                sx={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  textAlign: 'center', border: `2px dashed ${BORDER}`, borderRadius: 2, px: 2,
+                }}
+              >
+                <Typography variant="body2" sx={{ color: TAN }}>
+                  Click an object in the scene to edit its properties
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+
+                {/* Object name */}
+                <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
+                  {selectedItem.name}
+                </Typography>
+
+                <Divider sx={{ borderColor: BORDER }} />
+
+                {/* ── Position ── */}
+                <Box>
+                  <Typography variant="caption" sx={{ color: TAN, fontWeight: 600, display: 'block', mb: 1 }}>
+                    POSITION
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <PropField label="X" value={selectedItem.position[0]} onChange={(v) => handlePositionChange('x', v)} adornment="m" />
+                    <PropField label="Y" value={selectedItem.position[1]} onChange={(v) => handlePositionChange('y', v)} adornment="m" />
+                    <PropField label="Z" value={selectedItem.position[2]} onChange={(v) => handlePositionChange('z', v)} adornment="m" />
+                  </Box>
+                </Box>
+
+                <Divider sx={{ borderColor: BORDER }} />
+
+                {/* ── Scale ── */}
+                <Box>
+                  <Typography variant="caption" sx={{ color: TAN, fontWeight: 600, display: 'block', mb: 1 }}>
+                    SCALE
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <PropField label="W" value={selectedItem.scale[0]} onChange={(v) => handleScaleChange('x', v)} step={0.05} min={0.1} />
+                    <PropField label="H" value={selectedItem.scale[1]} onChange={(v) => handleScaleChange('y', v)} step={0.05} min={0.1} />
+                    <PropField label="D" value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
+                  </Box>
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="caption" sx={{ color: TAN, display: 'block', mb: 0.5 }}>
+                      Uniform scale
+                    </Typography>
+                    <Slider
+                      min={0.1} max={3} step={0.05}
+                      value={selectedItem.scale[0]}
+                      onChange={(_, v) => updateSelected({ scale: [v, v, v] })}
+                      sx={{ color: BROWN, '& .MuiSlider-thumb': { width: 14, height: 14 } }}
+                    />
+                  </Box>
+                </Box>
+
+                <Divider sx={{ borderColor: BORDER }} />
+
+                {/* ── Colour ── */}
+                <Box>
+                  <Typography variant="caption" sx={{ color: TAN, fontWeight: 600, display: 'block', mb: 1 }}>
+                    COLOUR
+                  </Typography>
+
+                  {/* Swatch grid */}
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1.5 }}>
+                    {COLOR_SWATCHES.map((c) => (
+                      <Box
+                        key={c}
+                        onClick={() => updateSelected({ color: c })}
+                        sx={{
+                          width: 28, height: 28,
+                          borderRadius: '50%',
+                          backgroundColor: c,
+                          cursor: 'pointer',
+                          border: selectedItem.color === c
+                            ? `3px solid ${BROWN}`
+                            : `2px solid transparent`,
+                          boxShadow: selectedItem.color === c
+                            ? `0 0 0 1px ${BORDER}`
+                            : 'none',
+                          transition: 'transform 0.1s',
+                          '&:hover': { transform: 'scale(1.15)' },
+                        }}
+                      />
+                    ))}
+                  </Box>
+
+                  {/* Custom colour picker */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <input
+                      type="color"
+                      value={selectedItem.color}
+                      onChange={(e) => updateSelected({ color: e.target.value })}
+                      style={{
+                        width: 36, height: 36,
+                        border: `1px solid ${BORDER}`,
+                        borderRadius: 4, cursor: 'pointer', padding: 2,
+                      }}
+                    />
+                    <Typography variant="caption" sx={{ color: TAN, fontFamily: 'monospace' }}>
+                      {selectedItem.color.toUpperCase()}
+                    </Typography>
+                  </Box>
+                </Box>
+
+              </Box>
+            )}
           </Paper>
         </Grid>
+
       </Grid>
     </Box>
   );
