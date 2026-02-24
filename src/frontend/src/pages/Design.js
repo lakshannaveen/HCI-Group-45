@@ -58,13 +58,14 @@ const Design = () => {
   const navigate = useNavigate();
 
   // ── Room state ──────────────────────────────────────────────────────────────
-  const [roomData, setRoomData] = useState({ width: 10, height: 10, color: '#ffffff' });
+  const [roomData, setRoomData]   = useState({ width: 10, height: 10, color: '#ffffff' });
+  // eslint-disable-next-line no-unused-vars
   const [currentDesignId, setCurrentDesignId] = useState(null);
 
   // ── Furniture + selection state ─────────────────────────────────────────────
-  const [items, setItems]               = useState(DEFAULT_ITEMS);
-  const [selectedId, setSelectedId]     = useState(null);
-  const [snapToGridEnabled, setSnapToGridEnabled] = useState(true);
+  const [items, setItems]                         = useState(DEFAULT_ITEMS);
+  const [selectedId, setSelectedId]               = useState(null);
+  const [snapToGridEnabled, setSnapToGridEnabled]  = useState(true);
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
 
