@@ -10,7 +10,8 @@ router.get('/', auth, async (req, res) => {
     const designs = await Design.find({ userId: req.user.id });
     res.json(designs);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching designs:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -18,16 +19,34 @@ router.get('/', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { name, roomData, furniture } = req.body;
+    
+    // Transform roomData to match schema (handle height->length, color->wallColor)
+    const transformedRoomData = {
+      width: roomData.width,
+      length: roomData.length || roomData.height, // Map height to length if length not provided
+      wallColor: roomData.wallColor || roomData.color || '#FFFFFF',
+      shape: roomData.shape || 'rectangular'
+    };
+    
+    // Ensure furniture array is valid (empty array is ok)
+    const furnitureArray = Array.isArray(furniture) ? furniture : [];
+    
     const design = new Design({
       userId: req.user.id,
-      name,
-      roomData,
-      furniture
+      name: name || 'Untitled Design',
+      roomData: transformedRoomData,
+      furniture: furnitureArray
     });
+    
     await design.save();
     res.status(201).json(design);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error creating design:', error);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message,
+      details: error.errors ? Object.keys(error.errors).map(key => error.errors[key].message) : []
+    });
   }
 });
 
@@ -40,14 +59,34 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     const { name, roomData, furniture } = req.body;
-    design.name = name || design.name;
-    design.roomData = roomData || design.roomData;
-    design.furniture = furniture || design.furniture;
+    
+    // Update name if provided
+    if (name) design.name = name;
+    
+    // Transform and update roomData if provided
+    if (roomData) {
+      design.roomData = {
+        width: roomData.width || design.roomData.width,
+        length: roomData.length || roomData.height || design.roomData.length,
+        wallColor: roomData.wallColor || roomData.color || design.roomData.wallColor,
+        shape: roomData.shape || design.roomData.shape
+      };
+    }
+    
+    // Update furniture if provided
+    if (furniture !== undefined) {
+      design.furniture = Array.isArray(furniture) ? furniture : [];
+    }
 
     await design.save();
     res.json(design);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error updating design:', error);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message,
+      details: error.errors ? Object.keys(error.errors).map(key => error.errors[key].message) : []
+    });
   }
 });
 
@@ -59,10 +98,11 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Design not found' });
     }
 
-    await design.remove();
+    await design.deleteOne();
     res.json({ message: 'Design deleted' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error deleting design:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

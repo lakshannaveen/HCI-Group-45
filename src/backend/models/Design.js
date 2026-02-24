@@ -13,11 +13,11 @@ const designSchema = new mongoose.Schema({
   roomData: {
     width: {
       type: Number,
-      required: true
+      default: 10
     },
     length: {
       type: Number,
-      required: true
+      default: 10
     },
     wallColor: {
       type: String,
@@ -31,27 +31,22 @@ const designSchema = new mongoose.Schema({
   },
   furniture: [{
     id: {
-      type: String,
-      required: true
+      type: String
     },
     type: {
-      type: String,
-      required: true
+      type: String
     },
     position: {
       x: {
         type: Number,
-        required: true,
         default: 0
       },
       y: {
         type: Number,
-        required: true,
         default: 0
       },
       z: {
         type: Number,
-        required: true,
         default: 0
       }
     },
