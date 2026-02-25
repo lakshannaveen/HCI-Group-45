@@ -23,6 +23,16 @@ const COLOR_SWATCHES = [
   '#1abc9c', '#e74c3c', '#3498db', '#95a5a6',
 ];
 
+// ─── Furniture catalogue ────────────────────────────────────────────────────
+const FURNITURE_CATALOGUE = [
+  { type: 'chair',    label: 'Chair',    icon: '🪑', color: '#e2844a', scale: [0.7, 1.0, 0.7] },
+  { type: 'table',    label: 'Table',    icon: '🪵', color: '#6b4f35', scale: [1.6, 0.5, 1.0] },
+  { type: 'sofa',     label: 'Sofa',     icon: '🛋️', color: '#9b59b6', scale: [2.0, 0.8, 0.9] },
+  { type: 'wardrobe', label: 'Wardrobe', icon: '🗄️', color: '#95a5a6', scale: [1.2, 2.0, 0.6] },
+  { type: 'bed',      label: 'Bed',      icon: '🛏️', color: '#3498db', scale: [1.4, 0.5, 2.0] },
+  { type: 'lamp',     label: 'Lamp',     icon: '💡', color: '#e2c94a', scale: [0.4, 1.5, 0.4] },
+];
+
 // Default furniture items
 const DEFAULT_ITEMS = [
   { id: 1, position: [-2, -1.25, 0], scale: [1, 1, 1], color: '#4a90e2', name: 'Object 1' },
@@ -155,6 +165,30 @@ const Design = () => {
     updateSelected({ scale: newScale });
   };
 
+  /** Add a new furniture item from the catalogue */
+  const handleAddFurniture = (template) => {
+    const newId = Date.now();
+    const count = items.filter((i) => i.name.startsWith(template.label)).length;
+    setItems((prev) => [
+      ...prev,
+      {
+        id: newId,
+        name: count > 0 ? `${template.label} ${count + 1}` : template.label,
+        color: template.color,
+        scale: [...template.scale],
+        position: [0, -1.25, 0],
+      },
+    ]);
+    setSelectedId(newId);
+  };
+
+  /** Delete the currently selected item */
+  const handleDeleteSelected = () => {
+    if (!selectedId) return;
+    setItems((prev) => prev.filter((i) => i.id !== selectedId));
+    setSelectedId(null);
+  };
+
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
     <Box sx={{ p: 2, backgroundColor: BG_PAGE, minHeight: '100vh' }}>
@@ -236,6 +270,42 @@ const Design = () => {
                 />
                 Enable (0.5 unit grid)
               </label>
+
+              <Divider sx={{ borderColor: BORDER, my: 1 }} />
+
+              {/* ── Furniture Library ── */}
+              <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
+                FURNITURE LIBRARY
+              </Typography>
+              <Typography variant="caption" sx={{ color: TAN, mt: -1 }}>
+                Click to add to scene
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {FURNITURE_CATALOGUE.map((template) => (
+                  <Button
+                    key={template.type}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => handleAddFurniture(template)}
+                    sx={{
+                      justifyContent: 'flex-start',
+                      gap: 1,
+                      borderColor: BORDER,
+                      color: BROWN,
+                      backgroundColor: BG_PAGE,
+                      textTransform: 'none',
+                      fontSize: 13,
+                      '&:hover': {
+                        borderColor: BROWN,
+                        backgroundColor: BG_PANEL,
+                      },
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>{template.icon}</span>
+                    {template.label}
+                  </Button>
+                ))}
+              </Box>
             </Box>
           </Paper>
         </Grid>
@@ -300,10 +370,29 @@ const Design = () => {
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 
-                {/* Object name */}
-                <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
-                  {selectedItem.name}
-                </Typography>
+                {/* Object name + delete */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
+                    {selectedItem.name}
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={handleDeleteSelected}
+                    sx={{
+                      minWidth: 0,
+                      px: 1.5,
+                      py: 0.25,
+                      fontSize: 11,
+                      borderColor: '#c0392b',
+                      color: '#c0392b',
+                      textTransform: 'none',
+                      '&:hover': { backgroundColor: '#fdecea', borderColor: '#a93226' },
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
 
                 <Divider sx={{ borderColor: BORDER }} />
 
