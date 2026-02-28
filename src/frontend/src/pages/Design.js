@@ -3,7 +3,7 @@ import {
   Box, Button, Typography, Paper, TextField, Grid,
   Divider, Slider, InputAdornment,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 
@@ -67,11 +67,12 @@ function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
 // ─── Main component ──────────────────────────────────────────────────────────
 const Design = () => {
   const navigate = useNavigate();
+  const { id: designId } = useParams();
 
   // ── Room state ──────────────────────────────────────────────────────────────
   const [roomData, setRoomData]   = useState({ width: 10, height: 10, color: '#ffffff' });
   // eslint-disable-next-line no-unused-vars
-  const [currentDesignId, setCurrentDesignId] = useState(null);
+  const [currentDesignId, setCurrentDesignId] = useState(designId || null);
 
   // ── Furniture + selection state ─────────────────────────────────────────────
   const [items, setItems]                         = useState(DEFAULT_ITEMS);
@@ -84,10 +85,13 @@ const Design = () => {
   useEffect(() => {
     const loadDesign = async () => {
       try {
-        const response = await axiosInstance.get('/api/designs');
-        const designs = response.data;
-        if (designs.length > 0) {
-            const design = designs[0];
+        if (designId) {
+          // Load specific design by ID
+          const response = await axiosInstance.get(`/api/designs`);
+          const designs = response.data;
+          const design = designs.find(d => d._id === designId);
+          
+          if (design) {
             setCurrentDesignId(design._id);
             setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
             if (design.furniture?.length) {
@@ -100,12 +104,13 @@ const Design = () => {
               })));
             }
           }
+        }
       } catch (error) {
         console.error('Error loading design:', error);
       }
     };
     loadDesign();
-  }, []);
+  }, [designId]);
 
   // ── Save design ──────────────────────────────────────────────────────────────
   const handleSave = async () => {

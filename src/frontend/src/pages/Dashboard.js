@@ -34,6 +34,19 @@ const Dashboard = () => {
     navigate('/design');
   };
 
+  const handleEdit = (designId) => {
+    navigate(`/design/${designId}`);
+  };
+
+  const handleDelete = async (designId) => {
+    try {
+      await axios.delete(`/api/designs/${designId}`);
+      setDesigns(designs.filter(design => design._id !== designId));
+    } catch (err) {
+      console.error('Failed to delete design', err);
+    }
+  };
+
   return (
     <Box sx={{ p: 3, backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -81,8 +94,8 @@ const Dashboard = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" sx={{ color: '#6b4f35' }}>Edit</Button>
-                <Button size="small" sx={{ color: '#6b4f35' }}>Delete</Button>
+                <Button size="small" sx={{ color: '#6b4f35' }} onClick={() => handleEdit(design._id)}>Edit</Button>
+                <Button size="small" sx={{ color: '#6b4f35' }} onClick={() => handleDelete(design._id)}>Delete</Button>
               </CardActions>
             </Card>
           </Grid>

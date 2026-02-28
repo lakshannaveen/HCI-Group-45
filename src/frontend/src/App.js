@@ -31,6 +31,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/design" element={<Design />} />
+          <Route path="/design/:id" element={<Design />} />
         </Routes>
       </Router>
     </ThemeProvider>
