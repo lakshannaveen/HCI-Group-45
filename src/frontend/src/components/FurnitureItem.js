@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { TransformControls, OrbitControls } from '@react-three/drei';
+import { TransformControls, OrbitControls, OrthographicCamera } from '@react-three/drei';
 
 const snapToGrid = (value, gridSize = 0.5) => Math.round(value / gridSize) * gridSize;
 
@@ -123,6 +123,8 @@ function FurnitureItem({
   const snapEnabled = externalSnap !== undefined ? externalSnap : internalSnap;
   const selectedId = isControlled ? externalSelectedId  : internalSelectedId;
 
+  const [is2DMode, setIs2DMode] = useState(false);
+
   const handleSelect = (id) => {
     const next = id === selectedId ? null : id; // click again to deselect
     if (isControlled) externalOnSelect?.(next);
@@ -165,8 +167,26 @@ function FurnitureItem({
         </div>
       )}
 
+      {/* View mode toggle */}
+      <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#fff0', flexShrink: 0 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#6b4f35' }}>
+          <input
+            type="checkbox"
+            checked={is2DMode}
+            onChange={(e) => setIs2DMode(e.target.checked)}
+            style={{ cursor: 'pointer', accentColor: '#6b4f35' }}
+          />
+          Top-down 2D View
+        </label>
+      </div>
+
       {/* 3-D Canvas */}
-      <Canvas shadows camera={{ position: [0, 5, 8], fov: 50 }} style={{ flex: 1 }}>
+      <Canvas shadows style={{ flex: 1 }}>
+        {is2DMode ? (
+          <OrthographicCamera makeDefault position={[0, 10, 0]} rotation={[-Math.PI / 2, 0, 0]} zoom={40} near={0.1} far={1000} />
+        ) : (
+          <perspectiveCamera makeDefault position={[0, 5, 8]} fov={50} />
+        )}
         <ambientLight intensity={0.6} />
         <directionalLight
           position={[10, 10, 10]}
@@ -197,7 +217,7 @@ function FurnitureItem({
           />
         ))}
 
-        <OrbitControls enableZoom enablePan enableRotate />
+        <OrbitControls enableZoom enablePan enableRotate={!is2DMode} />
         <gridHelper args={[20, 20]} position={[0, -1.9, 0]} />
       </Canvas>
     </div>
