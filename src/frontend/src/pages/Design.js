@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Typography, Paper, TextField, Grid,
-  Divider, Slider, InputAdornment, List, ListItem, ListItemText
+  Divider, Slider, InputAdornment, List, ListItem, ListItemText, Snackbar, Alert
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
@@ -80,6 +80,8 @@ const Design = () => {
   const [selectedId, setSelectedId]               = useState(null);
   const [snapToGridEnabled, setSnapToGridEnabled]  = useState(true);
   const [furnitureCatalogue, setFurnitureCatalogue] = useState(FURNITURE_CATALOGUE);
+  const [message, setMessage] = useState({ text: '', severity: 'success' });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
 
@@ -104,6 +106,15 @@ const Design = () => {
     fetchFurniture();
   }, []);
 
+  const showMessage = (text, severity = 'success') => {
+    setMessage({ text, severity });
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   useEffect(() => {
     const loadDesign = async () => {
       try {
@@ -125,6 +136,7 @@ const Design = () => {
           }
       } catch (error) {
         console.error('Error loading design:', error);
+        showMessage('Failed to load design', 'error');
       }
     };
     loadDesign();
@@ -148,22 +160,25 @@ const Design = () => {
       };
       const response = await axiosInstance.post('/api/designs', designData);
       setCurrentDesignId(response.data._id);
-      alert('Design saved successfully!');
+      showMessage('Design saved successfully!');
     } catch (error) {
       console.error('Error saving design:', error);
-      alert('Error saving design. Please try again.');
+      showMessage('Error saving design. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = async () => {
+    if (!window.confirm('Are you sure you want to log out?')) return;
     try {
       await axiosInstance.post('/api/auth/logout');
+      showMessage('Logged out successfully');
+      setTimeout(() => navigate('/'), 1000);
     } catch (err) {
       console.error('Logout failed', err);
+      navigate('/');
     }
-    navigate('/');
   };
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
@@ -575,6 +590,11 @@ const Design = () => {
 
       </Grid>
       </Box>
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={handleSnackbarClose} severity={message.severity} sx={{ width: '100%' }}>
+          {message.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

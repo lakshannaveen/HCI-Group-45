@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, Grid, Card, CardContent, CardActions, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { Box, Button, Typography, Grid, Card, CardContent, CardActions, List, ListItem, ListItemText, Divider, Snackbar, Alert } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
@@ -7,6 +7,8 @@ import FurnitureItem from '../components/FurnitureItem';
 const Dashboard = () => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: '', severity: 'success' });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -14,22 +16,35 @@ const Dashboard = () => {
     fetchDesigns();
   }, []);
 
+  const showMessage = (text, severity = 'success') => {
+    setMessage({ text, severity });
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const fetchDesigns = async () => {
     try {
       const res = await axios.get('/api/designs');
       setDesigns(res.data);
     } catch (err) {
       console.error('Failed to fetch designs', err);
+      showMessage('Failed to fetch designs', 'error');
     }
   };
 
   const handleLogout = async () => {
+    if (!window.confirm('Are you sure you want to log out?')) return;
     try {
       await axios.post('/api/auth/logout');
+      showMessage('Logged out successfully');
+      setTimeout(() => navigate('/'), 1000);
     } catch (err) {
       console.error('Logout failed', err);
+      navigate('/');
     }
-    navigate('/');
   };
 
   const handleNewDesign = () => {
@@ -38,12 +53,15 @@ const Dashboard = () => {
 
   const handleDeleteDesign = async (id) => {
     if (loading) return;
+    if (!window.confirm('Are you sure you want to delete this design?')) return;
     setLoading(true);
     try {
       await axios.delete(`/api/designs/${id}`);
+      showMessage('Design deleted successfully');
       fetchDesigns();
     } catch (err) {
       console.error('Failed to delete design', err);
+      showMessage('Failed to delete design', 'error');
     } finally {
       setLoading(false);
     }
@@ -168,6 +186,11 @@ const Dashboard = () => {
           ))}
         </Grid>
       </Box>
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={handleSnackbarClose} severity={message.severity} sx={{ width: '100%' }}>
+          {message.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

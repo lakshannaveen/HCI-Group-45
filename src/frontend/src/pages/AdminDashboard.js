@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Typography, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton
+  Box, Button, Typography, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Alert, Snackbar
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
@@ -15,6 +15,8 @@ const AdminDashboard = () => {
   const [open, setOpen] = useState(false);
   const [currentFurniture, setCurrentFurniture] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: '', severity: 'success' });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,12 +25,22 @@ const AdminDashboard = () => {
     else if (tabValue === 2) fetchDesigns();
   }, [tabValue]);
 
+  const showMessage = (text, severity = 'success') => {
+    setMessage({ text, severity });
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const fetchUsers = async () => {
     try {
       const res = await axios.get('/api/admin/users');
       setUsers(res.data);
     } catch (err) {
       console.error('Failed to fetch users', err);
+      showMessage('Failed to fetch users', 'error');
     }
   };
 
@@ -38,6 +50,7 @@ const AdminDashboard = () => {
       setDesigns(res.data);
     } catch (err) {
       console.error('Failed to fetch designs', err);
+      showMessage('Failed to fetch designs', 'error');
     }
   };
 
@@ -47,26 +60,33 @@ const AdminDashboard = () => {
       setFurniture(res.data);
     } catch (err) {
       console.error('Failed to fetch furniture', err);
+      showMessage('Failed to fetch furniture', 'error');
     }
   };
 
   const handleLogout = async () => {
+    if (!window.confirm('Are you sure you want to log out?')) return;
     try {
       await axios.post('/api/auth/logout');
+      showMessage('Logged out successfully');
+      setTimeout(() => navigate('/'), 1000);
     } catch (err) {
       console.error('Logout failed', err);
+      navigate('/');
     }
-    navigate('/');
   };
 
   const handleDeleteUser = async (id) => {
     if (loading) return;
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
     setLoading(true);
     try {
       await axios.delete(`/api/admin/users/${id}`);
+      showMessage('User deleted successfully');
       fetchUsers();
     } catch (err) {
       console.error('Failed to delete user', err);
+      showMessage('Failed to delete user', 'error');
     } finally {
       setLoading(false);
     }
@@ -74,12 +94,15 @@ const AdminDashboard = () => {
 
   const handleDeleteDesign = async (id) => {
     if (loading) return;
+    if (!window.confirm('Are you sure you want to delete this design?')) return;
     setLoading(true);
     try {
       await axios.delete(`/api/admin/designs/${id}`);
+      showMessage('Design deleted successfully');
       fetchDesigns();
     } catch (err) {
       console.error('Failed to delete design', err);
+      showMessage('Failed to delete design', 'error');
     } finally {
       setLoading(false);
     }
@@ -87,12 +110,15 @@ const AdminDashboard = () => {
 
   const handleDeleteFurniture = async (id) => {
     if (loading) return;
+    if (!window.confirm('Are you sure you want to delete this furniture item?')) return;
     setLoading(true);
     try {
       await axios.delete(`/api/admin/furniture/${id}`);
+      showMessage('Furniture deleted successfully');
       fetchFurniture();
     } catch (err) {
       console.error('Failed to delete furniture', err);
+      showMessage('Failed to delete furniture', 'error');
     } finally {
       setLoading(false);
     }
@@ -113,13 +139,17 @@ const AdminDashboard = () => {
     try {
       if (currentFurniture._id) {
         await axios.put(`/api/admin/furniture/${currentFurniture._id}`, currentFurniture);
+        showMessage('Furniture updated successfully');
       } else {
         await axios.post('/api/admin/furniture', currentFurniture);
+        showMessage('Furniture added successfully');
       }
       setOpen(false);
       fetchFurniture();
     } catch (err) {
       console.error('Failed to save furniture', err);
+      const errMsg = err.response?.data?.message || 'Failed to save furniture';
+      showMessage(errMsg, 'error');
     } finally {
       setLoading(false);
     }
@@ -333,6 +363,11 @@ const AdminDashboard = () => {
           <Button onClick={handleSaveFurniture} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={handleSnackbarClose} severity={message.severity} sx={{ width: '100%' }}>
+          {message.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
