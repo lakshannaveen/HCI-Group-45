@@ -73,6 +73,7 @@ const Design = () => {
   const [roomData, setRoomData]   = useState({ width: 10, height: 10, color: '#ffffff' });
   // eslint-disable-next-line no-unused-vars
   const [currentDesignId, setCurrentDesignId] = useState(null);
+  const [loading, setLoading]     = useState(false);
 
   // ── Furniture + selection state ─────────────────────────────────────────────
   const [items, setItems]                         = useState(DEFAULT_ITEMS);
@@ -131,6 +132,8 @@ const Design = () => {
 
   // ── Save design ──────────────────────────────────────────────────────────────
   const handleSave = async () => {
+    if (loading) return;
+    setLoading(true);
     try {
       const designData = {
         name: 'My Design',
@@ -149,6 +152,8 @@ const Design = () => {
     } catch (error) {
       console.error('Error saving design:', error);
       alert('Error saving design. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -281,9 +286,10 @@ const Design = () => {
           <Button
             variant="contained"
             onClick={handleSave}
+            disabled={loading}
             sx={{ backgroundColor: BROWN, '&:hover': { backgroundColor: BROWN_DARK } }}
           >
-            Save Design
+            {loading ? 'Saving...' : 'Save Design'}
           </Button>
           <Button
             variant="outlined"

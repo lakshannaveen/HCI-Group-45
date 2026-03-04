@@ -7,6 +7,7 @@ const Register = () => {
   const [formData, setFormData] = useState({ username: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,6 +21,7 @@ const Register = () => {
       return;
     }
 
+    setLoading(true);
     try {
       await axios.post('/api/auth/register', {
         username: formData.username,
@@ -31,6 +33,8 @@ const Register = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Registration failed';
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,6 +60,7 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
             sx={{ mb: 2 }}
           />
           <TextField
@@ -67,6 +72,7 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
             sx={{ mb: 2 }}
           />
           <TextField
@@ -78,20 +84,23 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
             sx={{ mb: 3 }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
+            disabled={loading}
             sx={{ mb: 2, backgroundColor: '#6b4f35', '&:hover': { backgroundColor: '#5a4230' } }}
           >
-            Create Account
+            {loading ? 'Registering...' : 'Create Account'}
           </Button>
           <Button
             fullWidth
             variant="outlined"
             onClick={() => navigate('/')}
+            disabled={loading}
             sx={{ borderColor: '#6b4f35', color: '#6b4f35', '&:hover': { borderColor: '#5a4230', backgroundColor: '#f9f6f0' } }}
           >
             Back to Login

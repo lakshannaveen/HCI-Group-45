@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [furniture, setFurniture] = useState([]);
   const [open, setOpen] = useState(false);
   const [currentFurniture, setCurrentFurniture] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,29 +60,41 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteUser = async (id) => {
+    if (loading) return;
+    setLoading(true);
     try {
       await axios.delete(`/api/admin/users/${id}`);
       fetchUsers();
     } catch (err) {
       console.error('Failed to delete user', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteDesign = async (id) => {
+    if (loading) return;
+    setLoading(true);
     try {
       await axios.delete(`/api/admin/designs/${id}`);
       fetchDesigns();
     } catch (err) {
       console.error('Failed to delete design', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteFurniture = async (id) => {
+    if (loading) return;
+    setLoading(true);
     try {
       await axios.delete(`/api/admin/furniture/${id}`);
       fetchFurniture();
     } catch (err) {
       console.error('Failed to delete furniture', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,6 +109,7 @@ const AdminDashboard = () => {
   };
 
   const handleSaveFurniture = async () => {
+    setLoading(true);
     try {
       if (currentFurniture._id) {
         await axios.put(`/api/admin/furniture/${currentFurniture._id}`, currentFurniture);
@@ -106,6 +120,8 @@ const AdminDashboard = () => {
       fetchFurniture();
     } catch (err) {
       console.error('Failed to save furniture', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -313,8 +329,8 @@ const AdminDashboard = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveFurniture}>Save</Button>
+          <Button onClick={() => setOpen(false)} disabled={loading}>Cancel</Button>
+          <Button onClick={handleSaveFurniture} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -6,6 +6,7 @@ import axios from '../utils/axios';
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,6 +15,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await axios.post('/api/auth/login', formData);
       // Fetch user info
@@ -27,6 +29,8 @@ const Login = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Login failed';
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +55,7 @@ const Login = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
             sx={{ mb: 2 }}
           />
           <TextField
@@ -62,20 +67,23 @@ const Login = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
             sx={{ mb: 3 }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
+            disabled={loading}
             sx={{ mb: 2, backgroundColor: '#6b4f35', '&:hover': { backgroundColor: '#5a4230' } }}
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </Button>
           <Button
             fullWidth
             variant="outlined"
             onClick={() => navigate('/register')}
+            disabled={loading}
             sx={{ borderColor: '#6b4f35', color: '#6b4f35', '&:hover': { borderColor: '#5a4230', backgroundColor: '#f9f6f0' } }}
           >
             Register
