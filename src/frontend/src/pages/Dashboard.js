@@ -38,7 +38,7 @@ const Dashboard = () => {
     <Box sx={{ p: 3, backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" sx={{ color: '#6b4f35' }}>
-          Furniture Designer Dashboard
+          Athlier Home Dashboard
         </Typography>
         <Button
           variant="outlined"
