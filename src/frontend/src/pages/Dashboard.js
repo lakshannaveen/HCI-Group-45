@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, Grid, Card, CardContent, CardActions, List, ListItem, ListItemText, Divider } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 
 const Dashboard = () => {
   const [designs, setDesigns] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     fetchDesigns();
@@ -42,11 +43,35 @@ const Dashboard = () => {
           Athlier Home
         </Typography>
         <List>
-          <ListItem button onClick={() => navigate('/dashboard')}>
-            <ListItemText primary="Dashboard" sx={{ color: '#6b4f35' }} />
+          <ListItem
+            button
+            onClick={() => navigate('/dashboard')}
+            sx={{
+              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#efe6d4' : 'transparent',
+              borderRadius: 1,
+              pl: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 1.5 : 1,
+              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '4px solid #6b4f35' : '4px solid transparent'
+            }}
+          >
+            <ListItemText
+              primary="Dashboard"
+              sx={{
+                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#5a4230' : '#6b4f35',
+                fontWeight: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '700' : '400'
+              }}
+            />
           </ListItem>
-          <ListItem button onClick={() => navigate('/design')}>
-            <ListItemText primary="New Design" sx={{ color: '#6b4f35' }} />
+          <ListItem
+            button
+            onClick={() => navigate('/design')}
+            sx={{
+              backgroundColor: location.pathname.startsWith('/design') ? '#efe6d4' : 'transparent',
+              borderRadius: 1,
+              pl: location.pathname.startsWith('/design') ? 1.5 : 1,
+              borderLeft: location.pathname.startsWith('/design') ? '4px solid #6b4f35' : '4px solid transparent'
+            }}
+          >
+            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? '#5a4230' : '#6b4f35', fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
           </ListItem>
           <Divider sx={{ my: 2 }} />
           <ListItem button onClick={handleLogout}>

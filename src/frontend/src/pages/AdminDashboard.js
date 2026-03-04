@@ -124,7 +124,19 @@ const AdminDashboard = () => {
           orientation="vertical"
           value={tabValue}
           onChange={handleTabChange}
-          sx={{ '& .MuiTab-root': { alignItems: 'flex-start', textAlign: 'left' } }}
+          sx={{
+            '& .MuiTab-root': {
+              alignItems: 'flex-start',
+              textAlign: 'left',
+              color: '#8b6f47',
+              '&:hover': { backgroundColor: '#f2ece0' }
+            },
+            '& .Mui-selected': {
+              backgroundColor: '#f9f6f0',
+              color: '#6b4f35',
+              fontWeight: 'bold'
+            }
+          }}
         >
           <Tab label="User Management" />
           <Tab label="Furniture Catalogue" />

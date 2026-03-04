@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Typography, Paper, TextField, Grid,
-  Divider, Slider, InputAdornment,
+  Divider, Slider, InputAdornment, List, ListItem, ListItemText
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 
@@ -67,6 +67,7 @@ function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
 // ─── Main component ──────────────────────────────────────────────────────────
 const Design = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // ── Room state ──────────────────────────────────────────────────────────────
   const [roomData, setRoomData]   = useState({ width: 10, height: 10, color: '#ffffff' });
@@ -151,6 +152,15 @@ const Design = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post('/api/auth/logout');
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
+    navigate('/');
+  };
+
   // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleRoomDataChange = (field, value) =>
     setRoomData((prev) => ({ ...prev, [field]: value }));
@@ -212,7 +222,52 @@ const Design = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
-    <Box sx={{ p: 2, backgroundColor: BG_PAGE, minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', backgroundColor: BG_PAGE, minHeight: '100vh' }}>
+      {/* Sidebar */}
+      <Box sx={{ width: 250, backgroundColor: '#f9f6f0', p: 2, borderRight: '1px solid #d4c5a9' }}>
+        <Typography variant="h6" sx={{ color: '#6b4f35', mb: 2 }}>
+          Athlier Home
+        </Typography>
+          <List>
+          <ListItem
+            button
+            onClick={() => navigate('/dashboard')}
+            sx={{
+              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#efe6d4' : 'transparent',
+              borderRadius: 1,
+              pl: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 1.5 : 1,
+              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '4px solid #6b4f35' : '4px solid transparent'
+            }}
+          >
+            <ListItemText
+              primary="Dashboard"
+              sx={{
+                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#5a4230' : '#6b4f35',
+                fontWeight: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '700' : '400'
+              }}
+            />
+          </ListItem>
+          <ListItem
+            button
+            onClick={() => navigate('/design')}
+            sx={{
+              backgroundColor: location.pathname.startsWith('/design') ? '#efe6d4' : 'transparent',
+              borderRadius: 1,
+              pl: location.pathname.startsWith('/design') ? 1.5 : 1,
+              borderLeft: location.pathname.startsWith('/design') ? '4px solid #6b4f35' : '4px solid transparent'
+            }}
+          >
+            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? '#5a4230' : '#6b4f35', fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
+          </ListItem>
+          <Divider sx={{ my: 2 }} />
+          <ListItem button onClick={handleLogout}>
+            <ListItemText primary="Logout" sx={{ color: '#6b4f35' }} />
+          </ListItem>
+        </List>
+      </Box>
+
+      {/* Main Content */}
+      <Box sx={{ flexGrow: 1, p: 2 }}>
 
       {/* ── Top bar ── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -510,6 +565,7 @@ const Design = () => {
         </Grid>
 
       </Grid>
+      </Box>
     </Box>
   );
 };
