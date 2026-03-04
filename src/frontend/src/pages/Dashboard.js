@@ -39,9 +39,12 @@ const Dashboard = () => {
     <Box sx={{ display: 'flex', backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
       {/* Sidebar */}
       <Box sx={{ width: 250, backgroundColor: '#f9f6f0', p: 2, borderRight: '1px solid #d4c5a9' }}>
-        <Typography variant="h6" sx={{ color: '#6b4f35', mb: 2 }}>
-          Athlier Home
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <img src="/user.png" alt="Athlier Home" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+          <Typography variant="h6" sx={{ color: '#6b4f35' }}>
+            Athlier Home
+          </Typography>
+        </Box>
         <List>
           <ListItem
             button
