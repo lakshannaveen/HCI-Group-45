@@ -77,10 +77,31 @@ const Design = () => {
   const [items, setItems]                         = useState(DEFAULT_ITEMS);
   const [selectedId, setSelectedId]               = useState(null);
   const [snapToGridEnabled, setSnapToGridEnabled]  = useState(true);
+  const [furnitureCatalogue, setFurnitureCatalogue] = useState(FURNITURE_CATALOGUE);
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
 
   // ── Load design on mount ─────────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchFurniture = async () => {
+      try {
+        const res = await axiosInstance.get('/api/admin/furniture/public');
+        if (res.data.length > 0) {
+          setFurnitureCatalogue(res.data.map(f => ({
+            type: f.type,
+            label: f.label,
+            icon: f.icon,
+            color: f.color,
+            scale: f.scale
+          })));
+        }
+      } catch (err) {
+        console.error('Failed to fetch furniture', err);
+      }
+    };
+    fetchFurniture();
+  }, []);
+
   useEffect(() => {
     const loadDesign = async () => {
       try {

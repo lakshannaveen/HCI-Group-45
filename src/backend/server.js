@@ -33,6 +33,9 @@ app.use('/api/auth', require('./routes/auth'));
 // Design routes placeholder
 app.use('/api/designs', require('./routes/designs'));
 
+// Admin routes
+app.use('/api/admin', require('./routes/admin'));
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

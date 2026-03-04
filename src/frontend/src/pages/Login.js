@@ -16,8 +16,14 @@ const Login = () => {
     e.preventDefault();
     try {
       await axios.post('/api/auth/login', formData);
-      // Token is now in httpOnly cookie, no need to store in localStorage
-      navigate('/dashboard');
+      // Fetch user info
+      const res = await axios.get('/api/auth/me');
+      const user = res.data;
+      if (user.role === 'admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Login failed';
       setError(errorMessage);
