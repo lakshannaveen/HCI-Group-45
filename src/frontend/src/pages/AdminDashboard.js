@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Typography, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton, Alert, Snackbar
+  Box, Button, Typography, List, ListItem, ListItemText,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, Dialog, DialogActions, DialogContent, DialogTitle,
+  TextField, IconButton, Alert, Snackbar, Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+
+const ADMIN_SECTIONS = [
+  { label: 'User Management',    index: 0 },
+  { label: 'Furniture Catalogue', index: 1 },
+  { label: 'Project Archives',   index: 2 },
+];
 
 const AdminDashboard = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -23,6 +32,7 @@ const AdminDashboard = () => {
     if (tabValue === 0) fetchUsers();
     else if (tabValue === 1) fetchFurniture();
     else if (tabValue === 2) fetchDesigns();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue]);
 
   const showMessage = (text, severity = 'success') => {
@@ -125,7 +135,7 @@ const AdminDashboard = () => {
   };
 
   const handleAddFurniture = () => {
-    setCurrentFurniture({ type: '', label: '', icon: '', color: '', scale: [1,1,1] });
+    setCurrentFurniture({ type: '', label: '', icon: '', color: '', scale: [1, 1, 1] });
     setOpen(true);
   };
 
@@ -155,46 +165,87 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
   return (
     <Box sx={{ display: 'flex', backgroundColor: 'var(--canvas-base)', minHeight: '100vh' }}>
-      {/* Sidebar */}
-      <Box sx={{ width: 250, backgroundColor: 'var(--surface-1)', p: 2, borderRight: '1px solid var(--grid-lines)' }}>
-        <Typography variant="h6" sx={{ color: 'var(--text-high)', mb: 2 }}>
-          Admin Panel
-        </Typography>
-        <Tabs
-          orientation="vertical"
-          value={tabValue}
-          onChange={handleTabChange}
+
+      {/* Sidebar — visually identical to AppSidebar */}
+      <Box
+        sx={{
+          width: 250,
+          minWidth: 250,
+          backgroundColor: 'var(--surface-1)',
+          borderRight: '1px solid var(--grid-lines)',
+          display: 'flex',
+          flexDirection: 'column',
+          p: 2,
+          minHeight: '100vh',
+        }}
+      >
+        {/* Brand mark */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, px: 1 }}>
+          <img
+            src="/logo.PNG"
+            alt="Athlier Home"
+            style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }}
+          />
+          <Typography variant="h6" sx={{ color: 'var(--text-high)', fontWeight: 700, letterSpacing: '-0.01em' }}>
+            Admin Panel
+          </Typography>
+        </Box>
+
+        {/* Nav items (section switcher) */}
+        <List disablePadding sx={{ flexGrow: 1 }}>
+          {ADMIN_SECTIONS.map((section) => {
+            const active = tabValue === section.index;
+            return (
+              <ListItem
+                key={section.index}
+                onClick={() => setTabValue(section.index)}
+                sx={{
+                  borderRadius: '6px',
+                  mb: 0.5,
+                  pl: active ? 1.5 : 2,
+                  cursor: 'pointer',
+                  backgroundColor: active ? 'var(--surface-2)' : 'transparent',
+                  borderLeft: active
+                    ? '3px solid var(--brand-primary)'
+                    : '3px solid transparent',
+                  '&:hover': { backgroundColor: 'var(--surface-2)' },
+                  transition: 'background-color 0.15s, border-color 0.15s',
+                }}
+              >
+                <ListItemText
+                  primary={section.label}
+                  primaryTypographyProps={{
+                    fontSize: '0.875rem',
+                    fontWeight: active ? 600 : 400,
+                    color: active ? 'var(--brand-primary)' : 'var(--text-med)',
+                  }}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
+
+        {/* Logout */}
+        <Divider sx={{ my: 2 }} />
+        <ListItem
+          onClick={handleLogout}
           sx={{
-            '& .MuiTab-root': {
-              alignItems: 'flex-start',
-              textAlign: 'left',
-              color: 'var(--brand-primary)',
-              '&:hover': { backgroundColor: 'var(--surface-2)' }
-            },
-            '& .Mui-selected': {
-              backgroundColor: 'var(--surface-1)',
-              color: 'var(--text-high)',
-              fontWeight: 'bold'
-            }
+            borderRadius: '6px',
+            cursor: 'pointer',
+            '&:hover': { backgroundColor: 'var(--surface-2)' },
           }}
         >
-          <Tab label="User Management" />
-          <Tab label="Furniture Catalogue" />
-          <Tab label="Project Archives" />
-        </Tabs>
-        <Button
-          variant="outlined"
-          onClick={handleLogout}
-          sx={{ mt: 2, borderColor: 'var(--brand-primary)', color: 'var(--brand-primary)', '&:hover': { borderColor: 'var(--brand-primary-pressed)', backgroundColor: 'var(--surface-1)' } }}
-        >
-          Logout
-        </Button>
+          <ListItemText
+            primary="Logout"
+            primaryTypographyProps={{
+              fontSize: '0.875rem',
+              fontWeight: 400,
+              color: 'var(--text-high)',
+            }}
+          />
+        </ListItem>
       </Box>
 
       {/* Main Content */}
@@ -203,6 +254,7 @@ const AdminDashboard = () => {
           Admin Dashboard
         </Typography>
 
+        {/* ── Users Tab ── */}
         {tabValue === 0 && (
           <Box>
             <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
@@ -227,8 +279,12 @@ const AdminDashboard = () => {
                       <TableCell>{user.role}</TableCell>
                       <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <IconButton onClick={() => handleDeleteUser(user._id)}>
-                          <DeleteIcon />
+                        <IconButton
+                          onClick={() => handleDeleteUser(user._id)}
+                          sx={{ color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.1)' } }}
+                          disabled={loading}
+                        >
+                          <DeleteIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -239,15 +295,21 @@ const AdminDashboard = () => {
           </Box>
         )}
 
+        {/* ── Furniture Tab ── */}
         {tabValue === 1 && (
           <Box>
             <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
               Furniture Catalogue
             </Typography>
-            <Button variant="contained" onClick={handleAddFurniture} sx={{ mb: 2, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddFurniture}
+              sx={{ mb: 2 }}
+            >
               Add Furniture
             </Button>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ backgroundColor: 'var(--surface-1)' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -268,11 +330,18 @@ const AdminDashboard = () => {
                       <TableCell>{item.color}</TableCell>
                       <TableCell>{item.scale.join(', ')}</TableCell>
                       <TableCell>
-                        <IconButton onClick={() => handleEditFurniture(item)}>
-                          <EditIcon />
+                        <IconButton
+                          onClick={() => handleEditFurniture(item)}
+                          sx={{ color: 'var(--brand-primary)', '&:hover': { backgroundColor: 'rgba(131,151,5,0.1)' } }}
+                        >
+                          <EditIcon fontSize="small" />
                         </IconButton>
-                        <IconButton onClick={() => handleDeleteFurniture(item._id)}>
-                          <DeleteIcon />
+                        <IconButton
+                          onClick={() => handleDeleteFurniture(item._id)}
+                          sx={{ color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.1)' } }}
+                          disabled={loading}
+                        >
+                          <DeleteIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -283,12 +352,13 @@ const AdminDashboard = () => {
           </Box>
         )}
 
+        {/* ── Designs Tab ── */}
         {tabValue === 2 && (
           <Box>
             <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
               Project Archives
             </Typography>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ backgroundColor: 'var(--surface-1)' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -305,8 +375,12 @@ const AdminDashboard = () => {
                       <TableCell>{design.userId.username}</TableCell>
                       <TableCell>{new Date(design.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <IconButton onClick={() => handleDeleteDesign(design._id)}>
-                          <DeleteIcon />
+                        <IconButton
+                          onClick={() => handleDeleteDesign(design._id)}
+                          sx={{ color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.1)' } }}
+                          disabled={loading}
+                        >
+                          <DeleteIcon fontSize="small" />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -318,10 +392,12 @@ const AdminDashboard = () => {
         )}
       </Box>
 
-      {/* Furniture Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{currentFurniture?._id ? 'Edit Furniture' : 'Add Furniture'}</DialogTitle>
-        <DialogContent>
+      {/* Furniture Dialog — dark theme applied via MUI theme override */}
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ color: 'var(--text-high)', borderBottom: '1px solid var(--grid-lines)' }}>
+          {currentFurniture?._id ? 'Edit Furniture' : 'Add Furniture'}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
           <TextField
             fullWidth
             label="Type"
@@ -358,12 +434,22 @@ const AdminDashboard = () => {
             margin="normal"
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} disabled={loading}>Cancel</Button>
-          <Button onClick={handleSaveFurniture} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
+        <DialogActions sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2 }}>
+          <Button variant="outlined" color="primary" onClick={() => setOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleSaveFurniture} disabled={loading}>
+            {loading ? 'Saving…' : 'Save'}
+          </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
         <Alert onClose={handleSnackbarClose} severity={message.severity} sx={{ width: '100%' }}>
           {message.text}
         </Alert>

@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Typography, Paper, TextField, Grid,
-  Divider, Slider, InputAdornment, List, ListItem, ListItemText, Snackbar, Alert
+  Divider, Slider, InputAdornment, Snackbar, Alert,
 } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
-
-// ─── Palette (mapped to CSS variables for Organic Dark theme) ──────────────
-const BROWN       = 'var(--brand-primary)';
-const BROWN_DARK  = 'var(--brand-primary-pressed)';
-const TAN         = 'var(--text-med)';
-const BG_PAGE     = 'var(--canvas-base)';
-const BG_PAPER    = 'var(--surface-1)';
-const BG_PANEL    = 'var(--surface-2)';
-const BORDER      = 'var(--grid-lines)';
+import AppSidebar from '../components/AppSidebar';
 
 // Pre-defined colour swatches for the Properties Panel colour picker
 const COLOR_SWATCHES = [
@@ -40,6 +32,11 @@ const DEFAULT_ITEMS = [
   { id: 3, position: [0,  -1.25, 0], scale: [1, 1, 1], color: '#5a9e6f', name: 'Object 3' },
 ];
 
+const NAV_ITEMS = [
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Design Tool', path: '/design' },
+];
+
 // ─── Small numeric field used in the Properties Panel ───────────────────────
 function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
   return (
@@ -51,15 +48,6 @@ function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
       size="small"
       inputProps={{ step, ...(min !== undefined ? { min } : {}) }}
       InputProps={adornment ? { endAdornment: <InputAdornment position="end">{adornment}</InputAdornment> } : {}}
-      sx={{
-        '& .MuiOutlinedInput-root': {
-          '& fieldset': { borderColor: BORDER },
-          '&:hover fieldset': { borderColor: TAN },
-          '&.Mui-focused fieldset': { borderColor: BROWN },
-        },
-        '& .MuiInputLabel-root': { color: TAN },
-        '& .MuiInputLabel-root.Mui-focused': { color: BROWN },
-      }}
     />
   );
 }
@@ -67,7 +55,6 @@ function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
 // ─── Main component ──────────────────────────────────────────────────────────
 const Design = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   // ── Room state ──────────────────────────────────────────────────────────────
   const [roomData, setRoomData]   = useState({ width: 10, height: 10, color: '#ffffff' });
@@ -96,7 +83,7 @@ const Design = () => {
             label: f.label,
             icon: f.icon,
             color: f.color,
-            scale: f.scale
+            scale: f.scale,
           })));
         }
       } catch (err) {
@@ -121,19 +108,19 @@ const Design = () => {
         const response = await axiosInstance.get('/api/designs');
         const designs = response.data;
         if (designs.length > 0) {
-            const design = designs[0];
-            setCurrentDesignId(design._id);
-            setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
-            if (design.furniture?.length) {
-              setItems(design.furniture.map((f, idx) => ({
-                id: f.id || idx + 1,
-                position: [f.position?.x ?? 0, f.position?.y ?? -1.25, f.position?.z ?? 0],
-                scale: [f.scale ?? 1, f.scale ?? 1, f.scale ?? 1],
-                color: f.color || COLOR_SWATCHES[idx % COLOR_SWATCHES.length],
-                name: f.name || `Object ${idx + 1}`,
-              })));
-            }
+          const design = designs[0];
+          setCurrentDesignId(design._id);
+          setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
+          if (design.furniture?.length) {
+            setItems(design.furniture.map((f, idx) => ({
+              id: f.id || idx + 1,
+              position: [f.position?.x ?? 0, f.position?.y ?? -1.25, f.position?.z ?? 0],
+              scale: [f.scale ?? 1, f.scale ?? 1, f.scale ?? 1],
+              color: f.color || COLOR_SWATCHES[idx % COLOR_SWATCHES.length],
+              name: f.name || `Object ${idx + 1}`,
+            })));
           }
+        }
       } catch (error) {
         console.error('Error loading design:', error);
         showMessage('Failed to load design', 'error');
@@ -185,14 +172,12 @@ const Design = () => {
   const handleRoomDataChange = (field, value) =>
     setRoomData((prev) => ({ ...prev, [field]: value }));
 
-  /** Called by FurnitureItem when user drags a 3D object → push new pos/scale into state */
   const handleTransformChange = (id, data) => {
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...data } : item))
     );
   };
 
-  /** Update any scalar property of the selected item from the Properties Panel */
   const updateSelected = (patch) => {
     if (!selectedId) return;
     setItems((prev) =>
@@ -216,7 +201,6 @@ const Design = () => {
     updateSelected({ scale: newScale });
   };
 
-  /** Add a new furniture item from the catalogue */
   const handleAddFurniture = (template) => {
     const newId = Date.now();
     const count = items.filter((i) => i.name.startsWith(template.label)).length;
@@ -233,7 +217,6 @@ const Design = () => {
     setSelectedId(newId);
   };
 
-  /** Delete the currently selected item */
   const handleDeleteSelected = () => {
     if (!selectedId) return;
     setItems((prev) => prev.filter((i) => i.id !== selectedId));
@@ -242,355 +225,354 @@ const Design = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
-    <Box sx={{ display: 'flex', backgroundColor: BG_PAGE, minHeight: '100vh' }}>
-      {/* Sidebar */}
-      <Box sx={{ width: 250, backgroundColor: BG_PAPER, p: 2, borderRight: `1px solid ${BORDER}` }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <img src="/user.png" alt="Athlier Home" style={{ width: 36, height: 36, objectFit: 'contain' }} />
-          <Typography variant="h6" sx={{ color: 'var(--text-high)' }}>
-            Athlier Home
-          </Typography>
-        </Box>
-          <List>
-          <ListItem
-            button
-            onClick={() => navigate('/dashboard')}
-            sx={{
-              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? BG_PANEL : 'transparent',
-              borderRadius: 1,
-              pl: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 1.5 : 1,
-              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? `4px solid ${BROWN}` : '4px solid transparent'
-            }}
-          >
-            <ListItemText
-              primary="Dashboard"
-              sx={{
-                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? BROWN_DARK : 'var(--text-med)',
-                fontWeight: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '700' : '400'
-              }}
-            />
-          </ListItem>
-          <ListItem
-            button
-            onClick={() => navigate('/design')}
-            sx={{
-              backgroundColor: location.pathname.startsWith('/design') ? BG_PANEL : 'transparent',
-              borderRadius: 1,
-              pl: location.pathname.startsWith('/design') ? 1.5 : 1,
-              borderLeft: location.pathname.startsWith('/design') ? `4px solid ${BROWN}` : '4px solid transparent'
-            }}
-          >
-            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? BROWN_DARK : BROWN, fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
-          </ListItem>
-          <Divider sx={{ my: 2 }} />
-          <ListItem button onClick={handleLogout}>
-            <ListItemText primary="Logout" sx={{ color: 'var(--text-high)' }} />
-          </ListItem>
-        </List>
-      </Box>
+    <Box sx={{ display: 'flex', backgroundColor: 'var(--canvas-base)', minHeight: '100vh' }}>
+      <AppSidebar navItems={NAV_ITEMS} onLogout={handleLogout} />
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, p: 2 }}>
+      <Box sx={{ flexGrow: 1, p: 3 }}>
 
-      {/* ── Top bar ── */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4" sx={{ color: 'var(--text-high)', fontWeight: 600 }}>
-          Design Studio
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            disabled={loading}
-            sx={{ backgroundColor: BROWN, color: 'var(--text-on-primary)', '&:hover': { backgroundColor: BROWN_DARK } }}
-          >
-            {loading ? 'Saving...' : 'Save Design'}
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/dashboard')}
-            sx={{ borderColor: BROWN, color: BROWN, '&:hover': { borderColor: BROWN_DARK, backgroundColor: BG_PAPER } }}
-          >
-            ← Dashboard
-          </Button>
+        {/* ── Top bar ── */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4" sx={{ color: 'var(--text-high)' }}>
+            Design Studio
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? 'Saving…' : 'Save Design'}
+            </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => navigate('/dashboard')}
+            >
+              ← Dashboard
+            </Button>
+          </Box>
         </Box>
-      </Box>
 
-      {/* ── Three-column layout ── */}
-      <Grid container spacing={2} sx={{ height: 'calc(100vh - 100px)' }}>
+        {/* ── Three-column layout ── */}
+        <Grid container spacing={2} sx={{ height: 'calc(100vh - 100px)' }}>
 
-        {/* ── LEFT: Room Configuration ── */}
-        <Grid item xs={12} md={2.5}>
-          <Paper sx={{ p: 2.5, backgroundColor: BG_PAPER, height: '100%', border: `1px solid ${BORDER}`, overflowY: 'auto' }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, color: BROWN, fontWeight: 700, letterSpacing: 0.5 }}>
-              ROOM CONFIG
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <TextField
-                label="Width (m)"
-                type="number"
-                value={roomData.width}
-                onChange={(e) => handleRoomDataChange('width', parseFloat(e.target.value) || 0)}
-                size="small"
-                fullWidth
-                sx={{ '& .MuiOutlinedInput-root fieldset': { borderColor: BORDER } }}
-              />
-              <TextField
-                label="Depth (m)"
-                type="number"
-                value={roomData.height}
-                onChange={(e) => handleRoomDataChange('height', parseFloat(e.target.value) || 0)}
-                size="small"
-                fullWidth
-                sx={{ '& .MuiOutlinedInput-root fieldset': { borderColor: BORDER } }}
-              />
-              <Box>
-                <Typography variant="caption" sx={{ color: TAN, mb: 0.5, display: 'block' }}>
-                  Wall Colour
-                </Typography>
-                <input
-                  type="color"
-                  value={roomData.color}
-                  onChange={(e) => handleRoomDataChange('color', e.target.value)}
-                  style={{ width: '100%', height: 40, border: `1px solid ${BORDER}`, borderRadius: 4, cursor: 'pointer', padding: 2 }}
+          {/* ── LEFT: Room Configuration ── */}
+          <Grid item xs={12} md={2.5}>
+            <Paper
+              sx={{
+                p: 2.5,
+                backgroundColor: 'var(--surface-1)',
+                height: '100%',
+                border: '1px solid var(--grid-lines)',
+                overflowY: 'auto',
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 2, color: 'var(--brand-primary)', fontWeight: 700, letterSpacing: 0.5 }}>
+                ROOM CONFIG
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField
+                  label="Width (m)"
+                  type="number"
+                  value={roomData.width}
+                  onChange={(e) => handleRoomDataChange('width', parseFloat(e.target.value) || 0)}
+                  size="small"
+                  fullWidth
                 />
-              </Box>
-
-              <Divider sx={{ borderColor: BORDER, my: 1 }} />
-
-              <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
-                SNAP TO GRID
-              </Typography>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: BROWN }}>
-                <input
-                  type="checkbox"
-                  checked={snapToGridEnabled}
-                  onChange={(e) => setSnapToGridEnabled(e.target.checked)}
-                  style={{ cursor: 'pointer', accentColor: BROWN, width: 16, height: 16 }}
+                <TextField
+                  label="Depth (m)"
+                  type="number"
+                  value={roomData.height}
+                  onChange={(e) => handleRoomDataChange('height', parseFloat(e.target.value) || 0)}
+                  size="small"
+                  fullWidth
                 />
-                Enable (0.5 unit grid)
-              </label>
-
-              <Divider sx={{ borderColor: BORDER, my: 1 }} />
-
-              {/* ── Furniture Library ── */}
-              <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
-                FURNITURE LIBRARY
-              </Typography>
-              <Typography variant="caption" sx={{ color: TAN, mt: -1 }}>
-                Click to add to scene
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {FURNITURE_CATALOGUE.map((template) => (
-                  <Button
-                    key={template.type}
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleAddFurniture(template)}
-                    sx={{
-                      justifyContent: 'flex-start',
-                      gap: 1,
-                      borderColor: BORDER,
-                      color: BROWN,
-                      backgroundColor: BG_PAGE,
-                      textTransform: 'none',
-                      fontSize: 13,
-                      '&:hover': {
-                        borderColor: BROWN,
-                        backgroundColor: BG_PANEL,
-                      },
+                <Box>
+                  <Typography variant="caption" sx={{ color: 'var(--text-med)', mb: 0.5, display: 'block' }}>
+                    Wall Colour
+                  </Typography>
+                  <input
+                    type="color"
+                    value={roomData.color}
+                    onChange={(e) => handleRoomDataChange('color', e.target.value)}
+                    style={{
+                      width: '100%',
+                      height: 40,
+                      border: '1px solid var(--grid-lines)',
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      padding: 2,
+                      backgroundColor: 'transparent',
                     }}
-                  >
-                    <span style={{ fontSize: 16 }}>{template.icon}</span>
-                    {template.label}
-                  </Button>
-                ))}
+                  />
+                </Box>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Typography variant="subtitle2" sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}>
+                  SNAP TO GRID
+                </Typography>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: 'pointer',
+                    fontSize: 14,
+                    color: 'var(--text-med)',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={snapToGridEnabled}
+                    onChange={(e) => setSnapToGridEnabled(e.target.checked)}
+                    style={{ cursor: 'pointer', accentColor: 'var(--brand-primary)', width: 16, height: 16 }}
+                  />
+                  Enable (0.5 unit grid)
+                </label>
+
+                <Divider sx={{ my: 1 }} />
+
+                {/* ── Furniture Library ── */}
+                <Typography variant="subtitle2" sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}>
+                  FURNITURE LIBRARY
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'var(--text-med)', mt: -1 }}>
+                  Click to add to scene
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {furnitureCatalogue.map((template) => (
+                    <Button
+                      key={template.type}
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleAddFurniture(template)}
+                      sx={{
+                        justifyContent: 'flex-start',
+                        gap: 1,
+                        borderColor: 'var(--grid-lines)',
+                        color: 'var(--brand-primary)',
+                        backgroundColor: 'var(--canvas-base)',
+                        fontSize: 13,
+                        '&:hover': {
+                          borderColor: 'var(--brand-primary)',
+                          backgroundColor: 'var(--surface-2)',
+                        },
+                      }}
+                    >
+                      <span style={{ fontSize: 16 }}>{template.icon}</span>
+                      {template.label}
+                    </Button>
+                  ))}
+                </Box>
               </Box>
-            </Box>
-          </Paper>
-        </Grid>
+            </Paper>
+          </Grid>
 
-        {/* ── CENTRE: 3-D Canvas ── */}
-        <Grid item xs={12} md={7}>
-          <Paper
-            sx={{
-              height: '100%',
-              backgroundColor: BG_PANEL,
-              border: `1px solid ${BORDER}`,
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <Box sx={{ px: 2, py: 1, borderBottom: `1px solid ${BORDER}`, backgroundColor: BG_PANEL, flexShrink: 0 }}>
-              <Typography variant="caption" sx={{ color: TAN, fontWeight: 600 }}>
-                3D CANVAS — click an object to select it, drag to move
-              </Typography>
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <FurnitureItem
-                externalItems={items}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                onTransformChange={handleTransformChange}
-                snapToGridEnabled={snapToGridEnabled}
-              />
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* ── RIGHT: Properties Panel ── */}
-        <Grid item xs={12} md={2.5}>
-          <Paper
-            sx={{
-              p: 2.5,
-              backgroundColor: BG_PAPER,
-              height: '100%',
-              border: `1px solid ${BORDER}`,
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <Typography variant="subtitle1" sx={{ mb: 2, color: 'var(--text-high)', fontWeight: 700, letterSpacing: 0.5 }}>
-              PROPERTIES
-            </Typography>
-
-            {!selectedItem ? (
+          {/* ── CENTRE: 3-D Canvas ── */}
+          <Grid item xs={12} md={7}>
+            <Paper
+              sx={{
+                height: '100%',
+                backgroundColor: 'var(--surface-2)',
+                border: '1px solid var(--grid-lines)',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
               <Box
                 sx={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  textAlign: 'center', border: `2px dashed ${BORDER}`, borderRadius: 2, px: 2,
+                  px: 2, py: 1,
+                  borderBottom: '1px solid var(--grid-lines)',
+                  backgroundColor: 'var(--surface-2)',
+                  flexShrink: 0,
                 }}
               >
-                <Typography variant="body2" sx={{ color: TAN }}>
-                  Click an object in the scene to edit its properties
+                <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600 }}>
+                  3D CANVAS — click an object to select it, drag to move
                 </Typography>
               </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              <Box sx={{ flex: 1 }}>
+                <FurnitureItem
+                  externalItems={items}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                  onTransformChange={handleTransformChange}
+                  snapToGridEnabled={snapToGridEnabled}
+                />
+              </Box>
+            </Paper>
+          </Grid>
 
-                {/* Object name + delete */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="subtitle2" sx={{ color: BROWN, fontWeight: 700 }}>
-                    {selectedItem.name}
+          {/* ── RIGHT: Properties Panel ── */}
+          <Grid item xs={12} md={2.5}>
+            <Paper
+              sx={{
+                p: 2.5,
+                backgroundColor: 'var(--surface-1)',
+                height: '100%',
+                border: '1px solid var(--grid-lines)',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 2, color: 'var(--text-high)', fontWeight: 700, letterSpacing: 0.5 }}>
+                PROPERTIES
+              </Typography>
+
+              {!selectedItem ? (
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    border: '2px dashed var(--grid-lines)',
+                    borderRadius: 2,
+                    px: 2,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: 'var(--text-med)' }}>
+                    Click an object in the scene to edit its properties
                   </Typography>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={handleDeleteSelected}
-                    sx={{
-                      minWidth: 0,
-                      px: 1.5,
-                      py: 0.25,
-                      fontSize: 11,
-                      borderColor: 'var(--color-error)',
-                      color: 'var(--color-error)',
-                      textTransform: 'none',
-                      '&:hover': { backgroundColor: '#fdecea', borderColor: '#a93226' },
-                    }}
-                  >
-                    Delete
-                  </Button>
                 </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 
-                <Divider sx={{ borderColor: BORDER }} />
-
-                {/* ── Position ── */}
-                <Box>
-                  <Typography variant="caption" sx={{ color: TAN, fontWeight: 600, display: 'block', mb: 1 }}>
-                    POSITION
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <PropField label="X" value={selectedItem.position[0]} onChange={(v) => handlePositionChange('x', v)} adornment="m" />
-                    <PropField label="Y" value={selectedItem.position[1]} onChange={(v) => handlePositionChange('y', v)} adornment="m" />
-                    <PropField label="Z" value={selectedItem.position[2]} onChange={(v) => handlePositionChange('z', v)} adornment="m" />
-                  </Box>
-                </Box>
-
-                <Divider sx={{ borderColor: BORDER }} />
-
-                {/* ── Scale ── */}
-                <Box>
-                  <Typography variant="caption" sx={{ color: TAN, fontWeight: 600, display: 'block', mb: 1 }}>
-                    SCALE
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <PropField label="W" value={selectedItem.scale[0]} onChange={(v) => handleScaleChange('x', v)} step={0.05} min={0.1} />
-                    <PropField label="H" value={selectedItem.scale[1]} onChange={(v) => handleScaleChange('y', v)} step={0.05} min={0.1} />
-                    <PropField label="D" value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
-                  </Box>
-                  <Box sx={{ mt: 1.5 }}>
-                    <Typography variant="caption" sx={{ color: TAN, display: 'block', mb: 0.5 }}>
-                      Uniform scale
+                  {/* Object name + delete */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="subtitle2" sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}>
+                      {selectedItem.name}
                     </Typography>
-                    <Slider
-                      min={0.1} max={3} step={0.05}
-                      value={selectedItem.scale[0]}
-                      onChange={(_, v) => updateSelected({ scale: [v, v, v] })}
-                      sx={{ color: BROWN, '& .MuiSlider-thumb': { width: 14, height: 14 } }}
-                    />
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={handleDeleteSelected}
+                      sx={{
+                        minWidth: 0,
+                        px: 1.5,
+                        py: 0.25,
+                        fontSize: 11,
+                        borderColor: 'var(--color-error)',
+                        color: 'var(--color-error)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(207,102,121,0.1)',
+                          borderColor: 'var(--color-error)',
+                        },
+                      }}
+                    >
+                      Delete
+                    </Button>
                   </Box>
-                </Box>
 
-                <Divider sx={{ borderColor: BORDER }} />
+                  <Divider />
 
-                {/* ── Colour ── */}
-                <Box>
-                  <Typography variant="caption" sx={{ color: TAN, fontWeight: 600, display: 'block', mb: 1 }}>
-                    COLOUR
-                  </Typography>
+                  {/* ── Position ── */}
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, display: 'block', mb: 1 }}>
+                      POSITION
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <PropField label="X" value={selectedItem.position[0]} onChange={(v) => handlePositionChange('x', v)} adornment="m" />
+                      <PropField label="Y" value={selectedItem.position[1]} onChange={(v) => handlePositionChange('y', v)} adornment="m" />
+                      <PropField label="Z" value={selectedItem.position[2]} onChange={(v) => handlePositionChange('z', v)} adornment="m" />
+                    </Box>
+                  </Box>
 
-                  {/* Swatch grid */}
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1.5 }}>
-                    {COLOR_SWATCHES.map((c) => (
-                      <Box
-                        key={c}
-                        onClick={() => updateSelected({ color: c })}
-                        sx={{
-                          width: 28, height: 28,
-                          borderRadius: '50%',
-                          backgroundColor: c,
-                          cursor: 'pointer',
-                          border: selectedItem.color === c
-                            ? `3px solid ${BROWN}`
-                            : `2px solid transparent`,
-                          boxShadow: selectedItem.color === c
-                            ? `0 0 0 1px ${BORDER}`
-                            : 'none',
-                          transition: 'transform 0.1s',
-                          '&:hover': { transform: 'scale(1.15)' },
+                  <Divider />
+
+                  {/* ── Scale ── */}
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, display: 'block', mb: 1 }}>
+                      SCALE
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <PropField label="W" value={selectedItem.scale[0]} onChange={(v) => handleScaleChange('x', v)} step={0.05} min={0.1} />
+                      <PropField label="H" value={selectedItem.scale[1]} onChange={(v) => handleScaleChange('y', v)} step={0.05} min={0.1} />
+                      <PropField label="D" value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
+                    </Box>
+                    <Box sx={{ mt: 1.5 }}>
+                      <Typography variant="caption" sx={{ color: 'var(--text-med)', display: 'block', mb: 0.5 }}>
+                        Uniform scale
+                      </Typography>
+                      <Slider
+                        min={0.1} max={3} step={0.05}
+                        value={selectedItem.scale[0]}
+                        onChange={(_, v) => updateSelected({ scale: [v, v, v] })}
+                        sx={{ color: 'var(--brand-primary)', '& .MuiSlider-thumb': { width: 14, height: 14 } }}
+                      />
+                    </Box>
+                  </Box>
+
+                  <Divider />
+
+                  {/* ── Colour ── */}
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, display: 'block', mb: 1 }}>
+                      COLOUR
+                    </Typography>
+
+                    {/* Swatch grid */}
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1.5 }}>
+                      {COLOR_SWATCHES.map((c) => (
+                        <Box
+                          key={c}
+                          onClick={() => updateSelected({ color: c })}
+                          sx={{
+                            width: 28, height: 28,
+                            borderRadius: '50%',
+                            backgroundColor: c,
+                            cursor: 'pointer',
+                            border: selectedItem.color === c
+                              ? '3px solid var(--brand-primary)'
+                              : '2px solid transparent',
+                            boxShadow: selectedItem.color === c
+                              ? '0 0 0 1px var(--grid-lines)'
+                              : 'none',
+                            transition: 'transform 0.1s',
+                            '&:hover': { transform: 'scale(1.15)' },
+                          }}
+                        />
+                      ))}
+                    </Box>
+
+                    {/* Custom colour picker */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <input
+                        type="color"
+                        value={selectedItem.color}
+                        onChange={(e) => updateSelected({ color: e.target.value })}
+                        style={{
+                          width: 36, height: 36,
+                          border: '1px solid var(--grid-lines)',
+                          borderRadius: 4, cursor: 'pointer', padding: 2,
                         }}
                       />
-                    ))}
+                      <Typography variant="caption" sx={{ color: 'var(--text-med)', fontFamily: 'monospace' }}>
+                        {selectedItem.color.toUpperCase()}
+                      </Typography>
+                    </Box>
                   </Box>
 
-                  {/* Custom colour picker */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <input
-                      type="color"
-                      value={selectedItem.color}
-                      onChange={(e) => updateSelected({ color: e.target.value })}
-                      style={{
-                        width: 36, height: 36,
-                        border: `1px solid ${BORDER}`,
-                        borderRadius: 4, cursor: 'pointer', padding: 2,
-                      }}
-                    />
-                    <Typography variant="caption" sx={{ color: TAN, fontFamily: 'monospace' }}>
-                      {selectedItem.color.toUpperCase()}
-                    </Typography>
-                  </Box>
                 </Box>
+              )}
+            </Paper>
+          </Grid>
 
-              </Box>
-            )}
-          </Paper>
         </Grid>
-
-      </Grid>
       </Box>
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
         <Alert onClose={handleSnackbarClose} severity={message.severity} sx={{ width: '100%' }}>
           {message.text}
         </Alert>

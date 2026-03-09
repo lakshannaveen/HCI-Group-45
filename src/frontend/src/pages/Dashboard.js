@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, Grid, Card, CardContent, CardActions, List, ListItem, ListItemText, Divider, Snackbar, Alert } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Box, Button, Typography, Grid, Card, CardContent, CardActions, Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
+import AppSidebar from '../components/AppSidebar';
+
+const NAV_ITEMS = [
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Design Tool', path: '/design' },
+];
 
 const Dashboard = () => {
   const [designs, setDesigns] = useState([]);
@@ -10,10 +16,10 @@ const Dashboard = () => {
   const [message, setMessage] = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     fetchDesigns();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const showMessage = (text, severity = 'success') => {
@@ -47,10 +53,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleNewDesign = () => {
-    navigate('/design');
-  };
-
   const handleDeleteDesign = async (id) => {
     if (loading) return;
     if (!window.confirm('Are you sure you want to delete this design?')) return;
@@ -69,48 +71,7 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ display: 'flex', backgroundColor: 'var(--canvas-base)', minHeight: '100vh' }}>
-      {/* Sidebar */}
-      <Box sx={{ width: 250, backgroundColor: 'var(--surface-1)', p: 2, borderRight: '1px solid var(--grid-lines)' }}>
-        <Typography variant="h6" sx={{ color: 'var(--text-high)', mb: 2 }}>
-          Athlier Home
-        </Typography>
-        <List>
-          <ListItem
-            button
-            onClick={() => navigate('/dashboard')}
-            sx={{
-              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 'var(--surface-2)' : 'transparent',
-              borderRadius: 1,
-              pl: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 1.5 : 1,
-              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '4px solid var(--brand-primary)' : '4px solid transparent'
-            }}
-          >
-            <ListItemText
-              primary="Dashboard"
-              sx={{
-                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 'var(--brand-primary-pressed)' : 'var(--text-med)',
-                fontWeight: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '700' : '400'
-              }}
-            />
-          </ListItem>
-          <ListItem
-            button
-            onClick={() => navigate('/design')}
-            sx={{
-              backgroundColor: location.pathname.startsWith('/design') ? 'var(--surface-2)' : 'transparent',
-              borderRadius: 1,
-              pl: location.pathname.startsWith('/design') ? 1.5 : 1,
-              borderLeft: location.pathname.startsWith('/design') ? '4px solid var(--brand-primary)' : '4px solid transparent'
-            }}
-          >
-            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? 'var(--brand-primary-pressed)' : 'var(--text-med)', fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
-          </ListItem>
-          <Divider sx={{ my: 2 }} />
-          <ListItem button onClick={handleLogout}>
-            <ListItemText primary="Logout" sx={{ color: 'var(--text-high)' }} />
-          </ListItem>
-        </List>
-      </Box>
+      <AppSidebar navItems={NAV_ITEMS} onLogout={handleLogout} />
 
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -139,7 +100,7 @@ const Dashboard = () => {
                   Active Projects
                 </Typography>
                 <Typography variant="h4" sx={{ color: 'var(--brand-primary)' }}>
-                  {designs.filter(d => new Date(d.createdAt) > new Date(Date.now() - 30*24*60*60*1000)).length}
+                  {designs.filter(d => new Date(d.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}
                 </Typography>
               </CardContent>
             </Card>
@@ -147,7 +108,7 @@ const Dashboard = () => {
         </Grid>
 
         <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
-          Furniture Designer - Interactive 3D Scene
+          Furniture Designer — Interactive 3D Scene
         </Typography>
         <Box sx={{ height: '400px', mb: 3 }}>
           <FurnitureItem />
@@ -155,8 +116,9 @@ const Dashboard = () => {
 
         <Button
           variant="contained"
-          onClick={handleNewDesign}
-          sx={{ mb: 3, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}
+          color="primary"
+          onClick={() => navigate('/design')}
+          sx={{ mb: 3 }}
         >
           Create New Design
         </Button>
@@ -178,15 +140,37 @@ const Dashboard = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" sx={{ color: 'var(--text-high)' }} onClick={() => navigate('/design')} disabled={loading}>Edit</Button>
-                  <Button size="small" sx={{ color: 'var(--text-high)' }} onClick={() => handleDeleteDesign(design._id)} disabled={loading}>{loading ? 'Deleting...' : 'Delete'}</Button>
+                  <Button
+                    size="small"
+                    variant="text"
+                    sx={{ color: 'var(--brand-primary)' }}
+                    onClick={() => navigate('/design')}
+                    disabled={loading}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="text"
+                    sx={{ color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)' } }}
+                    onClick={() => handleDeleteDesign(design._id)}
+                    disabled={loading}
+                  >
+                    {loading ? 'Deleting…' : 'Delete'}
+                  </Button>
                 </CardActions>
               </Card>
             </Grid>
           ))}
         </Grid>
       </Box>
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
         <Alert onClose={handleSnackbarClose} severity={message.severity} sx={{ width: '100%' }}>
           {message.text}
         </Alert>

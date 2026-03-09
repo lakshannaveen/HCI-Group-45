@@ -22,11 +22,11 @@ const Login = () => {
     try {
       await axios.post('/api/auth/login', formData);
       setSuccess('Login successful! Redirecting...');
-      
+
       // Fetch user info
       const res = await axios.get('/api/auth/me');
       const user = res.data;
-      
+
       setTimeout(() => {
         if (user.role === 'admin') {
           navigate('/admin-dashboard');
@@ -43,13 +43,41 @@ const Login = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--canvas-base)' }}>
-      <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400, backgroundColor: 'var(--surface-1)' }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: 'var(--text-high)' }}>
-          Furniture Designer
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: 'var(--canvas-base)',
+        gap: 2,
+      }}
+    >
+      {/* Brand mark */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+        <img src="/logo.PNG" alt="Athlier Home" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+        <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+          Athlier Home
         </Typography>
-        <Typography variant="h6" align="center" sx={{ mb: 3, color: 'var(--brand-primary)' }}>
-          Sign in to continue
+      </Box>
+
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          width: '100%',
+          maxWidth: 400,
+          backgroundColor: 'var(--surface-1)',
+          border: '1px solid var(--grid-lines)',
+          borderRadius: 'var(--radius-lg)',
+        }}
+      >
+        <Typography variant="h5" component="h1" gutterBottom align="center" sx={{ color: 'var(--text-high)', mb: 0.5 }}>
+          Welcome back
+        </Typography>
+        <Typography variant="body2" align="center" sx={{ mb: 3, color: 'var(--text-med)' }}>
+          Sign in to continue designing
         </Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -83,19 +111,20 @@ const Login = () => {
             type="submit"
             fullWidth
             variant="contained"
+            color="primary"
             disabled={loading}
-            sx={{ mb: 2, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}
+            sx={{ mb: 2 }}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Signing in…' : 'Sign in'}
           </Button>
           <Button
             fullWidth
             variant="outlined"
+            color="primary"
             onClick={() => navigate('/register')}
             disabled={loading}
-            sx={{ borderColor: 'var(--brand-primary)', color: 'var(--brand-primary)', '&:hover': { borderColor: 'var(--brand-primary-pressed)', backgroundColor: 'var(--surface-1)' } }}
           >
-            Register
+            Create an account
           </Button>
         </Box>
       </Paper>

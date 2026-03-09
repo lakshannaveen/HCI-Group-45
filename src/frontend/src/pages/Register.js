@@ -25,7 +25,7 @@ const Register = () => {
     try {
       await axios.post('/api/auth/register', {
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       });
       setSuccess('Account created successfully! Please log in.');
       setError('');
@@ -39,12 +39,40 @@ const Register = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--canvas-base)' }}>
-      <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400, backgroundColor: 'var(--surface-1)' }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: 'var(--text-high)' }}>
-          Create Account
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: 'var(--canvas-base)',
+        gap: 2,
+      }}
+    >
+      {/* Brand mark */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+        <img src="/logo.PNG" alt="Athlier Home" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+        <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+          Athlier Home
         </Typography>
-        <Typography variant="h6" align="center" sx={{ mb: 3, color: 'var(--brand-primary)' }}>
+      </Box>
+
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          width: '100%',
+          maxWidth: 400,
+          backgroundColor: 'var(--surface-1)',
+          border: '1px solid var(--grid-lines)',
+          borderRadius: 'var(--radius-lg)',
+        }}
+      >
+        <Typography variant="h5" component="h1" gutterBottom align="center" sx={{ color: 'var(--text-high)', mb: 0.5 }}>
+          Create account
+        </Typography>
+        <Typography variant="body2" align="center" sx={{ mb: 3, color: 'var(--text-med)' }}>
           Register to start designing
         </Typography>
 
@@ -91,19 +119,20 @@ const Register = () => {
             type="submit"
             fullWidth
             variant="contained"
+            color="primary"
             disabled={loading}
-            sx={{ mb: 2, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}
+            sx={{ mb: 2 }}
           >
-            {loading ? 'Registering...' : 'Create Account'}
+            {loading ? 'Creating account…' : 'Create account'}
           </Button>
           <Button
             fullWidth
             variant="outlined"
+            color="primary"
             onClick={() => navigate('/')}
             disabled={loading}
-            sx={{ borderColor: 'var(--brand-primary)', color: 'var(--brand-primary)', '&:hover': { borderColor: 'var(--brand-primary-pressed)', backgroundColor: 'var(--surface-1)' } }}
           >
-            Back to Login
+            Back to sign in
           </Button>
         </Box>
       </Paper>
