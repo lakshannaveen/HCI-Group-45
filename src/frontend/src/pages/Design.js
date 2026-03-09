@@ -7,14 +7,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 
-// ─── Palette ────────────────────────────────────────────────────────────────
-const BROWN       = '#6b4f35';
-const BROWN_DARK  = '#5a4230';
-const TAN         = '#8b6f47';
-const BG_PAGE     = '#f7f1e3';
-const BG_PAPER    = '#f9f6f0';
-const BG_PANEL    = '#f2ece0';
-const BORDER      = '#d4c5a9';
+// ─── Palette (mapped to CSS variables for Organic Dark theme) ──────────────
+const BROWN       = 'var(--brand-primary)';
+const BROWN_DARK  = 'var(--brand-primary-pressed)';
+const TAN         = 'var(--text-med)';
+const BG_PAGE     = 'var(--canvas-base)';
+const BG_PAPER    = 'var(--surface-1)';
+const BG_PANEL    = 'var(--surface-2)';
+const BORDER      = 'var(--grid-lines)';
 
 // Pre-defined colour swatches for the Properties Panel colour picker
 const COLOR_SWATCHES = [
@@ -244,10 +244,10 @@ const Design = () => {
   return (
     <Box sx={{ display: 'flex', backgroundColor: BG_PAGE, minHeight: '100vh' }}>
       {/* Sidebar */}
-      <Box sx={{ width: 250, backgroundColor: '#f9f6f0', p: 2, borderRight: '1px solid #d4c5a9' }}>
+      <Box sx={{ width: 250, backgroundColor: BG_PAPER, p: 2, borderRight: `1px solid ${BORDER}` }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
           <img src="/user.png" alt="Athlier Home" style={{ width: 36, height: 36, objectFit: 'contain' }} />
-          <Typography variant="h6" sx={{ color: '#6b4f35' }}>
+          <Typography variant="h6" sx={{ color: 'var(--text-high)' }}>
             Athlier Home
           </Typography>
         </Box>
@@ -256,16 +256,16 @@ const Design = () => {
             button
             onClick={() => navigate('/dashboard')}
             sx={{
-              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#efe6d4' : 'transparent',
+              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? BG_PANEL : 'transparent',
               borderRadius: 1,
               pl: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 1.5 : 1,
-              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '4px solid #6b4f35' : '4px solid transparent'
+              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? `4px solid ${BROWN}` : '4px solid transparent'
             }}
           >
             <ListItemText
               primary="Dashboard"
               sx={{
-                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#5a4230' : '#6b4f35',
+                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? BROWN_DARK : 'var(--text-med)',
                 fontWeight: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '700' : '400'
               }}
             />
@@ -274,17 +274,17 @@ const Design = () => {
             button
             onClick={() => navigate('/design')}
             sx={{
-              backgroundColor: location.pathname.startsWith('/design') ? '#efe6d4' : 'transparent',
+              backgroundColor: location.pathname.startsWith('/design') ? BG_PANEL : 'transparent',
               borderRadius: 1,
               pl: location.pathname.startsWith('/design') ? 1.5 : 1,
-              borderLeft: location.pathname.startsWith('/design') ? '4px solid #6b4f35' : '4px solid transparent'
+              borderLeft: location.pathname.startsWith('/design') ? `4px solid ${BROWN}` : '4px solid transparent'
             }}
           >
-            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? '#5a4230' : '#6b4f35', fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
+            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? BROWN_DARK : BROWN, fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
           </ListItem>
           <Divider sx={{ my: 2 }} />
           <ListItem button onClick={handleLogout}>
-            <ListItemText primary="Logout" sx={{ color: '#6b4f35' }} />
+            <ListItemText primary="Logout" sx={{ color: 'var(--text-high)' }} />
           </ListItem>
         </List>
       </Box>
@@ -294,7 +294,7 @@ const Design = () => {
 
       {/* ── Top bar ── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4" sx={{ color: BROWN, fontWeight: 600 }}>
+        <Typography variant="h4" sx={{ color: 'var(--text-high)', fontWeight: 600 }}>
           Design Studio
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -302,7 +302,7 @@ const Design = () => {
             variant="contained"
             onClick={handleSave}
             disabled={loading}
-            sx={{ backgroundColor: BROWN, '&:hover': { backgroundColor: BROWN_DARK } }}
+            sx={{ backgroundColor: BROWN, color: 'var(--text-on-primary)', '&:hover': { backgroundColor: BROWN_DARK } }}
           >
             {loading ? 'Saving...' : 'Save Design'}
           </Button>
@@ -415,7 +415,7 @@ const Design = () => {
           <Paper
             sx={{
               height: '100%',
-              backgroundColor: '#e8e0d4',
+              backgroundColor: BG_PANEL,
               border: `1px solid ${BORDER}`,
               overflow: 'hidden',
               display: 'flex',
@@ -452,7 +452,7 @@ const Design = () => {
               flexDirection: 'column',
             }}
           >
-            <Typography variant="subtitle1" sx={{ mb: 2, color: BROWN, fontWeight: 700, letterSpacing: 0.5 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, color: 'var(--text-high)', fontWeight: 700, letterSpacing: 0.5 }}>
               PROPERTIES
             </Typography>
 
@@ -484,8 +484,8 @@ const Design = () => {
                       px: 1.5,
                       py: 0.25,
                       fontSize: 11,
-                      borderColor: '#c0392b',
-                      color: '#c0392b',
+                      borderColor: 'var(--color-error)',
+                      color: 'var(--color-error)',
                       textTransform: 'none',
                       '&:hover': { backgroundColor: '#fdecea', borderColor: '#a93226' },
                     }}

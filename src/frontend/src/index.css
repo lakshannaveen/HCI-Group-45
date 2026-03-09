@@ -11,3 +11,34 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  /* Brand & actions */
+  --brand-primary: #839705;
+  --brand-primary-hover: #9DB306;
+  --brand-primary-pressed: #657504;
+  --brand-primary-muted: #2B3308;
+
+  /* Canvas & surfaces */
+  --canvas-base: #121415;
+  --surface-1: #1E2022;
+  --surface-2: #2A2D2F;
+  --grid-lines: #383C3F;
+
+  /* Typography */
+  --text-high: #F5F5F6;
+  --text-med: #A0AAB2;
+  --text-low: #68737D;
+  --text-on-primary: #121415;
+
+  /* Semantic */
+  --color-error: #CF6679;
+  --color-warning: #FFB74D;
+  --color-success: #81C784;
+  --color-focus: #64B5F6;
+}
+
+body {
+  background-color: var(--canvas-base);
+  color: var(--text-high);
+}

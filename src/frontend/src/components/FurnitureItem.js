@@ -97,7 +97,7 @@ function FurnitureObject({ id, position, scale, color, isSelected, onSelect, onT
 // Default items used when FurnitureItem is rendered without external state (e.g. Dashboard)
 const DEFAULT_ITEMS = [
   { id: 1, position: [-2, -1.25, 0], scale: [1, 1, 1], color: '#4a90e2' },
-  { id: 2, position: [2,  -1.25, 0], scale: [1, 1, 1], color: '#6b4f35' },
+  { id: 2, position: [2,  -1.25, 0], scale: [1, 1, 1], color: 'var(--brand-primary)' },
   { id: 3, position: [0,  -1.25, 0], scale: [1, 1, 1], color: '#5a9e6f' },
 ];
 
@@ -147,34 +147,34 @@ function FurnitureItem({
       {!isControlled && (
         <div style={{
           padding: '8px 12px',
-          backgroundColor: '#f0ebe0',
-          borderBottom: '1px solid #d4c5a9',
+          backgroundColor: 'var(--surface-1)',
+          borderBottom: '1px solid var(--grid-lines)',
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
           flexShrink: 0,
         }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#6b4f35' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-high)' }}>
             <input
               type="checkbox"
               checked={snapEnabled}
               onChange={(e) => setInternalSnap(e.target.checked)}
-              style={{ cursor: 'pointer', accentColor: '#6b4f35' }}
+              style={{ cursor: 'pointer', accentColor: 'var(--brand-primary)' }}
             />
             Snap to Grid (0.5 units)
           </label>
-          <span style={{ fontSize: '12px', color: '#8b6f47' }}>Floor constraint always active</span>
+          <span style={{ fontSize: '12px', color: 'var(--brand-primary)' }}>Floor constraint always active</span>
         </div>
       )}
 
       {/* View mode toggle */}
-      <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#fff0', flexShrink: 0 }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#6b4f35' }}>
+      <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: 'transparent', flexShrink: 0 }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-high)' }}>
           <input
             type="checkbox"
             checked={is2DMode}
             onChange={(e) => setIs2DMode(e.target.checked)}
-            style={{ cursor: 'pointer', accentColor: '#6b4f35' }}
+            style={{ cursor: 'pointer', accentColor: 'var(--brand-primary)' }}
           />
           Top-down 2D View
         </label>
@@ -200,7 +200,7 @@ function FurnitureItem({
         {/* Ground plane */}
         <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <planeGeometry args={[20, 20]} />
-          <meshStandardMaterial color="#d6cfc2" />
+          <meshStandardMaterial color="var(--surface-2)" />
         </mesh>
 
         {items.map((item) => (

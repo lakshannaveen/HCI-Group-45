@@ -160,10 +160,10 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', backgroundColor: 'var(--canvas-base)', minHeight: '100vh' }}>
       {/* Sidebar */}
-      <Box sx={{ width: 250, backgroundColor: '#f9f6f0', p: 2, borderRight: '1px solid #d4c5a9' }}>
-        <Typography variant="h6" sx={{ color: '#6b4f35', mb: 2 }}>
+      <Box sx={{ width: 250, backgroundColor: 'var(--surface-1)', p: 2, borderRight: '1px solid var(--grid-lines)' }}>
+        <Typography variant="h6" sx={{ color: 'var(--text-high)', mb: 2 }}>
           Admin Panel
         </Typography>
         <Tabs
@@ -174,12 +174,12 @@ const AdminDashboard = () => {
             '& .MuiTab-root': {
               alignItems: 'flex-start',
               textAlign: 'left',
-              color: '#8b6f47',
-              '&:hover': { backgroundColor: '#f2ece0' }
+              color: 'var(--brand-primary)',
+              '&:hover': { backgroundColor: 'var(--surface-2)' }
             },
             '& .Mui-selected': {
-              backgroundColor: '#f9f6f0',
-              color: '#6b4f35',
+              backgroundColor: 'var(--surface-1)',
+              color: 'var(--text-high)',
               fontWeight: 'bold'
             }
           }}
@@ -191,7 +191,7 @@ const AdminDashboard = () => {
         <Button
           variant="outlined"
           onClick={handleLogout}
-          sx={{ mt: 2, borderColor: '#6b4f35', color: '#6b4f35', '&:hover': { borderColor: '#5a4230', backgroundColor: '#f9f6f0' } }}
+          sx={{ mt: 2, borderColor: 'var(--brand-primary)', color: 'var(--brand-primary)', '&:hover': { borderColor: 'var(--brand-primary-pressed)', backgroundColor: 'var(--surface-1)' } }}
         >
           Logout
         </Button>
@@ -199,16 +199,16 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h4" sx={{ color: '#6b4f35', mb: 3 }}>
+        <Typography variant="h4" sx={{ color: 'var(--text-high)', mb: 3 }}>
           Admin Dashboard
         </Typography>
 
         {tabValue === 0 && (
           <Box>
-            <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+            <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
               User Management
             </Typography>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ backgroundColor: 'var(--surface-1)' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -241,10 +241,10 @@ const AdminDashboard = () => {
 
         {tabValue === 1 && (
           <Box>
-            <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+            <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
               Furniture Catalogue
             </Typography>
-            <Button variant="contained" onClick={handleAddFurniture} sx={{ mb: 2, backgroundColor: '#6b4f35' }}>
+            <Button variant="contained" onClick={handleAddFurniture} sx={{ mb: 2, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}>
               Add Furniture
             </Button>
             <TableContainer component={Paper}>
@@ -285,7 +285,7 @@ const AdminDashboard = () => {
 
         {tabValue === 2 && (
           <Box>
-            <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+            <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
               Project Archives
             </Typography>
             <TableContainer component={Paper}>

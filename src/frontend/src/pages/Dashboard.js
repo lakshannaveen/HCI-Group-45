@@ -68,10 +68,10 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#f7f1e3', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', backgroundColor: 'var(--canvas-base)', minHeight: '100vh' }}>
       {/* Sidebar */}
-      <Box sx={{ width: 250, backgroundColor: '#f9f6f0', p: 2, borderRight: '1px solid #d4c5a9' }}>
-        <Typography variant="h6" sx={{ color: '#6b4f35', mb: 2 }}>
+      <Box sx={{ width: 250, backgroundColor: 'var(--surface-1)', p: 2, borderRight: '1px solid var(--grid-lines)' }}>
+        <Typography variant="h6" sx={{ color: 'var(--text-high)', mb: 2 }}>
           Athlier Home
         </Typography>
         <List>
@@ -79,16 +79,16 @@ const Dashboard = () => {
             button
             onClick={() => navigate('/dashboard')}
             sx={{
-              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#efe6d4' : 'transparent',
+              backgroundColor: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 'var(--surface-2)' : 'transparent',
               borderRadius: 1,
               pl: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 1.5 : 1,
-              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '4px solid #6b4f35' : '4px solid transparent'
+              borderLeft: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '4px solid var(--brand-primary)' : '4px solid transparent'
             }}
           >
             <ListItemText
               primary="Dashboard"
               sx={{
-                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '#5a4230' : '#6b4f35',
+                color: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? 'var(--brand-primary-pressed)' : 'var(--text-med)',
                 fontWeight: (location.pathname === '/' || location.pathname.startsWith('/dashboard')) ? '700' : '400'
               }}
             />
@@ -97,48 +97,48 @@ const Dashboard = () => {
             button
             onClick={() => navigate('/design')}
             sx={{
-              backgroundColor: location.pathname.startsWith('/design') ? '#efe6d4' : 'transparent',
+              backgroundColor: location.pathname.startsWith('/design') ? 'var(--surface-2)' : 'transparent',
               borderRadius: 1,
               pl: location.pathname.startsWith('/design') ? 1.5 : 1,
-              borderLeft: location.pathname.startsWith('/design') ? '4px solid #6b4f35' : '4px solid transparent'
+              borderLeft: location.pathname.startsWith('/design') ? '4px solid var(--brand-primary)' : '4px solid transparent'
             }}
           >
-            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? '#5a4230' : '#6b4f35', fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
+            <ListItemText primary="Design Tool" sx={{ color: location.pathname.startsWith('/design') ? 'var(--brand-primary-pressed)' : 'var(--text-med)', fontWeight: location.pathname.startsWith('/design') ? '700' : '400' }} />
           </ListItem>
           <Divider sx={{ my: 2 }} />
           <ListItem button onClick={handleLogout}>
-            <ListItemText primary="Logout" sx={{ color: '#6b4f35' }} />
+            <ListItemText primary="Logout" sx={{ color: 'var(--text-high)' }} />
           </ListItem>
         </List>
       </Box>
 
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h4" sx={{ color: '#6b4f35', mb: 3 }}>
+        <Typography variant="h4" sx={{ color: 'var(--text-high)', mb: 3 }}>
           Dashboard
         </Typography>
 
         {/* Stats Cards */}
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ backgroundColor: '#f9f6f0' }}>
+            <Card sx={{ backgroundColor: 'var(--surface-1)' }}>
               <CardContent>
-                <Typography variant="h6" sx={{ color: '#6b4f35' }}>
+                <Typography variant="h6" sx={{ color: 'var(--text-high)' }}>
                   Total Designs
                 </Typography>
-                <Typography variant="h4" sx={{ color: '#8b6f47' }}>
+                <Typography variant="h4" sx={{ color: 'var(--brand-primary)' }}>
                   {designs.length}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ backgroundColor: '#f9f6f0' }}>
+            <Card sx={{ backgroundColor: 'var(--surface-1)' }}>
               <CardContent>
-                <Typography variant="h6" sx={{ color: '#6b4f35' }}>
+                <Typography variant="h6" sx={{ color: 'var(--text-high)' }}>
                   Active Projects
                 </Typography>
-                <Typography variant="h4" sx={{ color: '#8b6f47' }}>
+                <Typography variant="h4" sx={{ color: 'var(--brand-primary)' }}>
                   {designs.filter(d => new Date(d.createdAt) > new Date(Date.now() - 30*24*60*60*1000)).length}
                 </Typography>
               </CardContent>
@@ -146,7 +146,7 @@ const Dashboard = () => {
           </Grid>
         </Grid>
 
-        <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+        <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
           Furniture Designer - Interactive 3D Scene
         </Typography>
         <Box sx={{ height: '400px', mb: 3 }}>
@@ -156,21 +156,21 @@ const Dashboard = () => {
         <Button
           variant="contained"
           onClick={handleNewDesign}
-          sx={{ mb: 3, backgroundColor: '#6b4f35', '&:hover': { backgroundColor: '#5a4230' } }}
+          sx={{ mb: 3, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}
         >
           Create New Design
         </Button>
 
-        <Typography variant="h5" sx={{ mb: 2, color: '#8b6f47' }}>
+        <Typography variant="h5" sx={{ mb: 2, color: 'var(--brand-primary)' }}>
           Your Designs
         </Typography>
 
         <Grid container spacing={3}>
           {designs.map((design) => (
             <Grid item xs={12} sm={6} md={4} key={design._id}>
-              <Card sx={{ backgroundColor: '#f9f6f0' }}>
+              <Card sx={{ backgroundColor: 'var(--surface-1)' }}>
                 <CardContent>
-                  <Typography variant="h6" sx={{ color: '#6b4f35' }}>
+                  <Typography variant="h6" sx={{ color: 'var(--text-high)' }}>
                     {design.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -178,8 +178,8 @@ const Dashboard = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" sx={{ color: '#6b4f35' }} onClick={() => navigate('/design')} disabled={loading}>Edit</Button>
-                  <Button size="small" sx={{ color: '#6b4f35' }} onClick={() => handleDeleteDesign(design._id)} disabled={loading}>{loading ? 'Deleting...' : 'Delete'}</Button>
+                  <Button size="small" sx={{ color: 'var(--text-high)' }} onClick={() => navigate('/design')} disabled={loading}>Edit</Button>
+                  <Button size="small" sx={{ color: 'var(--text-high)' }} onClick={() => handleDeleteDesign(design._id)} disabled={loading}>{loading ? 'Deleting...' : 'Delete'}</Button>
                 </CardActions>
               </Card>
             </Grid>

@@ -10,15 +10,22 @@ import AdminDashboard from './pages/AdminDashboard';
 
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: {
-      main: '#6b4f35',
+      main: '#839705',
+      contrastText: '#121415'
     },
     secondary: {
-      main: '#8b6f47',
+      main: '#9DB306',
     },
     background: {
-      default: '#f7f1e3',
+      default: '#121415',
+      paper: '#1E2022'
     },
+    text: {
+      primary: '#F5F5F6',
+      secondary: '#A0AAB2'
+    }
   },
 });
 

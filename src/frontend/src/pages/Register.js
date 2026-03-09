@@ -39,12 +39,12 @@ const Register = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f7f1e3' }}>
-      <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400, backgroundColor: '#f9f6f0' }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: '#6b4f35' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--canvas-base)' }}>
+      <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400, backgroundColor: 'var(--surface-1)' }}>
+        <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: 'var(--text-high)' }}>
           Create Account
         </Typography>
-        <Typography variant="h6" align="center" sx={{ mb: 3, color: '#8b6f47' }}>
+        <Typography variant="h6" align="center" sx={{ mb: 3, color: 'var(--brand-primary)' }}>
           Register to start designing
         </Typography>
 
@@ -92,7 +92,7 @@ const Register = () => {
             fullWidth
             variant="contained"
             disabled={loading}
-            sx={{ mb: 2, backgroundColor: '#6b4f35', '&:hover': { backgroundColor: '#5a4230' } }}
+            sx={{ mb: 2, backgroundColor: 'var(--brand-primary)', color: 'var(--text-on-primary)', '&:hover': { backgroundColor: 'var(--brand-primary-pressed)' } }}
           >
             {loading ? 'Registering...' : 'Create Account'}
           </Button>
@@ -101,7 +101,7 @@ const Register = () => {
             variant="outlined"
             onClick={() => navigate('/')}
             disabled={loading}
-            sx={{ borderColor: '#6b4f35', color: '#6b4f35', '&:hover': { borderColor: '#5a4230', backgroundColor: '#f9f6f0' } }}
+            sx={{ borderColor: 'var(--brand-primary)', color: 'var(--brand-primary)', '&:hover': { borderColor: 'var(--brand-primary-pressed)', backgroundColor: 'var(--surface-1)' } }}
           >
             Back to Login
           </Button>
