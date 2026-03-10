@@ -3,7 +3,7 @@ import {
   Box, Button, Typography, Paper, TextField, Grid,
   Divider, Slider, InputAdornment, Snackbar, Alert,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import FurnitureItem from '../components/FurnitureItem';
 import AppSidebar from '../components/AppSidebar';
@@ -55,11 +55,11 @@ function PropField({ label, value, onChange, adornment, step = 0.1, min }) {
 // ─── Main component ──────────────────────────────────────────────────────────
 const Design = () => {
   const navigate = useNavigate();
+  const { id: designId } = useParams();
 
   // ── Room state ──────────────────────────────────────────────────────────────
   const [roomData, setRoomData]   = useState({ width: 10, height: 10, color: '#ffffff' });
-  // eslint-disable-next-line no-unused-vars
-  const [currentDesignId, setCurrentDesignId] = useState(null);
+  const [currentDesignId, setCurrentDesignId] = useState(designId || null);
   const [loading, setLoading]     = useState(false);
 
   // ── Furniture + selection state ─────────────────────────────────────────────
@@ -104,11 +104,12 @@ const Design = () => {
 
   useEffect(() => {
     const loadDesign = async () => {
+      if (!designId) return;
       try {
         const response = await axiosInstance.get('/api/designs');
         const designs = response.data;
-        if (designs.length > 0) {
-          const design = designs[0];
+        const design = designs.find(d => d._id === designId);
+        if (design) {
           setCurrentDesignId(design._id);
           setRoomData(design.roomData || { width: 10, height: 10, color: '#ffffff' });
           if (design.furniture?.length) {
@@ -127,7 +128,8 @@ const Design = () => {
       }
     };
     loadDesign();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [designId]);
 
   // ── Save design ──────────────────────────────────────────────────────────────
   const handleSave = async () => {

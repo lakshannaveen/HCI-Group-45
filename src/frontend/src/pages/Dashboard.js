@@ -144,7 +144,7 @@ const Dashboard = () => {
                     size="small"
                     variant="text"
                     sx={{ color: 'var(--brand-primary)' }}
-                    onClick={() => navigate('/design')}
+                    onClick={() => navigate(`/design/${design._id}`)}
                     disabled={loading}
                   >
                     Edit
