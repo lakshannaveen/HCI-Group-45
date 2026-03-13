@@ -16,22 +16,148 @@ function getFurnitureArgs(name) {
   if (n.includes('sofa'))                               return [2.0,  0.75, 0.9];
   if (n.includes('bed'))                                return [1.4,  0.4,  2.0];
   if (n.includes('wardrobe') || n.includes('cabinet'))  return [1.2,  2.0,  0.55];
-  if (n.includes('table') || n.includes('desk'))        return [1.5,  0.08, 0.9];
+  if (n.includes('dining'))                             return [1.8,  0.08, 0.9];
+  if (n.includes('coffee'))                             return [0.9,  0.06, 0.5];
+  if (n.includes('desk'))                               return [1.2,  0.06, 0.7];
+  if (n.includes('table'))                              return [1.5,  0.08, 0.9];
   if (n.includes('lamp'))                               return [0.3,  1.6,  0.3];
-  if (n.includes('shelf') || n.includes('bookcase'))    return [1.2,  1.8,  0.3];
+  if (n.includes('bookshelf') || n.includes('shelf') || n.includes('bookcase')) return [1.0, 1.8, 0.3];
   if (n.includes('chair'))                              return [0.65, 1.0,  0.65];
   return [0.8, 1.2, 0.8];
 }
 
+// ─── Recognizable multi-part furniture geometry ───────────────────────────────
+function FurnitureMesh({ name, color, isSelected }) {
+  const n   = (name || '').toLowerCase();
+  const col = color || '#888888';
+  const sel = isSelected;
+
+  const M = ({ c = col, metal = 0.1, rough = 0.65, emissive = sel ? '#6b1c1c' : '#000000', emissiveIntensity = sel ? 0.3 : 0 } = {}) => (
+    <meshStandardMaterial color={sel ? '#d45c5c' : c} metalness={metal} roughness={rough} emissive={emissive} emissiveIntensity={emissiveIntensity} />
+  );
+  const wood = '#5c3a1e';
+
+  if (n.includes('sofa')) return (
+    <group>
+      {/* Seat */}
+      <mesh castShadow receiveShadow position={[0, 0, 0]}><boxGeometry args={[1.8, 0.22, 0.75]} /><M /></mesh>
+      {/* Back */}
+      <mesh castShadow position={[0, 0.38, -0.3]}><boxGeometry args={[1.8, 0.55, 0.12]} /><M /></mesh>
+      {/* Arms */}
+      {[-0.86, 0.86].map((x, i) => <mesh key={i} castShadow position={[x, 0.15, 0]}><boxGeometry args={[0.12, 0.36, 0.75]} /><M /></mesh>)}
+      {/* Base/feet */}
+      <mesh castShadow position={[0, -0.19, 0]}><boxGeometry args={[1.8, 0.14, 0.75]} /><M c={wood} /></mesh>
+    </group>
+  );
+
+  if (n.includes('bed')) return (
+    <group>
+      {/* Frame */}
+      <mesh castShadow receiveShadow position={[0, -0.1, 0]}><boxGeometry args={[1.3, 0.14, 1.9]} /><M /></mesh>
+      {/* Mattress */}
+      <mesh castShadow position={[0, 0.1, 0]}><boxGeometry args={[1.2, 0.22, 1.65]} /><M c={sel ? col : '#f4f0eb'} rough={0.9} /></mesh>
+      {/* Headboard */}
+      <mesh castShadow position={[0, 0.5, -0.9]}><boxGeometry args={[1.3, 0.84, 0.1]} /><M /></mesh>
+      {/* Footboard */}
+      <mesh castShadow position={[0, 0.22, 0.9]}><boxGeometry args={[1.3, 0.3, 0.1]} /><M /></mesh>
+      {/* Pillow */}
+      <mesh castShadow position={[0, 0.28, -0.62]}><boxGeometry args={[1.0, 0.1, 0.28]} /><M c={sel ? col : '#ffffff'} rough={0.9} /></mesh>
+    </group>
+  );
+
+  if (n.includes('wardrobe') || n.includes('cabinet')) return (
+    <group>
+      {/* Body */}
+      <mesh castShadow receiveShadow><boxGeometry args={[1.1, 1.85, 0.5]} /><M /></mesh>
+      {/* Door panels */}
+      {[-0.26, 0.26].map((x, i) => <mesh key={i} castShadow position={[x, 0, 0.26]}><boxGeometry args={[0.48, 1.65, 0.02]} /><M c={sel ? col : '#d8cfc4'} rough={0.5} /></mesh>)}
+      {/* Handles */}
+      {[-0.07, 0.07].map((x, i) => <mesh key={i} castShadow position={[x, 0, 0.28]}><boxGeometry args={[0.035, 0.1, 0.015]} /><meshStandardMaterial color="#a0a0a0" metalness={0.7} roughness={0.2} /></mesh>)}
+    </group>
+  );
+
+  if (n.includes('chair')) return (
+    <group>
+      {/* Seat */}
+      <mesh castShadow receiveShadow position={[0, 0.04, 0.04]}><boxGeometry args={[0.52, 0.08, 0.5]} /><M /></mesh>
+      {/* Backrest */}
+      <mesh castShadow position={[0, 0.38, -0.2]}><boxGeometry args={[0.52, 0.6, 0.07]} /><M /></mesh>
+      {/* 4 legs */}
+      {[[-0.21, 0.12], [-0.21, -0.19], [0.21, 0.12], [0.21, -0.19]].map(([x, z], i) => (
+        <mesh key={i} castShadow position={[x, -0.28, z]}><boxGeometry args={[0.05, 0.58, 0.05]} /><M c={wood} /></mesh>
+      ))}
+    </group>
+  );
+
+  if (n.includes('lamp')) return (
+    <group>
+      {/* Base */}
+      <mesh castShadow position={[0, -0.65, 0]}><cylinderGeometry args={[0.17, 0.21, 0.09, 10]} /><M c={sel ? col : '#888'} metal={0.5} rough={0.4} /></mesh>
+      {/* Pole */}
+      <mesh castShadow position={[0, 0, 0]}><cylinderGeometry args={[0.022, 0.022, 1.32, 8]} /><meshStandardMaterial color="#aaa" metalness={0.8} roughness={0.15} /></mesh>
+      {/* Shade */}
+      <mesh castShadow position={[0, 0.72, 0]}><cylinderGeometry args={[0.28, 0.13, 0.38, 12]} /><M c={sel ? col : '#f8e8c0'} rough={0.7} emissive={sel ? '#6b1c1c' : '#ffe090'} emissiveIntensity={sel ? 0.3 : 0.25} /></mesh>
+    </group>
+  );
+
+  if (n.includes('bookshelf') || n.includes('shelf') || n.includes('bookcase')) return (
+    <group>
+      {/* Back panel */}
+      <mesh castShadow receiveShadow position={[0, 0, -0.12]}><boxGeometry args={[0.92, 1.75, 0.03]} /><M /></mesh>
+      {/* Side panels */}
+      {[-0.44, 0.44].map((x, i) => <mesh key={i} castShadow position={[x, 0, 0]}><boxGeometry args={[0.04, 1.75, 0.27]} /><M /></mesh>)}
+      {/* Shelves */}
+      {[-0.8, -0.38, 0.04, 0.46, 0.84].map((y, i) => <mesh key={i} castShadow position={[0, y, 0]}><boxGeometry args={[0.84, 0.04, 0.27]} /><M /></mesh>)}
+    </group>
+  );
+
+  if (n.includes('dining')) return (
+    <group>
+      {/* Top */}
+      <mesh castShadow receiveShadow position={[0, 0.04, 0]}><boxGeometry args={[1.7, 0.07, 0.85]} /><M /></mesh>
+      {/* Legs */}
+      {[[-0.75, -0.36], [-0.75, 0.36], [0.75, -0.36], [0.75, 0.36]].map(([x, z], i) => (
+        <mesh key={i} castShadow position={[x, -0.49, z]}><boxGeometry args={[0.07, 0.95, 0.07]} /><M c={wood} /></mesh>
+      ))}
+    </group>
+  );
+
+  if (n.includes('coffee')) return (
+    <group>
+      {/* Top */}
+      <mesh castShadow receiveShadow position={[0, 0.02, 0]}><boxGeometry args={[0.88, 0.07, 0.5]} /><M /></mesh>
+      {/* Legs */}
+      {[[-0.37, -0.2], [-0.37, 0.2], [0.37, -0.2], [0.37, 0.2]].map(([x, z], i) => (
+        <mesh key={i} castShadow position={[x, -0.17, z]}><boxGeometry args={[0.05, 0.32, 0.05]} /><M c={wood} /></mesh>
+      ))}
+    </group>
+  );
+
+  if (n.includes('desk') || n.includes('table')) return (
+    <group>
+      {/* Top */}
+      <mesh castShadow receiveShadow position={[0, 0.04, 0]}><boxGeometry args={[1.4, 0.07, 0.75]} /><M /></mesh>
+      {/* Legs */}
+      {[[-0.61, -0.32], [-0.61, 0.32], [0.61, -0.32], [0.61, 0.32]].map(([x, z], i) => (
+        <mesh key={i} castShadow position={[x, -0.42, z]}><boxGeometry args={[0.07, 0.82, 0.07]} /><M c={wood} /></mesh>
+      ))}
+    </group>
+  );
+
+  // Fallback: plain box
+  const [w, h, d] = getFurnitureArgs(name);
+  return <mesh castShadow receiveShadow><boxGeometry args={[w, h, d]} /><M /></mesh>;
+}
+
 // ─── Individual furniture object with TransformControls ──────────────────────
 function FurnitureObject({
-  id, name, position, scale, color,
-  isSelected, onSelect, onTransformChange, snapEnabled, onDragging,
+  id, name, position, scale, rotation, color,
+  isSelected, onSelect, onTransformChange, snapEnabled, onDragging, transformMode,
 }) {
-  const groupRef     = useRef(null);
-  const transformRef = useRef(null);
+  const groupRef      = useRef(null);
+  const transformRef  = useRef(null);
   const isDraggingRef = useRef(false);
-  const lastStateRef  = useRef({ pos: null, scl: null });
+  const lastStateRef  = useRef({ pos: null, scl: null, rot: null });
   const FLOOR_Y = -1.25;
 
   // When this item is deselected, ensure dragging state is cleared.
@@ -42,24 +168,32 @@ function FurnitureObject({
     }
   }, [isSelected]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Props → mesh (only when not actively dragging)
+  // Props → mesh: only applied when NOT dragging (handles initial placement & undo/redo).
+  // KEY DESIGN: the <group> lives permanently in the scene (never re-parented inside TC),
+  // so Three.js position is preserved across selection changes without any stale-prop writes.
   useEffect(() => {
     if (groupRef.current && !isDraggingRef.current) {
       groupRef.current.position.set(position[0], position[1], position[2]);
       groupRef.current.scale.set(scale[0], scale[1], scale[2]);
+      groupRef.current.rotation.set(
+        rotation?.[0] ?? 0,
+        rotation?.[1] ?? 0,
+        rotation?.[2] ?? 0
+      );
     }
-  }, [position, scale]);
+  }, [position, scale, rotation]);
 
-  // Mesh → React state during drag
+  // Mesh → React state during drag (runs every frame while dragging)
   useFrame(() => {
     if (!groupRef.current || !isDraggingRef.current) return;
     const pos = groupRef.current.position;
     const scl = groupRef.current.scale;
+    const rot = groupRef.current.rotation;
     if (!pos || !scl) return;
 
     if (pos.y < FLOOR_Y) pos.y = FLOOR_Y;
 
-    if (snapEnabled) {
+    if (snapEnabled && (transformMode === 'translate' || !transformMode)) {
       pos.x = snapToGrid(pos.x);
       pos.y = Math.max(FLOOR_Y, snapToGrid(pos.y));
       pos.z = snapToGrid(pos.z);
@@ -77,52 +211,75 @@ function FurnitureObject({
       Math.abs(scl.y - lastStateRef.current.scl.y) > 0.005 ||
       Math.abs(scl.z - lastStateRef.current.scl.z) > 0.005;
 
-    if (posChanged || sclChanged) {
+    const rotChanged =
+      !lastStateRef.current.rot ||
+      Math.abs(rot.x - lastStateRef.current.rot.x) > 0.005 ||
+      Math.abs(rot.y - lastStateRef.current.rot.y) > 0.005 ||
+      Math.abs(rot.z - lastStateRef.current.rot.z) > 0.005;
+
+    if (posChanged || sclChanged || rotChanged) {
       try {
-        lastStateRef.current = { pos: pos.clone(), scl: scl.clone() };
+        lastStateRef.current = { pos: pos.clone(), scl: scl.clone(), rot: rot.clone() };
         onTransformChange?.({
           position: [pos.x, pos.y, pos.z],
           scale:    [scl.x, scl.y, scl.z],
+          rotation: [rot.x, rot.y, rot.z],
         });
       } catch (_) {}
     }
   });
 
-  const geoArgs = getFurnitureArgs(name);
-
-  // FIX BUG-1: the mesh group is always rendered so groupRef is always valid.
-  // TransformControls is ONLY rendered when this item is selected — prevents
-  // all TC gizmos from being active simultaneously and intercepting clicks.
-  const meshGroup = (
-    <group
-      ref={groupRef}
-      onClick={(e) => { e.stopPropagation(); onSelect?.(id); }}
-    >
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={geoArgs} />
-        <meshStandardMaterial
-          color={isSelected ? '#d45c5c' : color}
-          metalness={0.1}
-          roughness={0.65}
-          emissive={isSelected ? '#6b1c1c' : '#000000'}
-          emissiveIntensity={isSelected ? 0.3 : 0}
-        />
-      </mesh>
-    </group>
-  );
-
-  if (!isSelected) return meshGroup;
+  // ── ARCHITECTURE NOTE ────────────────────────────────────────────────────────
+  // The <group> is rendered as a STABLE sibling of <TransformControls>, never
+  // as a child.  TC attaches to it via the `object` prop.
+  //
+  // WHY: when the group was rendered INSIDE <TC> (old code), switching selection
+  // changed the JSX root type (TC → group), causing React to UNMOUNT + REMOUNT
+  // the group.  The new Three.js object always started at [0,0,0], and the
+  // subsequent useEffect wrote the last-known (stale) React state position back
+  // — visually "resetting" the object to where it was originally placed.
+  //
+  // With the sibling pattern the group Three.js object is NEVER destroyed between
+  // selection changes, so its position is always the live dragged value.
+  // ────────────────────────────────────────────────────────────────────────────
 
   return (
-    <TransformControls
-      ref={transformRef}
-      mode="translate"
-      size={0.7}
-      onMouseDown={() => { isDraggingRef.current = true;  onDragging?.(true);  }}
-      onMouseUp={()   => { isDraggingRef.current = false; onDragging?.(false); }}
-    >
-      {meshGroup}
-    </TransformControls>
+    <>
+      {/* Mesh group — always in scene, never re-parented */}
+      <group
+        ref={groupRef}
+        onClick={(e) => { e.stopPropagation(); onSelect?.(id); }}
+      >
+        <FurnitureMesh name={name} color={color} isSelected={isSelected} />
+      </group>
+
+      {/* TC mounts/unmounts alongside the group without affecting it */}
+      {isSelected && (
+        <TransformControls
+          ref={transformRef}
+          object={groupRef}          // attach to sibling group by ref
+          mode={transformMode || 'translate'}
+          size={1.0}                 // larger handles = easier to grab
+          onMouseDown={() => { isDraggingRef.current = true;  onDragging?.(true);  }}
+          onMouseUp={() => {
+            // Flush final mesh state → React before clearing the drag flag so
+            // that useEffect (above) never writes stale props back to the mesh.
+            if (groupRef.current) {
+              const pos = groupRef.current.position;
+              const scl = groupRef.current.scale;
+              const rot = groupRef.current.rotation;
+              onTransformChange?.({
+                position: [pos.x, pos.y, pos.z],
+                scale:    [scl.x, scl.y, scl.z],
+                rotation: [rot.x, rot.y, rot.z],
+              });
+            }
+            isDraggingRef.current = false;
+            onDragging?.(false);
+          }}
+        />
+      )}
+    </>
   );
 }
 
@@ -185,6 +342,7 @@ function FurnitureItem({
   snapToGridEnabled: externalSnap,
   is2DOverride,
   roomData,
+  transformMode: externalTransformMode,
 }) {
   const isControlled = externalItems !== undefined;
 
@@ -195,10 +353,11 @@ function FurnitureItem({
   // FIX BUG-2: track whether any object is being dragged so we can disable OrbitControls
   const [isAnyDragging, setIsAnyDragging]           = useState(false);
 
-  const items       = isControlled ? externalItems        : internalItems;
-  const snapEnabled = externalSnap !== undefined ? externalSnap : internalSnap;
-  const selectedId  = isControlled ? externalSelectedId  : internalSelectedId;
-  const is2DMode    = is2DOverride !== undefined ? is2DOverride : internalIs2D;
+  const items          = isControlled ? externalItems        : internalItems;
+  const snapEnabled    = externalSnap !== undefined ? externalSnap : internalSnap;
+  const selectedId     = isControlled ? externalSelectedId  : internalSelectedId;
+  const is2DMode       = is2DOverride !== undefined ? is2DOverride : internalIs2D;
+  const transformMode  = externalTransformMode || 'translate';
 
   // Room dimensions
   const roomW     = roomData?.width  ?? 10;
@@ -317,12 +476,14 @@ function FurnitureItem({
             name={item.name}
             position={item.position}
             scale={item.scale}
+            rotation={item.rotation || [0, 0, 0]}
             color={item.color}
             isSelected={item.id === selectedId}
             onSelect={handleSelect}
             onTransformChange={(data) => handleTransformChange(item.id, data)}
             snapEnabled={snapEnabled}
             onDragging={(v) => setIsAnyDragging(v)}
+            transformMode={transformMode}
           />
         ))}
 

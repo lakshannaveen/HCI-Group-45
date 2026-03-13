@@ -26,7 +26,7 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ username });
@@ -42,7 +42,7 @@ router.post('/register', [
     const role = username === 'admin' ? 'admin' : 'user';
 
     // Create user
-    const user = new User({ username, password: hashedPassword, role });
+    const user = new User({ username, password: hashedPassword, email: email || undefined, role });
     await user.save();
 
     res.status(201).json({ message: 'User registered successfully' });

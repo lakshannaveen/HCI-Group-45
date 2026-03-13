@@ -18,12 +18,16 @@ const COLOR_SWATCHES = [
 
 // ─── Default furniture catalogue (overridden from API) ────────────────────────
 const FURNITURE_CATALOGUE = [
-  { type: 'chair',    label: 'Chair',    icon: '🪑', color: '#e2844a', scale: [0.7, 1.0, 0.7] },
-  { type: 'table',    label: 'Table',    icon: '🪵', color: '#6b4f35', scale: [1.6, 0.5, 1.0] },
-  { type: 'sofa',     label: 'Sofa',     icon: '🛋️', color: '#9b59b6', scale: [2.0, 0.8, 0.9] },
-  { type: 'wardrobe', label: 'Wardrobe', icon: '🗄️', color: '#95a5a6', scale: [1.2, 2.0, 0.6] },
-  { type: 'bed',      label: 'Bed',      icon: '🛏️', color: '#3498db', scale: [1.4, 0.5, 2.0] },
-  { type: 'lamp',     label: 'Lamp',     icon: '💡', color: '#e2c94a', scale: [0.4, 1.5, 0.4] },
+  { type: 'chair',        label: 'Chair',        icon: '🪑', color: '#e2844a', scale: [0.7,  1.0,  0.7] },
+  { type: 'table',        label: 'Table',        icon: '🪵', color: '#6b4f35', scale: [1.6,  0.5,  1.0] },
+  { type: 'sofa',         label: 'Sofa',         icon: '🛋️', color: '#9b59b6', scale: [2.0,  0.8,  0.9] },
+  { type: 'wardrobe',     label: 'Wardrobe',     icon: '🗄️', color: '#95a5a6', scale: [1.2,  2.0,  0.6] },
+  { type: 'bed',          label: 'Bed',          icon: '🛏️', color: '#3498db', scale: [1.4,  0.5,  2.0] },
+  { type: 'lamp',         label: 'Lamp',         icon: '💡', color: '#e2c94a', scale: [0.4,  1.5,  0.4] },
+  { type: 'dining-table', label: 'Dining Table', icon: '🍽️', color: '#8B4513', scale: [1.8,  0.5,  0.9] },
+  { type: 'bookshelf',    label: 'Bookshelf',    icon: '📚', color: '#DEB887', scale: [1.0,  1.8,  0.3] },
+  { type: 'desk',         label: 'Desk',         icon: '🖥️', color: '#A0522D', scale: [1.2,  0.5,  0.7] },
+  { type: 'coffee-table', label: 'Coffee Table', icon: '☕', color: '#D2691E', scale: [0.9,  0.4,  0.5] },
 ];
 
 // ─── Tool palette ─────────────────────────────────────────────────────────────
@@ -150,6 +154,7 @@ const Design = () => {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
   const [is2DMode, setIs2DMode]       = useState(false);
+  const [transformMode, setTransformMode] = useState('translate');
   const [openDialogOpen, setOpenDialogOpen] = useState(false);
 
   // Undo / Redo
@@ -210,10 +215,11 @@ const Design = () => {
               : [f.scale ?? 1, f.scale ?? 1, f.scale ?? 1];
             return {
               id:       f.id || idx + 1,
-              position: [f.position?.x ?? 0, f.position?.y ?? -1.25, f.position?.z ?? 0],
-              scale:    scaleArr,
-              color:    f.color || COLOR_SWATCHES[idx % COLOR_SWATCHES.length],
               name:     f.name || `Object ${idx + 1}`,
+              color:    f.color || COLOR_SWATCHES[idx % COLOR_SWATCHES.length],
+              position: [f.position?.x ?? 0, f.position?.y ?? -1.25, f.position?.z ?? 0],
+              rotation: [f.rotation?.x ?? 0, f.rotation?.y ?? 0, f.rotation?.z ?? 0],
+              scale:    scaleArr,
             };
           });
           setItems(loaded);
@@ -274,6 +280,7 @@ const Design = () => {
           name:     item.name,
           color:    item.color,
           position: { x: item.position[0], y: item.position[1], z: item.position[2] },
+          rotation: { x: item.rotation?.[0] ?? 0, y: item.rotation?.[1] ?? 0, z: item.rotation?.[2] ?? 0 },
           scale:    Array.isArray(item.scale) ? item.scale : [item.scale ?? 1, item.scale ?? 1, item.scale ?? 1],
         })),
       };
@@ -330,6 +337,7 @@ const Design = () => {
         color:    template.color,
         scale:    [...template.scale],
         position: [0, -1.25, 0],
+        rotation: [0, 0, 0],
       },
     ];
     setItems(newItems);
@@ -496,6 +504,45 @@ const Design = () => {
             }
             sx={{ m: 0, gap: 0.5 }}
           />
+        </Tooltip>
+
+        {/* Separator */}
+        <Box sx={{ width: 1, height: 22, backgroundColor: 'var(--grid-lines)', mx: 0.25 }} />
+
+        {/* Move / Rotate mode toggle */}
+        <Tooltip title="Switch between Move and Rotate">
+          <Box
+            sx={{
+              display: 'flex',
+              border: '1px solid var(--grid-lines)',
+              borderRadius: 1,
+              overflow: 'hidden',
+            }}
+          >
+            {[
+              { mode: 'translate', label: '↕', title: 'Move' },
+              { mode: 'rotate',    label: '↻', title: 'Rotate' },
+            ].map(({ mode, label, title }) => {
+              const active = transformMode === mode;
+              return (
+                <Button
+                  key={mode}
+                  size="small"
+                  onClick={() => setTransformMode(mode)}
+                  title={title}
+                  sx={{
+                    px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: 15,
+                    backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
+                    color: active ? 'var(--canvas-base)' : 'var(--text-med)',
+                    fontWeight: active ? 700 : 400,
+                    '&:hover': { backgroundColor: active ? 'var(--brand-primary-hover)' : 'var(--surface-2)' },
+                  }}
+                >
+                  {label}
+                </Button>
+              );
+            })}
+          </Box>
         </Tooltip>
 
         {/* Centre: 2D / 3D toggle */}
@@ -730,6 +777,7 @@ const Design = () => {
             snapToGridEnabled={snapToGridEnabled}
             is2DOverride={is2DMode}
             roomData={roomData}
+            transformMode={transformMode}
           />
 
           {/* Coordinate label */}

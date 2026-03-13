@@ -535,7 +535,7 @@ const AdminDashboard = () => {
                           <TableCell>{design.userId?.username || '—'}</TableCell>
                           <TableCell>
                             {design.roomData
-                              ? `${design.roomData.width}m × ${design.roomData.height}m`
+                              ? `${design.roomData.width || '?'}m × ${design.roomData.length || design.roomData.height || '?'}m`
                               : '—'}
                           </TableCell>
                           <TableCell>

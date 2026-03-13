@@ -139,6 +139,7 @@ function RegisterModal({ open, onClose }) {
               size="small"
               required
               disabled={loading}
+              helperText="Min 6 chars, must include uppercase, lowercase & a number"
             />
             <TextField
               label="Confirm Password"
