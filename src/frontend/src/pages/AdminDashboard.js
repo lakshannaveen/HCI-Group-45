@@ -11,7 +11,7 @@ import axios from '../utils/axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
-import UserProfileModal from '../components/UserProfileModal';
+import TopNavbar from '../components/TopNavbar';
 
 const ADMIN_SECTIONS = [
   { label: 'User Management',    index: 0 },
@@ -29,7 +29,6 @@ const AdminDashboard = () => {
   const [open, setOpen]                     = useState(false);
   const [currentFurniture, setCurrentFurniture] = useState(null);
   const [loading, setLoading]               = useState(false);
-  const [profileOpen, setProfileOpen]       = useState(false);
   const [message, setMessage]               = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen]     = useState(false);
   const navigate = useNavigate();
@@ -178,66 +177,7 @@ const AdminDashboard = () => {
         backgroundColor: 'var(--canvas-base)',
       }}
     >
-      {/* ── Top Navigation Bar ── */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: 3,
-          py: 1.5,
-          backgroundColor: 'var(--surface-1)',
-          borderBottom: '1px solid var(--grid-lines)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        {/* Left: Dashboard title (clickable — navigates back) */}
-        <Typography
-          variant="h6"
-          sx={{
-            color: 'var(--text-high)',
-            fontWeight: 700,
-            cursor: 'pointer',
-            letterSpacing: '-0.01em',
-          }}
-          onClick={() => navigate('/dashboard')}
-        >
-          Dashboard
-        </Typography>
-
-        {/* Right: Admin Panel (active state) + User icon */}
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => navigate('/dashboard')}
-            sx={{ fontWeight: 700 }}
-          >
-            Admin Panel
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => setProfileOpen(true)}
-            sx={{
-              minWidth: 40,
-              width: 40,
-              height: 36,
-              p: 0,
-              borderRadius: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Typography variant="caption" sx={{ fontWeight: 700, fontSize: 9, lineHeight: 1 }}>
-              USER
-            </Typography>
-          </Button>
-        </Box>
-      </Box>
+      <TopNavbar />
 
       {/* ── Main Layout: sidebar + content ── */}
       <Box sx={{ display: 'flex', flex: 1 }}>
@@ -630,13 +570,6 @@ const AdminDashboard = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* User Profile Modal */}
-      <UserProfileModal
-        open={profileOpen}
-        onClose={() => setProfileOpen(false)}
-        onLogout={handleLogout}
-      />
 
       <Snackbar
         open={snackbarOpen}

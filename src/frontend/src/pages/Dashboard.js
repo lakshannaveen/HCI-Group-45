@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
-import UserProfileModal from '../components/UserProfileModal';
+import TopNavbar from '../components/TopNavbar';
 
 // ── Screen 4: Room Configuration Modal ──────────────────────────────────────
 function RoomConfigModal({ open, onClose, onCreate }) {
@@ -121,16 +121,13 @@ function RoomConfigModal({ open, onClose, onCreate }) {
 const Dashboard = () => {
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
   const [roomConfigOpen, setRoomConfigOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [message, setMessage] = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchDesigns();
-    fetchUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -145,24 +142,6 @@ const Dashboard = () => {
       setDesigns(res.data);
     } catch (err) {
       showMessage('Failed to fetch designs', 'error');
-    }
-  };
-
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get('/api/auth/me');
-      setUser(res.data);
-    } catch (err) {
-      console.error('Failed to fetch user', err);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await axios.post('/api/auth/logout');
-      navigate('/');
-    } catch {
-      navigate('/');
     }
   };
 
@@ -196,70 +175,7 @@ const Dashboard = () => {
         backgroundColor: 'var(--canvas-base)',
       }}
     >
-      {/* ── Top Navigation Bar ── */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: 3,
-          py: 1.5,
-          backgroundColor: 'var(--surface-1)',
-          borderBottom: '1px solid var(--grid-lines)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        {/* Left: Dashboard title (clickable) */}
-        <Typography
-          variant="h6"
-          sx={{
-            color: 'var(--brand-primary)',
-            fontWeight: 700,
-            cursor: 'pointer',
-            letterSpacing: '-0.01em',
-          }}
-          onClick={() => navigate('/dashboard')}
-        >
-          Dashboard
-        </Typography>
-
-        {/* Right: Admin Panel + User icon */}
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          {user?.role === 'admin' && (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => navigate('/admin-dashboard')}
-            >
-              Admin Panel
-            </Button>
-          )}
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => setProfileOpen(true)}
-            sx={{
-              minWidth: 40,
-              width: 40,
-              height: 36,
-              p: 0,
-              borderRadius: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{ fontWeight: 700, fontSize: 9, lineHeight: 1 }}
-            >
-              USER
-            </Typography>
-          </Button>
-        </Box>
-      </Box>
+      <TopNavbar />
 
       {/* ── Main Content ── */}
       <Box
@@ -449,12 +365,6 @@ const Dashboard = () => {
         onClose={() => setRoomConfigOpen(false)}
         onCreate={handleCreateRoom}
       />
-      <UserProfileModal
-        open={profileOpen}
-        onClose={() => setProfileOpen(false)}
-        onLogout={handleLogout}
-      />
-
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
