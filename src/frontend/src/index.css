@@ -55,3 +55,33 @@ body {
   background-color: var(--canvas-base);
   color: var(--text-high);
 }
+
+/* Global input styling: neutralize browser autofill blue and keep labels readable. */
+.MuiTextField-root .MuiOutlinedInput-root,
+.MuiFormControl-root .MuiOutlinedInput-root {
+  background-color: var(--surface-2);
+}
+
+.MuiTextField-root .MuiOutlinedInput-input,
+.MuiFormControl-root .MuiOutlinedInput-input {
+  color: var(--text-high);
+}
+
+.MuiTextField-root .MuiOutlinedInput-input:-webkit-autofill,
+.MuiTextField-root .MuiOutlinedInput-input:-webkit-autofill:hover,
+.MuiTextField-root .MuiOutlinedInput-input:-webkit-autofill:focus,
+.MuiFormControl-root .MuiOutlinedInput-input:-webkit-autofill,
+.MuiFormControl-root .MuiOutlinedInput-input:-webkit-autofill:hover,
+.MuiFormControl-root .MuiOutlinedInput-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+  -webkit-text-fill-color: var(--text-high);
+  caret-color: var(--text-high);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.MuiTextField-root .MuiInputLabel-root.MuiInputLabel-shrink,
+.MuiFormControl-root .MuiInputLabel-root.MuiInputLabel-shrink {
+  background-color: var(--surface-1);
+  padding: 0 6px;
+  border-radius: 4px;
+}
