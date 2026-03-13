@@ -115,4 +115,39 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
+// Update user profile
+router.put('/profile', auth, [
+  body('displayName').optional().isLength({ max: 50 }).withMessage('Display name too long'),
+  body('email').optional().isEmail().withMessage('Invalid email format'),
+  body('newPassword').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage('Password must contain uppercase, lowercase, and number'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { displayName, email, currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+    if (displayName !== undefined) user.displayName = displayName;
+    if (email !== undefined) user.email = email || undefined;
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password is required to change password' });
+      }
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+    }
+    await user.save();
+    const updatedUser = await User.findById(req.user.id).select('-password');
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
