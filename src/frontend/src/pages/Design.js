@@ -216,7 +216,7 @@ const Design = () => {
               id:       f.id || idx + 1,
               name:     f.name || `Object ${idx + 1}`,
               color:    f.color || COLOR_SWATCHES[idx % COLOR_SWATCHES.length],
-              position: [f.position?.x ?? 0, f.position?.y ?? -1.25, f.position?.z ?? 0],
+              position: [f.position?.x ?? 0, f.position?.y ?? -2, f.position?.z ?? 0],
               rotation: [f.rotation?.x ?? 0, f.rotation?.y ?? 0, f.rotation?.z ?? 0],
               scale:    scaleArr,
             };
@@ -335,7 +335,7 @@ const Design = () => {
         name:     count > 0 ? `${template.label} ${count + 1}` : template.label,
         color:    template.color,
         scale:    [...template.scale],
-        position: [0, -1.25, 0],
+        position: [0, -2, 0],
         rotation: [0, 0, 0],
       },
     ];

@@ -37,116 +37,120 @@ function FurnitureMesh({ name, color, isSelected }) {
   );
   const wood = '#5c3a1e';
 
+  // All meshes are shifted so their BOTTOM sits at local y = 0.
+  // This lets every item rest exactly on the floor (group.position.y = -2)
+  // regardless of scale, with no per-type placement offsets needed.
+
   if (n.includes('sofa')) return (
     <group>
+      {/* Base/feet — bottom at y=0 (+0.26 shift) */}
+      <mesh castShadow position={[0, 0.07, 0]}><boxGeometry args={[1.8, 0.14, 0.75]} /><M c={wood} /></mesh>
       {/* Seat */}
-      <mesh castShadow receiveShadow position={[0, 0, 0]}><boxGeometry args={[1.8, 0.22, 0.75]} /><M /></mesh>
-      {/* Back */}
-      <mesh castShadow position={[0, 0.38, -0.3]}><boxGeometry args={[1.8, 0.55, 0.12]} /><M /></mesh>
+      <mesh castShadow receiveShadow position={[0, 0.26, 0]}><boxGeometry args={[1.8, 0.22, 0.75]} /><M /></mesh>
       {/* Arms */}
-      {[-0.86, 0.86].map((x, i) => <mesh key={i} castShadow position={[x, 0.15, 0]}><boxGeometry args={[0.12, 0.36, 0.75]} /><M /></mesh>)}
-      {/* Base/feet */}
-      <mesh castShadow position={[0, -0.19, 0]}><boxGeometry args={[1.8, 0.14, 0.75]} /><M c={wood} /></mesh>
+      {[-0.86, 0.86].map((x, i) => <mesh key={i} castShadow position={[x, 0.41, 0]}><boxGeometry args={[0.12, 0.36, 0.75]} /><M /></mesh>)}
+      {/* Back */}
+      <mesh castShadow position={[0, 0.64, -0.3]}><boxGeometry args={[1.8, 0.55, 0.12]} /><M /></mesh>
     </group>
   );
 
   if (n.includes('bed')) return (
     <group>
-      {/* Frame */}
-      <mesh castShadow receiveShadow position={[0, -0.1, 0]}><boxGeometry args={[1.3, 0.14, 1.9]} /><M /></mesh>
+      {/* Frame — bottom at y=0 (+0.17 shift) */}
+      <mesh castShadow receiveShadow position={[0, 0.07, 0]}><boxGeometry args={[1.3, 0.14, 1.9]} /><M /></mesh>
       {/* Mattress */}
-      <mesh castShadow position={[0, 0.1, 0]}><boxGeometry args={[1.2, 0.22, 1.65]} /><M c={sel ? col : '#f4f0eb'} rough={0.9} /></mesh>
+      <mesh castShadow position={[0, 0.27, 0]}><boxGeometry args={[1.2, 0.22, 1.65]} /><M c={sel ? col : '#f4f0eb'} rough={0.9} /></mesh>
       {/* Headboard */}
-      <mesh castShadow position={[0, 0.5, -0.9]}><boxGeometry args={[1.3, 0.84, 0.1]} /><M /></mesh>
+      <mesh castShadow position={[0, 0.67, -0.9]}><boxGeometry args={[1.3, 0.84, 0.1]} /><M /></mesh>
       {/* Footboard */}
-      <mesh castShadow position={[0, 0.22, 0.9]}><boxGeometry args={[1.3, 0.3, 0.1]} /><M /></mesh>
+      <mesh castShadow position={[0, 0.39, 0.9]}><boxGeometry args={[1.3, 0.3, 0.1]} /><M /></mesh>
       {/* Pillow */}
-      <mesh castShadow position={[0, 0.28, -0.62]}><boxGeometry args={[1.0, 0.1, 0.28]} /><M c={sel ? col : '#ffffff'} rough={0.9} /></mesh>
+      <mesh castShadow position={[0, 0.45, -0.62]}><boxGeometry args={[1.0, 0.1, 0.28]} /><M c={sel ? col : '#ffffff'} rough={0.9} /></mesh>
     </group>
   );
 
   if (n.includes('wardrobe') || n.includes('cabinet')) return (
     <group>
-      {/* Body */}
-      <mesh castShadow receiveShadow><boxGeometry args={[1.1, 1.85, 0.5]} /><M /></mesh>
+      {/* Body — bottom at y=0 (+0.925 shift) */}
+      <mesh castShadow receiveShadow position={[0, 0.925, 0]}><boxGeometry args={[1.1, 1.85, 0.5]} /><M /></mesh>
       {/* Door panels */}
-      {[-0.26, 0.26].map((x, i) => <mesh key={i} castShadow position={[x, 0, 0.26]}><boxGeometry args={[0.48, 1.65, 0.02]} /><M c={sel ? col : '#d8cfc4'} rough={0.5} /></mesh>)}
+      {[-0.26, 0.26].map((x, i) => <mesh key={i} castShadow position={[x, 0.925, 0.26]}><boxGeometry args={[0.48, 1.65, 0.02]} /><M c={sel ? col : '#d8cfc4'} rough={0.5} /></mesh>)}
       {/* Handles */}
-      {[-0.07, 0.07].map((x, i) => <mesh key={i} castShadow position={[x, 0, 0.28]}><boxGeometry args={[0.035, 0.1, 0.015]} /><meshStandardMaterial color="#a0a0a0" metalness={0.7} roughness={0.2} /></mesh>)}
+      {[-0.07, 0.07].map((x, i) => <mesh key={i} castShadow position={[x, 0.925, 0.28]}><boxGeometry args={[0.035, 0.1, 0.015]} /><meshStandardMaterial color="#a0a0a0" metalness={0.7} roughness={0.2} /></mesh>)}
     </group>
   );
 
   if (n.includes('chair')) return (
     <group>
-      {/* Seat */}
-      <mesh castShadow receiveShadow position={[0, 0.04, 0.04]}><boxGeometry args={[0.52, 0.08, 0.5]} /><M /></mesh>
-      {/* Backrest */}
-      <mesh castShadow position={[0, 0.38, -0.2]}><boxGeometry args={[0.52, 0.6, 0.07]} /><M /></mesh>
-      {/* 4 legs */}
+      {/* 4 legs — bottom at y=0 (+0.57 shift) */}
       {[[-0.21, 0.12], [-0.21, -0.19], [0.21, 0.12], [0.21, -0.19]].map(([x, z], i) => (
-        <mesh key={i} castShadow position={[x, -0.28, z]}><boxGeometry args={[0.05, 0.58, 0.05]} /><M c={wood} /></mesh>
+        <mesh key={i} castShadow position={[x, 0.29, z]}><boxGeometry args={[0.05, 0.58, 0.05]} /><M c={wood} /></mesh>
       ))}
+      {/* Seat */}
+      <mesh castShadow receiveShadow position={[0, 0.61, 0.04]}><boxGeometry args={[0.52, 0.08, 0.5]} /><M /></mesh>
+      {/* Backrest */}
+      <mesh castShadow position={[0, 0.95, -0.2]}><boxGeometry args={[0.52, 0.6, 0.07]} /><M /></mesh>
     </group>
   );
 
   if (n.includes('lamp')) return (
     <group>
-      {/* Base */}
-      <mesh castShadow position={[0, -0.65, 0]}><cylinderGeometry args={[0.17, 0.21, 0.09, 10]} /><M c={sel ? col : '#888'} metal={0.5} rough={0.4} /></mesh>
+      {/* Base — bottom at y=0 (+0.695 shift) */}
+      <mesh castShadow position={[0, 0.045, 0]}><cylinderGeometry args={[0.17, 0.21, 0.09, 10]} /><M c={sel ? col : '#888'} metal={0.5} rough={0.4} /></mesh>
       {/* Pole */}
-      <mesh castShadow position={[0, 0, 0]}><cylinderGeometry args={[0.022, 0.022, 1.32, 8]} /><meshStandardMaterial color="#aaa" metalness={0.8} roughness={0.15} /></mesh>
+      <mesh castShadow position={[0, 0.695, 0]}><cylinderGeometry args={[0.022, 0.022, 1.32, 8]} /><meshStandardMaterial color="#aaa" metalness={0.8} roughness={0.15} /></mesh>
       {/* Shade */}
-      <mesh castShadow position={[0, 0.72, 0]}><cylinderGeometry args={[0.28, 0.13, 0.38, 12]} /><M c={sel ? col : '#f8e8c0'} rough={0.7} emissive={sel ? '#6b1c1c' : '#ffe090'} emissiveIntensity={sel ? 0.3 : 0.25} /></mesh>
+      <mesh castShadow position={[0, 1.415, 0]}><cylinderGeometry args={[0.28, 0.13, 0.38, 12]} /><M c={sel ? col : '#f8e8c0'} rough={0.7} emissive={sel ? '#6b1c1c' : '#ffe090'} emissiveIntensity={sel ? 0.3 : 0.25} /></mesh>
     </group>
   );
 
   if (n.includes('bookshelf') || n.includes('shelf') || n.includes('bookcase')) return (
     <group>
-      {/* Back panel */}
-      <mesh castShadow receiveShadow position={[0, 0, -0.12]}><boxGeometry args={[0.92, 1.75, 0.03]} /><M /></mesh>
+      {/* Back panel — bottom at y=0 (+0.875 shift) */}
+      <mesh castShadow receiveShadow position={[0, 0.875, -0.12]}><boxGeometry args={[0.92, 1.75, 0.03]} /><M /></mesh>
       {/* Side panels */}
-      {[-0.44, 0.44].map((x, i) => <mesh key={i} castShadow position={[x, 0, 0]}><boxGeometry args={[0.04, 1.75, 0.27]} /><M /></mesh>)}
+      {[-0.44, 0.44].map((x, i) => <mesh key={i} castShadow position={[x, 0.875, 0]}><boxGeometry args={[0.04, 1.75, 0.27]} /><M /></mesh>)}
       {/* Shelves */}
-      {[-0.8, -0.38, 0.04, 0.46, 0.84].map((y, i) => <mesh key={i} castShadow position={[0, y, 0]}><boxGeometry args={[0.84, 0.04, 0.27]} /><M /></mesh>)}
+      {[0.075, 0.495, 0.915, 1.335, 1.715].map((y, i) => <mesh key={i} castShadow position={[0, y, 0]}><boxGeometry args={[0.84, 0.04, 0.27]} /><M /></mesh>)}
     </group>
   );
 
   if (n.includes('dining')) return (
     <group>
-      {/* Top */}
-      <mesh castShadow receiveShadow position={[0, 0.04, 0]}><boxGeometry args={[1.7, 0.07, 0.85]} /><M /></mesh>
-      {/* Legs */}
+      {/* Legs — bottom at y=0 (+0.965 shift) */}
       {[[-0.75, -0.36], [-0.75, 0.36], [0.75, -0.36], [0.75, 0.36]].map(([x, z], i) => (
-        <mesh key={i} castShadow position={[x, -0.49, z]}><boxGeometry args={[0.07, 0.95, 0.07]} /><M c={wood} /></mesh>
+        <mesh key={i} castShadow position={[x, 0.475, z]}><boxGeometry args={[0.07, 0.95, 0.07]} /><M c={wood} /></mesh>
       ))}
+      {/* Top */}
+      <mesh castShadow receiveShadow position={[0, 1.005, 0]}><boxGeometry args={[1.7, 0.07, 0.85]} /><M /></mesh>
     </group>
   );
 
   if (n.includes('coffee')) return (
     <group>
-      {/* Top */}
-      <mesh castShadow receiveShadow position={[0, 0.02, 0]}><boxGeometry args={[0.88, 0.07, 0.5]} /><M /></mesh>
-      {/* Legs */}
+      {/* Legs — bottom at y=0 (+0.33 shift) */}
       {[[-0.37, -0.2], [-0.37, 0.2], [0.37, -0.2], [0.37, 0.2]].map(([x, z], i) => (
-        <mesh key={i} castShadow position={[x, -0.17, z]}><boxGeometry args={[0.05, 0.32, 0.05]} /><M c={wood} /></mesh>
+        <mesh key={i} castShadow position={[x, 0.16, z]}><boxGeometry args={[0.05, 0.32, 0.05]} /><M c={wood} /></mesh>
       ))}
+      {/* Top */}
+      <mesh castShadow receiveShadow position={[0, 0.35, 0]}><boxGeometry args={[0.88, 0.07, 0.5]} /><M /></mesh>
     </group>
   );
 
   if (n.includes('desk') || n.includes('table')) return (
     <group>
-      {/* Top */}
-      <mesh castShadow receiveShadow position={[0, 0.04, 0]}><boxGeometry args={[1.4, 0.07, 0.75]} /><M /></mesh>
-      {/* Legs */}
+      {/* Legs — bottom at y=0 (+0.83 shift) */}
       {[[-0.61, -0.32], [-0.61, 0.32], [0.61, -0.32], [0.61, 0.32]].map(([x, z], i) => (
-        <mesh key={i} castShadow position={[x, -0.42, z]}><boxGeometry args={[0.07, 0.82, 0.07]} /><M c={wood} /></mesh>
+        <mesh key={i} castShadow position={[x, 0.41, z]}><boxGeometry args={[0.07, 0.82, 0.07]} /><M c={wood} /></mesh>
       ))}
+      {/* Top */}
+      <mesh castShadow receiveShadow position={[0, 0.87, 0]}><boxGeometry args={[1.4, 0.07, 0.75]} /><M /></mesh>
     </group>
   );
 
-  // Fallback: plain box
+  // Fallback: plain box with bottom at y=0
   const [w, h, d] = getFurnitureArgs(name);
-  return <mesh castShadow receiveShadow><boxGeometry args={[w, h, d]} /><M /></mesh>;
+  return <mesh castShadow receiveShadow position={[0, h / 2, 0]}><boxGeometry args={[w, h, d]} /><M /></mesh>;
 }
 
 // ─── Individual furniture object with TransformControls ──────────────────────
@@ -158,7 +162,7 @@ function FurnitureObject({
   const transformRef  = useRef(null);
   const isDraggingRef = useRef(false);
   const lastStateRef  = useRef({ pos: null, scl: null, rot: null });
-  const FLOOR_Y = -1.25;
+  const FLOOR_Y = -2;   // floor plane sits at y=-2; furniture bottom is at local y=0
 
   // When this item is deselected, ensure dragging state is cleared.
   useEffect(() => {
@@ -322,9 +326,9 @@ function Room({ width = 10, depth = 10, wallColor = '#e8e8e8' }) {
 
 // ─── Default items for Dashboard preview ────────────────────────────────────
 const DEFAULT_ITEMS = [
-  { id: 1, name: 'Chair',  position: [-2, -1.25,  0], scale: [1, 1, 1], color: '#e2844a' },
-  { id: 2, name: 'Table',  position: [ 2, -1.25,  0], scale: [1, 1, 1], color: '#6b4f35' },
-  { id: 3, name: 'Sofa',   position: [ 0, -1.25, -2], scale: [1, 1, 1], color: '#9b59b6' },
+  { id: 1, name: 'Chair',  position: [-2, -2,  0], scale: [1, 1, 1], color: '#e2844a' },
+  { id: 2, name: 'Table',  position: [ 2, -2,  0], scale: [1, 1, 1], color: '#6b4f35' },
+  { id: 3, name: 'Sofa',   position: [ 0, -2, -2], scale: [1, 1, 1], color: '#9b59b6' },
 ];
 
 // ─── Main exported component ──────────────────────────────────────────────────
