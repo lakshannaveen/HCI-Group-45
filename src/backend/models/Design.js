@@ -11,9 +11,12 @@ const designSchema = new mongoose.Schema({
     required: true
   },
   roomData: {
-    width:     { type: Number, default: 10 },
-    length:    { type: Number, default: 10 },
-    wallColor: { type: String, default: '#FFFFFF' },
+    width:      { type: Number, default: 10 },
+    length:     { type: Number, default: 10 },
+    height:     { type: Number, default: 10 },
+    color:      { type: String, default: '#e8e8e8' },
+    wallColor:  { type: String, default: '#FFFFFF' },
+    floorColor: { type: String, default: '#c8b89a' },
     shape: {
       type: String,
       enum: ['rectangular', 'square', 'L-shaped'],

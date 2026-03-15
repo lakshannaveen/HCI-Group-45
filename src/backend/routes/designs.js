@@ -22,10 +22,11 @@ router.post('/', auth, async (req, res) => {
     
     // Transform roomData to match schema (handle height->length, color->wallColor)
     const transformedRoomData = {
-      width: roomData.width,
-      length: roomData.length || roomData.height, // Map height to length if length not provided
-      wallColor: roomData.wallColor || roomData.color || '#FFFFFF',
-      shape: roomData.shape || 'rectangular'
+      width:      roomData.width,
+      length:     roomData.length || roomData.height,
+      wallColor:  roomData.wallColor || roomData.color || '#FFFFFF',
+      floorColor: roomData.floorColor || '#c8b89a',
+      shape:      roomData.shape || 'rectangular'
     };
     
     // Ensure furniture array is valid (empty array is ok)
@@ -66,10 +67,11 @@ router.put('/:id', auth, async (req, res) => {
     // Transform and update roomData if provided
     if (roomData) {
       design.roomData = {
-        width: roomData.width || design.roomData.width,
-        length: roomData.length || roomData.height || design.roomData.length,
-        wallColor: roomData.wallColor || roomData.color || design.roomData.wallColor,
-        shape: roomData.shape || design.roomData.shape
+        width:      roomData.width                                    || design.roomData.width,
+        length:     roomData.length     || roomData.height            || design.roomData.length,
+        wallColor:  roomData.wallColor  || roomData.color             || design.roomData.wallColor,
+        floorColor: roomData.floorColor                               || design.roomData.floorColor || '#c8b89a',
+        shape:      roomData.shape                                    || design.roomData.shape,
       };
     }
     

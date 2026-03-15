@@ -11,11 +11,11 @@ import TopNavbar from '../components/TopNavbar';
 
 // ── Screen 4: Room Configuration Modal ──────────────────────────────────────
 function RoomConfigModal({ open, onClose, onCreate }) {
-  const [form, setForm] = useState({ length: '', width: '', wallColor: '#ffffff' });
+  const [form, setForm] = useState({ length: '', width: '', wallColor: '#ffffff', floorColor: '#c8b89a' });
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
-    setForm({ length: '', width: '', wallColor: '#ffffff' });
+    setForm({ length: '', width: '', wallColor: '#ffffff', floorColor: '#c8b89a' });
     onClose();
   };
 
@@ -23,7 +23,7 @@ function RoomConfigModal({ open, onClose, onCreate }) {
     setLoading(true);
     onCreate(form);
     setLoading(false);
-    setForm({ length: '', width: '', wallColor: '#ffffff' });
+    setForm({ length: '', width: '', wallColor: '#ffffff', floorColor: '#c8b89a' });
   };
 
   return (
@@ -94,6 +94,27 @@ function RoomConfigModal({ open, onClose, onCreate }) {
                 <MenuItem value="#d4f7d4">Light Green</MenuItem>
                 <MenuItem value="#f7d4d4">Light Pink</MenuItem>
                 <MenuItem value="#fffde7">Cream</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Floor Color */}
+          <Box>
+            <Typography variant="caption" sx={{ color: 'var(--text-med)', display: 'block', mb: 0.5 }}>
+              Floor Color
+            </Typography>
+            <FormControl fullWidth size="small">
+              <Select
+                value={form.floorColor}
+                onChange={(e) => setForm((f) => ({ ...f, floorColor: e.target.value }))}
+              >
+                <MenuItem value="#c8b89a">Timber (default)</MenuItem>
+                <MenuItem value="#e8dcc8">Light Oak</MenuItem>
+                <MenuItem value="#a0856b">Dark Oak</MenuItem>
+                <MenuItem value="#d9d0c4">Stone</MenuItem>
+                <MenuItem value="#b8b8b8">Concrete</MenuItem>
+                <MenuItem value="#f5f5f5">White Tile</MenuItem>
+                <MenuItem value="#2d2d2d">Dark Tile</MenuItem>
               </Select>
             </FormControl>
           </Box>

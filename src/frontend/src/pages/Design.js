@@ -133,9 +133,10 @@ const Design = () => {
 
   // Room state (init from Room Config Modal if provided)
   const [roomData, setRoomData] = useState({
-    width:  roomConfig?.width  ? parseFloat(roomConfig.width)  : 10,
-    height: roomConfig?.length ? parseFloat(roomConfig.length) : 10,
-    color:  roomConfig?.wallColor || '#e8e8e8',
+    width:      roomConfig?.width  ? parseFloat(roomConfig.width)  : 10,
+    height:     roomConfig?.length ? parseFloat(roomConfig.length) : 10,
+    color:      roomConfig?.wallColor  || '#e8e8e8',
+    floorColor: roomConfig?.floorColor || '#c8b89a',
   });
 
   const [currentDesignId, setCurrentDesignId] = useState(designId || null);
@@ -201,9 +202,10 @@ const Design = () => {
 
         const rd = design.roomData || {};
         setRoomData({
-          width:  rd.width     || 10,
-          height: rd.length    || rd.height || 10,
-          color:  rd.wallColor || rd.color  || '#e8e8e8',
+          width:      rd.width              || 10,
+          height:     rd.length             || rd.height || 10,
+          color:      rd.wallColor          || rd.color  || '#e8e8e8',
+          floorColor: rd.floorColor         || '#c8b89a',
         });
 
         if (design.furniture?.length) {
@@ -269,10 +271,11 @@ const Design = () => {
       const payload = {
         name: designName || 'Untitled Design',
         roomData: {
-          width:    roomData.width,
-          height:   roomData.height,
-          color:    roomData.color,
-          wallColor: roomData.color,
+          width:      roomData.width,
+          height:     roomData.height,
+          color:      roomData.color,
+          wallColor:  roomData.color,
+          floorColor: roomData.floorColor,
         },
         furniture: items.map((item) => ({
           id:       item.id,
@@ -858,6 +861,42 @@ const Design = () => {
                       }}
                     >
                       {(roomData.color || '#e8e8e8').toUpperCase()}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'var(--text-med)', display: 'block', mb: 0.75 }}
+                  >
+                    Floor Color
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <input
+                      type="color"
+                      value={roomData.floorColor || '#c8b89a'}
+                      onChange={(e) =>
+                        setRoomData((r) => ({ ...r, floorColor: e.target.value }))
+                      }
+                      style={{
+                        width: 36,
+                        height: 36,
+                        border: '1px solid var(--grid-lines)',
+                        borderRadius: 4,
+                        cursor: 'pointer',
+                        padding: 2,
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'var(--text-med)',
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                      }}
+                    >
+                      {(roomData.floorColor || '#c8b89a').toUpperCase()}
                     </Typography>
                   </Box>
                 </Box>

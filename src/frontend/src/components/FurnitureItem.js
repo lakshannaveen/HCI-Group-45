@@ -288,20 +288,20 @@ function FurnitureObject({
 }
 
 // ─── Room (floor + three walls) ───────────────────────────────────────────────
-function Room({ width = 10, depth = 10, wallColor = '#e8e8e8' }) {
-  const wallH     = 3;
-  const halfW     = width  / 2;
-  const halfD     = depth  / 2;
-  const floorY    = -2;
-  const wallCol   = (wallColor && !wallColor.startsWith('var(')) ? wallColor : '#e8e8e8';
-  const FLOOR_COL = '#c8b89a'; // static warm timber — unaffected by wall colour
+function Room({ width = 10, depth = 10, wallColor = '#e8e8e8', floorColor = '#c8b89a' }) {
+  const wallH    = 3;
+  const halfW    = width  / 2;
+  const halfD    = depth  / 2;
+  const floorY   = -2;
+  const wallCol  = (wallColor  && !wallColor.startsWith('var('))  ? wallColor  : '#e8e8e8';
+  const floorCol = (floorColor && !floorColor.startsWith('var(')) ? floorColor : '#c8b89a';
 
   return (
     <group>
-      {/* Floor — always timber/neutral, wall colour does NOT apply here */}
+      {/* Floor — independently coloured, unaffected by wall colour */}
       <mesh position={[0, floorY, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial color={FLOOR_COL} roughness={0.85} />
+        <meshStandardMaterial color={floorCol} roughness={0.85} />
       </mesh>
 
       {/* Back wall */}
@@ -365,10 +365,11 @@ function FurnitureItem({
   const transformMode  = externalTransformMode || 'translate';
 
   // Room dimensions
-  const roomW     = roomData?.width  ?? 10;
-  const roomD     = roomData?.height ?? roomData?.depth ?? 10;
-  const wallColor = roomData?.color  ?? '#e8e8e8';
-  const gridSize  = Math.max(roomW, roomD) + 6;
+  const roomW      = roomData?.width      ?? 10;
+  const roomD      = roomData?.height     ?? roomData?.depth ?? 10;
+  const wallColor  = roomData?.color      ?? '#e8e8e8';
+  const floorColor = roomData?.floorColor ?? '#c8b89a';
+  const gridSize   = Math.max(roomW, roomD) + 6;
 
   const handleSelect = (id) => {
     const next = id === selectedId ? null : id;
@@ -465,7 +466,7 @@ function FurnitureItem({
         <pointLight position={[-8, 8, 8]} intensity={0.3} />
 
         {/* Room */}
-        <Room width={roomW} depth={roomD} wallColor={wallColor} />
+        <Room width={roomW} depth={roomD} wallColor={wallColor} floorColor={floorColor} />
 
         {/* Grid */}
         <gridHelper
