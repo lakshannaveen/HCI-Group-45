@@ -4,7 +4,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Dialog, DialogActions, DialogContent, DialogTitle,
   TextField, IconButton, Alert, Snackbar, Divider,
-  InputAdornment, Select, MenuItem, FormControl,
+  InputAdornment, Select, MenuItem, FormControl, FormHelperText,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
@@ -31,6 +31,8 @@ const AdminDashboard = () => {
   const [loading, setLoading]               = useState(false);
   const [message, setMessage]               = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen]     = useState(false);
+  // Confirm-delete dialog state: { type: 'user'|'design'|'furniture', id, label }
+  const [confirmDelete, setConfirmDelete]   = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,46 +83,42 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = (id) => {
     if (loading) return;
-    if (!window.confirm('Delete this user and all their designs?')) return;
-    setLoading(true);
-    try {
-      await axios.delete(`/api/admin/users/${id}`);
-      showMessage('User deleted successfully');
-      fetchUsers();
-    } catch {
-      showMessage('Failed to delete user', 'error');
-    } finally {
-      setLoading(false);
-    }
+    setConfirmDelete({ type: 'user', id, label: 'Delete this user and all their designs?' });
   };
 
-  const handleDeleteDesign = async (id) => {
+  const handleDeleteDesign = (id) => {
     if (loading) return;
-    if (!window.confirm('Delete this design?')) return;
-    setLoading(true);
-    try {
-      await axios.delete(`/api/admin/designs/${id}`);
-      showMessage('Design deleted successfully');
-      fetchDesigns();
-    } catch {
-      showMessage('Failed to delete design', 'error');
-    } finally {
-      setLoading(false);
-    }
+    setConfirmDelete({ type: 'design', id, label: 'Delete this design?' });
   };
 
-  const handleDeleteFurniture = async (id) => {
+  const handleDeleteFurniture = (id) => {
     if (loading) return;
-    if (!window.confirm('Delete this furniture item?')) return;
+    setConfirmDelete({ type: 'furniture', id, label: 'Delete this furniture item?' });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDelete) return;
+    const { type, id } = confirmDelete;
+    setConfirmDelete(null);
     setLoading(true);
     try {
-      await axios.delete(`/api/admin/furniture/${id}`);
-      showMessage('Furniture deleted successfully');
-      fetchFurniture();
+      if (type === 'user') {
+        await axios.delete(`/api/admin/users/${id}`);
+        showMessage('User deleted successfully');
+        fetchUsers();
+      } else if (type === 'design') {
+        await axios.delete(`/api/admin/designs/${id}`);
+        showMessage('Design deleted successfully');
+        fetchDesigns();
+      } else if (type === 'furniture') {
+        await axios.delete(`/api/admin/furniture/${id}`);
+        showMessage('Furniture deleted successfully');
+        fetchFurniture();
+      }
     } catch {
-      showMessage('Failed to delete furniture', 'error');
+      showMessage('Failed to delete item', 'error');
     } finally {
       setLoading(false);
     }
@@ -503,6 +501,43 @@ const AdminDashboard = () => {
           )}
         </Box>
       </Box>
+
+      {/* ── Confirm-delete dialog ── */}
+      <Dialog
+        open={Boolean(confirmDelete)}
+        onClose={() => setConfirmDelete(null)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+          Confirm Deletion
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ color: 'var(--text-med)' }}>
+            {confirmDelete?.label}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'var(--color-error)', display: 'block', mt: 1 }}>
+            This action is permanent and cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1 }}>
+          <Button variant="outlined" onClick={() => setConfirmDelete(null)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleConfirmDelete}
+            disabled={loading}
+            sx={{
+              backgroundColor: 'var(--color-error)',
+              color: '#fff',
+              '&:hover': { backgroundColor: '#b5566a' },
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* ── Furniture Add/Edit Dialog ── */}
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">

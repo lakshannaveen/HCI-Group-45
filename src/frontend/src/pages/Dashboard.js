@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Typography, Grid, Paper,
-  Dialog, DialogContent, DialogTitle,
+  Dialog, DialogContent, DialogTitle, DialogActions,
   TextField, Select, MenuItem, FormControl, InputLabel,
   InputAdornment, Snackbar, Alert,
   IconButton, Menu,
@@ -148,6 +148,7 @@ const Dashboard = () => {
   const [message, setMessage] = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [menuState, setMenuState] = useState({ el: null, id: null });
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -169,9 +170,10 @@ const Dashboard = () => {
     }
   };
 
-  const handleDeleteDesign = async (id) => {
-    if (loading) return;
-    if (!window.confirm('Delete this design?')) return;
+  const handleDeleteDesign = async () => {
+    if (!deleteConfirmId || loading) return;
+    const id = deleteConfirmId;
+    setDeleteConfirmId(null);
     setLoading(true);
     try {
       await axios.delete(`/api/designs/${id}`);
@@ -371,7 +373,7 @@ const Dashboard = () => {
               onClick={() => {
                 const id = menuState.id;
                 setMenuState({ el: null, id: null });
-                handleDeleteDesign(id);
+                setDeleteConfirmId(id);
               }}
               sx={{ color: 'var(--color-error)' }}
             >
@@ -381,6 +383,40 @@ const Dashboard = () => {
           </>
         )}
       </Box>
+
+      {/* ── Delete confirmation dialog ── */}
+      <Dialog
+        open={Boolean(deleteConfirmId)}
+        onClose={() => setDeleteConfirmId(null)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+          Delete Design?
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ color: 'var(--text-med)' }}>
+            This action is permanent and cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1 }}>
+          <Button variant="outlined" onClick={() => setDeleteConfirmId(null)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleDeleteDesign}
+            disabled={loading}
+            sx={{
+              backgroundColor: 'var(--color-error)',
+              color: '#fff',
+              '&:hover': { backgroundColor: '#b5566a' },
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* ── Modals ── */}
       <RoomConfigModal
