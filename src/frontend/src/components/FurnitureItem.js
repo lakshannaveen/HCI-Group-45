@@ -289,36 +289,37 @@ function FurnitureObject({
 
 // ─── Room (floor + three walls) ───────────────────────────────────────────────
 function Room({ width = 10, depth = 10, wallColor = '#e8e8e8' }) {
-  const wallH  = 3;
-  const halfW  = width  / 2;
-  const halfD  = depth  / 2;
-  const floorY = -2;
-  const col    = (wallColor && !wallColor.startsWith('var(')) ? wallColor : '#e8e8e8';
+  const wallH     = 3;
+  const halfW     = width  / 2;
+  const halfD     = depth  / 2;
+  const floorY    = -2;
+  const wallCol   = (wallColor && !wallColor.startsWith('var(')) ? wallColor : '#e8e8e8';
+  const FLOOR_COL = '#c8b89a'; // static warm timber — unaffected by wall colour
 
   return (
     <group>
-      {/* Floor */}
+      {/* Floor — always timber/neutral, wall colour does NOT apply here */}
       <mesh position={[0, floorY, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial color={col} roughness={0.9} />
+        <meshStandardMaterial color={FLOOR_COL} roughness={0.85} />
       </mesh>
 
       {/* Back wall */}
       <mesh position={[0, floorY + wallH / 2, -halfD]} receiveShadow>
         <boxGeometry args={[width + 0.25, wallH, 0.12]} />
-        <meshStandardMaterial color={col} roughness={0.9} />
+        <meshStandardMaterial color={wallCol} roughness={0.9} />
       </mesh>
 
       {/* Left wall */}
       <mesh position={[-halfW, floorY + wallH / 2, 0]} receiveShadow>
         <boxGeometry args={[0.12, wallH, depth]} />
-        <meshStandardMaterial color={col} roughness={0.9} />
+        <meshStandardMaterial color={wallCol} roughness={0.9} />
       </mesh>
 
       {/* Right wall */}
       <mesh position={[halfW, floorY + wallH / 2, 0]} receiveShadow>
         <boxGeometry args={[0.12, wallH, depth]} />
-        <meshStandardMaterial color={col} roughness={0.9} />
+        <meshStandardMaterial color={wallCol} roughness={0.9} />
       </mesh>
     </group>
   );

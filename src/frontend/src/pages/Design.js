@@ -405,163 +405,116 @@ const Design = () => {
           borderBottom: '1px solid var(--grid-lines)',
           flexShrink: 0,
           minHeight: 48,
+          gap: 1,
           position: 'relative',
         }}
       >
-        {/* ── Left group ── */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+        {/* Dashboard button */}
+        <Button
+          size="small"
+          variant="text"
+          onClick={() => navigate('/dashboard')}
+          sx={{ color: 'var(--text-med)', fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap' }}
+        >
+          ← Dashboard
+        </Button>
 
-          {/* Dashboard button */}
-          <Button
-            size="small"
-            variant="text"
-            onClick={() => navigate('/dashboard')}
-            sx={{ color: 'var(--text-med)', fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap' }}
-          >
-            ← Dashboard
-          </Button>
+        {/* 1px divider */}
+        <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
 
-          {/* Separator */}
-          <Box sx={{ width: 1, height: 22, backgroundColor: 'var(--grid-lines)', mx: 1 }} />
-
-          {/* File ops group */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Tooltip title="Open Design">
-              <span>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                  onClick={() => setOpenDialogOpen(true)}
-                >
-                  📁
-                </Button>
-              </span>
-            </Tooltip>
-
-            <Tooltip title="Save Design">
-              <span>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  disabled={loading}
-                  sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                  onClick={handleSave}
-                >
-                  {loading ? <CircularProgress size={14} /> : '💾'}
-                </Button>
-              </span>
-            </Tooltip>
-
-            <Tooltip title="Undo (Ctrl+Z)">
-              <span>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  disabled={historyIndex === 0}
-                  sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                  onClick={handleUndo}
-                >
-                  ↩
-                </Button>
-              </span>
-            </Tooltip>
-
-            <Tooltip title="Redo (Ctrl+Y)">
-              <span>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  disabled={historyIndex >= history.length - 1}
-                  sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                  onClick={handleRedo}
-                >
-                  ↪
-                </Button>
-              </span>
-            </Tooltip>
-          </Box>
-
-          {/* Separator */}
-          <Box sx={{ width: 1, height: 22, backgroundColor: 'var(--grid-lines)', mx: 1 }} />
-
-          {/* Design name */}
-          <TextField
-            value={designName}
-            onChange={(e) => setDesignName(e.target.value)}
-            size="small"
-            variant="outlined"
-            placeholder="Design name…"
-            sx={{
-              width: 180,
-              '& .MuiOutlinedInput-input': { py: 0.6, fontSize: 13 },
-            }}
-          />
-
-          {/* Separator */}
-          <Box sx={{ width: 1, height: 22, backgroundColor: 'var(--grid-lines)', mx: 1 }} />
-
-          {/* Snap toggle */}
-          <Tooltip title="Snap objects to 0.5-unit grid">
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={snapToGridEnabled}
-                  onChange={(e) => setSnapToGridEnabled(e.target.checked)}
-                  sx={{ '& .MuiSwitch-thumb': { width: 14, height: 14 } }}
-                />
-              }
-              label={
-                <Typography variant="caption" sx={{ color: 'var(--text-med)', fontSize: 11 }}>
-                  Snap
-                </Typography>
-              }
-              sx={{ m: 0, gap: 0.5 }}
-            />
+        {/* File ops: open · save · undo · redo */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Tooltip title="Open Design">
+            <span>
+              <Button size="small" variant="outlined"
+                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
+                onClick={() => setOpenDialogOpen(true)}>📁</Button>
+            </span>
           </Tooltip>
-
-          {/* Separator */}
-          <Box sx={{ width: 1, height: 22, backgroundColor: 'var(--grid-lines)', mx: 1 }} />
-
-          {/* Move / Rotate mode toggle */}
-          <Tooltip title="Switch between Move and Rotate">
-            <Box
-              sx={{
-                display: 'flex',
-                border: '1px solid var(--grid-lines)',
-                borderRadius: 1,
-                overflow: 'hidden',
-              }}
-            >
-              {[
-                { mode: 'translate', label: '↕', title: 'Move' },
-                { mode: 'rotate',    label: '↻', title: 'Rotate' },
-              ].map(({ mode, label, title }) => {
-                const active = transformMode === mode;
-                return (
-                  <Button
-                    key={mode}
-                    size="small"
-                    onClick={() => setTransformMode(mode)}
-                    title={title}
-                    sx={{
-                      px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: 15,
-                      backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
-                      color: active ? 'var(--canvas-base)' : 'var(--text-med)',
-                      fontWeight: active ? 700 : 400,
-                      '&:hover': { backgroundColor: active ? 'var(--brand-primary-hover)' : 'var(--surface-2)' },
-                    }}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
-            </Box>
+          <Tooltip title="Save Design">
+            <span>
+              <Button size="small" variant="outlined" disabled={loading}
+                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
+                onClick={handleSave}>
+                {loading ? <CircularProgress size={14} /> : '💾'}
+              </Button>
+            </span>
+          </Tooltip>
+          <Tooltip title="Undo (Ctrl+Z)">
+            <span>
+              <Button size="small" variant="outlined" disabled={historyIndex === 0}
+                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
+                onClick={handleUndo}>↩</Button>
+            </span>
+          </Tooltip>
+          <Tooltip title="Redo (Ctrl+Y)">
+            <span>
+              <Button size="small" variant="outlined" disabled={historyIndex >= history.length - 1}
+                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
+                onClick={handleRedo}>↪</Button>
+            </span>
           </Tooltip>
         </Box>
 
-        {/* ── Centre: 2D / 3D toggle ── */}
+        {/* 1px divider */}
+        <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
+
+        {/* Design name */}
+        <TextField
+          value={designName}
+          onChange={(e) => setDesignName(e.target.value)}
+          size="small"
+          variant="outlined"
+          placeholder="Design name…"
+          sx={{ width: 180, '& .MuiOutlinedInput-input': { py: 0.6, fontSize: 13 } }}
+        />
+
+        {/* 1px divider */}
+        <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
+
+        {/* Snap toggle */}
+        <Tooltip title="Snap objects to 0.5-unit grid">
+          <FormControlLabel
+            control={
+              <Switch size="small" checked={snapToGridEnabled}
+                onChange={(e) => setSnapToGridEnabled(e.target.checked)}
+                sx={{ '& .MuiSwitch-thumb': { width: 14, height: 14 } }} />
+            }
+            label={
+              <Typography variant="caption" sx={{ color: 'var(--text-med)', fontSize: 11 }}>
+                Snap
+              </Typography>
+            }
+            sx={{ m: 0, gap: 0.5 }}
+          />
+        </Tooltip>
+
+        {/* 1px divider */}
+        <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
+
+        {/* Move / Rotate toggle */}
+        <Tooltip title="Switch between Move and Rotate">
+          <Box sx={{ display: 'flex', border: '1px solid var(--grid-lines)', borderRadius: 1, overflow: 'hidden' }}>
+            {[
+              { mode: 'translate', label: '↕', title: 'Move' },
+              { mode: 'rotate',    label: '↻', title: 'Rotate' },
+            ].map(({ mode, label, title }) => {
+              const active = transformMode === mode;
+              return (
+                <Button key={mode} size="small" onClick={() => setTransformMode(mode)} title={title}
+                  sx={{
+                    px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: 15,
+                    backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
+                    color: active ? 'var(--canvas-base)' : 'var(--text-med)',
+                    fontWeight: active ? 700 : 400,
+                    '&:hover': { backgroundColor: active ? 'var(--brand-primary-hover)' : 'var(--surface-2)' },
+                  }}>{label}</Button>
+              );
+            })}
+          </Box>
+        </Tooltip>
+
+        {/* ── Centre: 2D / 3D toggle (absolutely centred) ── */}
         <Box
           sx={{
             position: 'absolute',
@@ -576,31 +529,18 @@ const Design = () => {
           {['2D', '3D'].map((mode) => {
             const active = mode === '2D' ? is2DMode : !is2DMode;
             return (
-              <Button
-                key={mode}
-                size="small"
-                onClick={() => setIs2DMode(mode === '2D')}
+              <Button key={mode} size="small" onClick={() => setIs2DMode(mode === '2D')}
                 sx={{
-                  px: 2.5,
-                  py: 0.5,
-                  borderRadius: 0,
-                  minWidth: 48,
+                  px: 2.5, py: 0.5, borderRadius: 0, minWidth: 48,
                   backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
                   color: active ? 'var(--canvas-base)' : 'var(--text-med)',
                   fontWeight: active ? 700 : 400,
-                  '&:hover': {
-                    backgroundColor: active ? 'var(--brand-primary-hover)' : 'var(--surface-2)',
-                  },
-                }}
-              >
-                {mode}
-              </Button>
+                  '&:hover': { backgroundColor: active ? 'var(--brand-primary-hover)' : 'var(--surface-2)' },
+                }}>{mode}</Button>
             );
           })}
         </Box>
 
-        {/* ── Right: placeholder ── */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }} />
       </Box>
 
       {/* ════ THREE-COLUMN LAYOUT ════ */}
@@ -787,31 +727,6 @@ const Design = () => {
             roomData={roomData}
             transformMode={transformMode}
           />
-
-          {/* Coordinate label */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 8,
-              left: 8,
-              pointerEvents: 'none',
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'var(--text-low)',
-                fontFamily: 'monospace',
-                fontSize: 10,
-                backgroundColor: 'rgba(18,20,21,0.7)',
-                px: 0.75,
-                py: 0.25,
-                borderRadius: 0.5,
-              }}
-            >
-              0, 0
-            </Typography>
-          </Box>
 
           {/* Room size indicator */}
           <Box
@@ -1082,34 +997,6 @@ const Design = () => {
                   />
                 </Box>
 
-                {/* Stroke (decorative) */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'var(--text-low)', width: 36, flexShrink: 0 }}
-                  >
-                    Stroke
-                  </Typography>
-                  <TextField
-                    size="small"
-                    value="#000000"
-                    disabled
-                    sx={{
-                      flex: 1,
-                      '& input': { fontSize: 10, fontFamily: 'monospace', py: 0.75 },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      width: 28,
-                      height: 28,
-                      backgroundColor: '#000000',
-                      border: '1px solid var(--grid-lines)',
-                      borderRadius: 0.5,
-                      flexShrink: 0,
-                    }}
-                  />
-                </Box>
               </Box>
 
               <Divider />
