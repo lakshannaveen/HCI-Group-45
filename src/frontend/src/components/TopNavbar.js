@@ -48,12 +48,20 @@ const TopNavbar = () => {
             alt="Athlier Home"
             style={{ width: 28, height: 28, objectFit: 'contain' }}
           />
-          <Typography
-            variant="body1"
-            sx={{ color: 'var(--brand-primary)', fontWeight: 700, letterSpacing: '-0.01em' }}
-          >
-            Athlier Home
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography
+              variant="h6"
+              sx={{ color: 'var(--brand-primary)', fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}
+            >
+              Athlier Home
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ color: 'var(--text-med)', letterSpacing: '0.05em', lineHeight: 1 }}
+            >
+              Design Studio
+            </Typography>
+          </Box>
         </Box>
 
         {/* Right: Admin Panel + User icon */}
