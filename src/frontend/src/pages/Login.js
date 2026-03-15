@@ -153,25 +153,14 @@ function RegisterModal({ open, onClose }) {
             />
           </Box>
 
-          {/* Footer: two equal-width buttons */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="outlined"
-              onClick={handleClose}
-              fullWidth
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={loading}
-            >
-              {loading ? 'Creating…' : 'Create Account'}
-            </Button>
-          </Box>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading}
+            sx={{ display: 'block', mx: 'auto', minWidth: 180 }}
+          >
+            {loading ? 'Creating…' : 'Create Account'}
+          </Button>
 
           <Button
             variant="text"
@@ -244,18 +233,6 @@ const Login = () => {
         gap: 2,
       }}
     >
-      {/* Logo / brand */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-        <img
-          src="/logo.PNG"
-          alt="Athlier Home"
-          style={{ width: 40, height: 40, objectFit: 'contain' }}
-        />
-        <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
-          Athlier Home
-        </Typography>
-      </Box>
-
       <Paper
         elevation={0}
         sx={{

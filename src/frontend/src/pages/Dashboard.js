@@ -4,7 +4,9 @@ import {
   Dialog, DialogContent, DialogTitle,
   TextField, Select, MenuItem, FormControl, InputLabel,
   InputAdornment, Snackbar, Alert,
+  IconButton, Menu,
 } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import TopNavbar from '../components/TopNavbar';
@@ -145,6 +147,7 @@ const Dashboard = () => {
   const [roomConfigOpen, setRoomConfigOpen] = useState(false);
   const [message, setMessage] = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [menuState, setMenuState] = useState({ el: null, id: null });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -248,14 +251,15 @@ const Dashboard = () => {
             </Button>
           </Box>
         ) : (
-          /* Design card grid — 4 cols on lg, 3 on md, 2 on sm, 1 on xs */
+          <>
+          {/* Design card grid */}
           <Grid container spacing={2}>
             {designs.map((design) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={design._id}>
+              <Grid item xs={12} sm={12} md={12} lg={12} key={design._id}>
                 <Paper
                   elevation={0}
                   sx={{
-                    p: 2,
+                    p: 2.5,
                     backgroundColor: 'var(--surface-1)',
                     border: '1px solid var(--grid-lines)',
                     cursor: 'pointer',
@@ -267,12 +271,24 @@ const Dashboard = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 1.5,
-                    minHeight: 180,
+                    gap: 1,
+                    position: 'relative',
                   }}
                   onClick={() => navigate(`/design/${design._id}`)}
                 >
-                  {/* Design icon placeholder */}
+                  {/* Three-dot menu button */}
+                  <IconButton
+                    size="small"
+                    sx={{ position: 'absolute', top: 6, right: 6, color: 'var(--text-low)' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuState({ el: e.currentTarget, id: design._id });
+                    }}
+                  >
+                    <MoreHorizIcon fontSize="small" />
+                  </IconButton>
+
+                  {/* Design icon */}
                   <Box
                     sx={{
                       width: 80,
@@ -283,13 +299,13 @@ const Dashboard = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 32,
+                      fontSize: 36,
                       flexShrink: 0,
                       position: 'relative',
+                      mt: 1,
                     }}
                   >
                     🏠
-                    {/* Furniture count badge */}
                     {design.furniture?.length > 0 && (
                       <Box
                         sx={{
@@ -314,12 +330,7 @@ const Dashboard = () => {
                   {/* Design title */}
                   <Typography
                     variant="body2"
-                    sx={{
-                      color: 'var(--text-high)',
-                      fontWeight: 600,
-                      textAlign: 'center',
-                      wordBreak: 'break-word',
-                    }}
+                    sx={{ color: 'var(--text-high)', fontWeight: 600, textAlign: 'center', wordBreak: 'break-word' }}
                   >
                     {design.name}
                   </Typography>
@@ -328,12 +339,7 @@ const Dashboard = () => {
                   {design.roomData && (
                     <Typography
                       variant="caption"
-                      sx={{
-                        color: 'var(--brand-primary)',
-                        fontFamily: 'monospace',
-                        fontSize: 10,
-                        mt: -0.5,
-                      }}
+                      sx={{ color: 'var(--brand-primary)', fontFamily: 'monospace', fontSize: 10 }}
                     >
                       {design.roomData.width || '?'}m × {design.roomData.length || design.roomData.height || '?'}m
                     </Typography>
@@ -342,41 +348,37 @@ const Dashboard = () => {
                   <Typography variant="caption" sx={{ color: 'var(--text-low)' }}>
                     {new Date(design.createdAt).toLocaleDateString()}
                   </Typography>
-
-                  {/* Card actions */}
-                  <Box
-                    sx={{ display: 'flex', gap: 0.5, mt: 'auto', width: '100%' }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      fullWidth
-                      onClick={() => navigate(`/design/${design._id}`)}
-                      sx={{ fontSize: 11 }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      fullWidth
-                      onClick={() => handleDeleteDesign(design._id)}
-                      disabled={loading}
-                      sx={{
-                        fontSize: 11,
-                        borderColor: 'var(--color-error)',
-                        color: 'var(--color-error)',
-                        '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)' },
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
                 </Paper>
               </Grid>
             ))}
           </Grid>
+
+          {/* Three-dot context menu */}
+          <Menu
+            anchorEl={menuState.el}
+            open={Boolean(menuState.el)}
+            onClose={() => setMenuState({ el: null, id: null })}
+          >
+            <MenuItem
+              onClick={() => {
+                setMenuState({ el: null, id: null });
+                navigate(`/design/${menuState.id}`);
+              }}
+            >
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                const id = menuState.id;
+                setMenuState({ el: null, id: null });
+                handleDeleteDesign(id);
+              }}
+              sx={{ color: 'var(--color-error)' }}
+            >
+              Delete
+            </MenuItem>
+          </Menu>
+          </>
         )}
       </Box>
 
