@@ -217,13 +217,18 @@ const Dashboard = () => {
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             mb: 3,
           }}
         >
-          <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 600 }}>
-            Recent Designs
-          </Typography>
+          <Box>
+            <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 600 }}>
+              Recent Designs
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'var(--text-low)', mt: 0.5 }}>
+              Your saved room configurations
+            </Typography>
+          </Box>
           <Button variant="contained" onClick={() => setRoomConfigOpen(true)}>
             + Create New Room
           </Button>
@@ -255,11 +260,11 @@ const Dashboard = () => {
           {/* Design card grid */}
           <Grid container spacing={2}>
             {designs.map((design) => (
-              <Grid item xs={12} sm={12} md={12} lg={12} key={design._id}>
+              <Grid item xs={12} sm={6} md={4} lg={4} key={design._id}>
                 <Paper
                   elevation={0}
                   sx={{
-                    p: 2.5,
+                    p: 3,
                     backgroundColor: 'var(--surface-1)',
                     border: '1px solid var(--grid-lines)',
                     cursor: 'pointer',
@@ -271,8 +276,11 @@ const Dashboard = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 1,
+                    justifyContent: 'center',
+                    gap: 1.5,
                     position: 'relative',
+                    width: '100%',
+                    aspectRatio: '1 / 1',
                   }}
                   onClick={() => navigate(`/design/${design._id}`)}
                 >
