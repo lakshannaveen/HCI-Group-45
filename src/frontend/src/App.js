@@ -51,7 +51,7 @@ const theme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true, size: 'small' },
       styleOverrides: {
-        sizeSmall: { height: 36, minHeight: 36 },
+        sizeSmall: { height: 36, minHeight: 36, padding: '0 16px', minWidth: 80 },
         containedPrimary: {
           backgroundColor: '#839705',
           color: '#121415',                               // WCAG AAA on olive
