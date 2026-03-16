@@ -74,14 +74,16 @@ const TopNavbar = () => {
                 variant="outlined"
                 size="small"
                 onClick={() => navigate('/dashboard')}
+                sx={{ minWidth: 'auto', px: 2 }}
               >
                 Dashboard
               </Button>
             ) : (
               <Button
-                variant="contained"
+                variant="outlined"
                 size="small"
                 onClick={() => navigate('/admin-dashboard')}
+                sx={{ minWidth: 'auto', px: 2 }}
               >
                 Admin Panel
               </Button>

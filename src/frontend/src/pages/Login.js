@@ -10,7 +10,6 @@ import axios from '../utils/axios';
 function RegisterModal({ open, onClose }) {
   const [form, setForm] = useState({
     fullName: '',
-    staffId: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -20,7 +19,7 @@ function RegisterModal({ open, onClose }) {
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
-    setForm({ fullName: '', staffId: '', email: '', password: '', confirmPassword: '' });
+    setForm({ fullName: '', email: '', password: '', confirmPassword: '' });
     setError('');
     setSuccess('');
     onClose();
@@ -33,9 +32,9 @@ function RegisterModal({ open, onClose }) {
       return;
     }
 
-    // Build a valid username (alphanumeric, 3-20 chars) from Full Name or Staff ID
+    // Build a valid username (alphanumeric, 3-20 chars) from Full Name
     const rawUsername =
-      (form.fullName || form.staffId || '')
+      (form.fullName || '')
         .replace(/[^a-zA-Z0-9]/g, '') // strip non-alphanumeric
         .slice(0, 20);
 
@@ -75,7 +74,10 @@ function RegisterModal({ open, onClose }) {
           fontWeight: 700,
         }}
       >
-        Create Account
+        Create Designer Account
+        <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+          Join the Athlier Home design team
+        </Typography>
       </DialogTitle>
 
       <DialogContent sx={{ backgroundColor: 'var(--surface-1)' }}>
@@ -97,15 +99,6 @@ function RegisterModal({ open, onClose }) {
             disabled={loading}
             placeholder="e.g. JaneSmith"
             helperText="Letters and numbers only — used as your username"
-          />
-          <TextField
-            label="Staff ID"
-            value={form.staffId}
-            onChange={(e) => setForm((f) => ({ ...f, staffId: e.target.value }))}
-            fullWidth
-            size="small"
-            disabled={loading}
-            placeholder="Optional"
           />
           <TextField
             label="Email Address"
@@ -285,14 +278,14 @@ const Login = () => {
             align="center"
             sx={{ color: 'var(--text-high)', mb: 0.5 }}
           >
-            Welcome back
+            Designer Login Portal
           </Typography>
           <Typography
             variant="body2"
             align="center"
             sx={{ mb: 3, color: 'var(--text-med)' }}
           >
-            Sign in to continue designing
+            Sign in to Athlier Home
           </Typography>
 
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
@@ -345,7 +338,7 @@ const Login = () => {
               disabled={loading}
               sx={{ mb: 2 }}
             >
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? 'Signing in…' : 'Log In'}
             </Button>
 
             {/* Registration link (text link, not a button) */}

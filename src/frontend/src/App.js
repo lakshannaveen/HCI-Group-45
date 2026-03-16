@@ -34,16 +34,16 @@ const theme = createTheme({
   typography: {
     fontFamily: "'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     fontSize: 14,
-    h4: { fontSize: '1.375rem', fontWeight: 700 },
-    h5: { fontSize: '1.125rem', fontWeight: 600 },
-    h6: { fontSize: '1rem',     fontWeight: 600 },
-    subtitle1: { fontSize: '0.9375rem', fontWeight: 500 },
-    subtitle2: { fontSize: '0.875rem',  fontWeight: 600 },
-    body1:     { fontSize: '0.875rem' },
-    body2:     { fontSize: '0.8125rem' },
-    caption:   { fontSize: '0.75rem',   lineHeight: 1.4 },
+    h4: { fontSize: '1.375rem', fontWeight: 700, lineHeight: 1.3 },
+    h5: { fontSize: '1.125rem', fontWeight: 700, lineHeight: 1.3 },
+    h6: { fontSize: '1rem',     fontWeight: 600, lineHeight: 1.4 },
+    subtitle1: { fontSize: '0.9375rem', fontWeight: 500, lineHeight: 1.5 },
+    subtitle2: { fontSize: '0.875rem',  fontWeight: 600, lineHeight: 1.5 },
+    body1:     { fontSize: '0.875rem',  lineHeight: 1.6 },
+    body2:     { fontSize: '0.8125rem', lineHeight: 1.6 },
+    caption:   { fontSize: '0.75rem',   lineHeight: 1.5 },
     overline:  { fontSize: '0.625rem',  fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.4 },
-    button:    { textTransform: 'none', fontWeight: 500, fontSize: '0.875rem' },
+    button:    { textTransform: 'none', fontWeight: 500, fontSize: '0.875rem', lineHeight: 1 },
   },
   shape: { borderRadius: 8 },
   components: {
@@ -51,7 +51,11 @@ const theme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true, size: 'small' },
       styleOverrides: {
-        sizeSmall: { height: 36, minHeight: 36, padding: '0 16px', minWidth: 80 },
+        root: {
+          borderRadius: 6,
+          letterSpacing: '0.01em',
+        },
+        sizeSmall: { height: 36, minHeight: 36, padding: '0 14px', minWidth: 'auto' },
         containedPrimary: {
           backgroundColor: '#839705',
           color: '#121415',                               // WCAG AAA on olive
@@ -68,6 +72,10 @@ const theme = createTheme({
           },
           '&:active': { borderColor: '#657504' },
         },
+        text: {
+          color: 'var(--text-med)',
+          '&:hover': { backgroundColor: 'rgba(160,170,178,0.08)' },
+        },
       },
     },
 
@@ -76,11 +84,19 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: 'var(--surface-2)',
+          borderRadius: 6,
           '& fieldset': { borderColor: 'var(--grid-lines)' },
           '&:hover:not(.Mui-disabled) fieldset': { borderColor: 'var(--text-med)' },
           '&.Mui-focused fieldset': { borderColor: 'var(--color-focus)' }, // #64B5F6
         },
-        input: { color: 'var(--text-high)' },
+        input: {
+          color: 'var(--text-high)',
+          fontSize: '0.875rem',
+        },
+        inputSizeSmall: {
+          paddingTop: 8,
+          paddingBottom: 8,
+        },
       },
     },
 
@@ -204,21 +220,34 @@ const theme = createTheme({
     },
 
     // ── Tables ───────────────────────────────────────────────────────────────
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          '&:hover': { backgroundColor: 'var(--surface-2)' },
+          transition: 'background-color 0.1s',
+        },
+        head: {
+          '&:hover': { backgroundColor: 'transparent' },
+        },
+      },
+    },
     MuiTableCell: {
       styleOverrides: {
         root: {
           borderBottom: '1px solid var(--grid-lines)',
           color: 'var(--text-high)',
-          padding: '10px 16px',
+          padding: '11px 16px',
           fontSize: '0.875rem',
+          lineHeight: 1.5,
         },
         head: {
           color: 'var(--text-med)',
           fontWeight: 600,
           backgroundColor: 'var(--surface-2)',
-          padding: '8px 16px',
-          fontSize: '0.8rem',
-          letterSpacing: '0.03em',
+          padding: '9px 16px',
+          fontSize: '0.75rem',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
         },
       },
     },

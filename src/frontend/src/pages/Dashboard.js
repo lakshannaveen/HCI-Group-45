@@ -39,6 +39,9 @@ function RoomConfigModal({ open, onClose, onCreate }) {
         }}
       >
         New Room Setup
+        <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+          Configure your room dimensions
+        </Typography>
       </DialogTitle>
 
       <DialogContent sx={{ backgroundColor: 'var(--surface-1)' }}>

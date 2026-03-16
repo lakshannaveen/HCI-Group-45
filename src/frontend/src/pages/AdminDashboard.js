@@ -244,9 +244,14 @@ const AdminDashboard = () => {
           {/* ── User Management ── */}
           {tabValue === 0 && (
             <Box>
-              <Typography variant="h5" sx={{ mb: 2, color: 'var(--text-high)', fontWeight: 700 }}>
-                User Management
-              </Typography>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+                  User Management
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'var(--text-med)', mt: 0.5 }}>
+                  View and manage all registered designer accounts
+                </Typography>
+              </Box>
               <TableContainer component={Paper} sx={{ backgroundColor: 'var(--surface-1)' }}>
                 <Table>
                   <TableHead>
@@ -260,10 +265,7 @@ const AdminDashboard = () => {
                   </TableHead>
                   <TableBody>
                     {users.map((user) => (
-                      <TableRow
-                        key={user._id}
-                        sx={{ '&:hover': { backgroundColor: 'var(--surface-2)' } }}
-                      >
+                      <TableRow key={user._id}>
                         <TableCell>{user.username}</TableCell>
                         <TableCell>{user.email || '—'}</TableCell>
                         <TableCell>{user.role}</TableCell>
@@ -302,9 +304,14 @@ const AdminDashboard = () => {
                   mb: 2,
                 }}
               >
-                <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
-                  Furniture Inventory
-                </Typography>
+                <Box>
+                  <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+                    Furniture Inventory
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'var(--text-med)', mt: 0.5 }}>
+                    Manage furniture items and catalogue
+                  </Typography>
+                </Box>
                 <Button variant="contained" size="small" onClick={handleAddFurniture}>
                   + Add New Item
                 </Button>
@@ -354,10 +361,7 @@ const AdminDashboard = () => {
                   </TableHead>
                   <TableBody>
                     {filteredFurniture.map((item) => (
-                      <TableRow
-                        key={item._id}
-                        sx={{ '&:hover': { backgroundColor: 'var(--surface-2)' } }}
-                      >
+                      <TableRow key={item._id}>
                         <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.6875rem' }}>
                           {item._id.slice(-6)}
                         </TableCell>
@@ -416,9 +420,14 @@ const AdminDashboard = () => {
           {/* ── Project Archives ── */}
           {tabValue === 2 && (
             <Box>
-              <Typography variant="h5" sx={{ mb: 2, color: 'var(--text-high)', fontWeight: 700 }}>
-                Project Archives
-              </Typography>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+                  Project Archives
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'var(--text-med)', mt: 0.5 }}>
+                  All saved room designs across all designers
+                </Typography>
+              </Box>
               {designs.length === 0 ? (
                 <Box
                   sx={{
@@ -446,10 +455,7 @@ const AdminDashboard = () => {
                     </TableHead>
                     <TableBody>
                       {designs.map((design) => (
-                        <TableRow
-                          key={design._id}
-                          sx={{ '&:hover': { backgroundColor: 'var(--surface-2)' } }}
-                        >
+                        <TableRow key={design._id}>
                           <TableCell>{design.name}</TableCell>
                           <TableCell>{design.userId?.username || '—'}</TableCell>
                           <TableCell>
