@@ -193,12 +193,7 @@ const AdminDashboard = () => {
           }}
         >
           {/* Brand mark */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, px: 1 }}>
-            <img
-              src="/logo.PNG"
-              alt="Athlier Home"
-              style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }}
-            />
+          <Box sx={{ mb: 3, px: 1 }}>
             <Typography
               variant="h6"
               sx={{ color: 'var(--text-high)', fontWeight: 700, letterSpacing: '-0.01em' }}
@@ -241,20 +236,6 @@ const AdminDashboard = () => {
             })}
           </List>
 
-          <Divider sx={{ my: 2 }} />
-          <ListItem
-            onClick={handleLogout}
-            sx={{
-              borderRadius: '6px',
-              cursor: 'pointer',
-              '&:hover': { backgroundColor: 'var(--surface-2)' },
-            }}
-          >
-            <ListItemText
-              primary="Logout"
-              primaryTypographyProps={{ fontSize: '0.875rem', color: 'var(--text-high)' }}
-            />
-          </ListItem>
         </Box>
 
         {/* Main Content Area */}
