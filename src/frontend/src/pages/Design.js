@@ -33,10 +33,13 @@ const FURNITURE_CATALOGUE = [
 
 // ─── Tool palette ─────────────────────────────────────────────────────────────
 const TOOLS = [
-  { id: 'select',    label: 'Select',    symbol: '▶',  hasLibrary: false },
-  { id: 'chair',     label: 'Chair',     symbol: '🪑', hasLibrary: true,  filter: 'chair' },
-  { id: 'lamp',      label: 'Lamp',      symbol: '💡', hasLibrary: true,  filter: 'lamp'  },
-  { id: 'furniture', label: 'Furniture', symbol: '🏠', hasLibrary: true,  filter: null    },
+  { id: 'select',   label: 'Select',   symbol: '▶',  hasLibrary: false },
+  { id: 'seating',  label: 'Seating',  symbol: '🪑', hasLibrary: true, filter: ['chair', 'sofa'] },
+  { id: 'beds',     label: 'Beds',     symbol: '🛏️', hasLibrary: true, filter: ['bed'] },
+  { id: 'tables',   label: 'Tables',   symbol: '🍽️', hasLibrary: true, filter: ['table', 'dining-table', 'coffee-table', 'desk'] },
+  { id: 'storage',  label: 'Storage',  symbol: '🗄️', hasLibrary: true, filter: ['wardrobe', 'bookshelf'] },
+  { id: 'lighting', label: 'Lighting', symbol: '💡', hasLibrary: true, filter: ['lamp'] },
+  { id: 'all',      label: 'All',      symbol: '🏠', hasLibrary: true, filter: null },
 ];
 
 // ─── Numeric field for properties panel ──────────────────────────────────────
@@ -322,10 +325,11 @@ const Design = () => {
     }
   };
 
-  const getLibraryItems = () =>
-    activeFilter
-      ? furnitureCatalogue.filter((f) => f.type === activeFilter)
-      : furnitureCatalogue;
+  const getLibraryItems = () => {
+    if (!activeFilter) return furnitureCatalogue;
+    if (Array.isArray(activeFilter)) return furnitureCatalogue.filter((f) => activeFilter.includes(f.type));
+    return furnitureCatalogue.filter((f) => f.type === activeFilter);
+  };
 
   // ── Furniture operations ───────────────────────────────────────────────────
   const handleAddFurniture = (template) => {
