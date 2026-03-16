@@ -55,3 +55,32 @@ body {
   background-color: var(--canvas-base);
   color: var(--text-high);
 }
+
+/* ── Input / autofill ────────────────────────────────────────────────────── */
+
+/* Neutralise browser-injected autofill blue across all MUI outlined inputs */
+.MuiOutlinedInput-input:-webkit-autofill,
+.MuiOutlinedInput-input:-webkit-autofill:hover,
+.MuiOutlinedInput-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+  -webkit-text-fill-color: var(--text-high);
+  caret-color: var(--text-high);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Floating label background so it masks the fieldset border cleanly */
+.MuiInputLabel-root.MuiInputLabel-shrink {
+  background-color: var(--surface-1);
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+/* ── Native colour picker ────────────────────────────────────────────────── */
+input[type='color'] {
+  background-color: var(--surface-2);
+  cursor: pointer;
+}
+input[type='color']:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

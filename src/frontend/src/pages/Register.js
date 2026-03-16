@@ -117,22 +117,12 @@ const Register = () => {
           />
           <Button
             type="submit"
-            fullWidth
             variant="contained"
             color="primary"
             disabled={loading}
-            sx={{ mb: 2 }}
+            sx={{ display: 'block', mx: 'auto', minWidth: 180 }}
           >
             {loading ? 'Creating account…' : 'Create account'}
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate('/')}
-            disabled={loading}
-          >
-            Back to sign in
           </Button>
         </Box>
       </Paper>
