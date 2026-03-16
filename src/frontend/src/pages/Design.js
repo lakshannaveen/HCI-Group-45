@@ -388,6 +388,47 @@ const Design = () => {
     setSelectedId(null);
   };
 
+  const handleRotationChange = (axis, value) => {
+    if (!selectedItem) return;
+    const idx = { x: 0, y: 1, z: 2 }[axis];
+    const newRot = [...(selectedItem.rotation || [0, 0, 0])];
+    newRot[idx] = (value * Math.PI) / 180;
+    updateSelected({ rotation: newRot });
+  };
+
+  const handleRotate90 = (direction) => {
+    if (!selectedItem) return;
+    const rot = [...(selectedItem.rotation || [0, 0, 0])];
+    rot[1] = rot[1] + (direction * Math.PI) / 2;
+    updateSelected({ rotation: rot });
+  };
+
+  const handleFlip = (axis) => {
+    if (!selectedItem) return;
+    const idx = { h: 0, v: 2 }[axis];
+    const newScale = [...selectedItem.scale];
+    newScale[idx] = -newScale[idx];
+    updateSelected({ scale: newScale });
+  };
+
+  const handleDuplicate = () => {
+    if (!selectedItem) return;
+    const newItem = {
+      ...selectedItem,
+      id: Date.now(),
+      name: `${selectedItem.name} (copy)`,
+      position: [
+        selectedItem.position[0] + 0.5,
+        selectedItem.position[1],
+        selectedItem.position[2] + 0.5,
+      ],
+    };
+    const newItems = [...items, newItem];
+    setItems(newItems);
+    pushHistory(newItems);
+    setSelectedId(newItem.id);
+  };
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Box
@@ -506,32 +547,41 @@ const Design = () => {
           </Box>
         </Tooltip>
 
-        {/* ── Centre: 2D / 3D toggle (absolutely centred) ── */}
-        <Box
-          sx={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            border: '1px solid var(--grid-lines)',
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}
-        >
-          {['2D', '3D'].map((mode) => {
-            const active = mode === '2D' ? is2DMode : !is2DMode;
-            return (
-              <Button key={mode} size="small" onClick={() => setIs2DMode(mode === '2D')}
-                sx={{
-                  px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: '0.8125rem',
-                  backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
-                  color: active ? 'var(--canvas-base)' : 'var(--text-med)',
-                  fontWeight: active ? 700 : 400,
-                  '&:hover': { backgroundColor: active ? 'var(--brand-primary-hover)' : 'var(--surface-2)' },
-                }}>{mode}</Button>
-            );
-          })}
-        </Box>
+        {/* Selection actions — only visible when an item is selected */}
+        {selectedItem && (
+          <>
+            <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              {[
+                { title: 'Rotate −90°',     symbol: '↺', onClick: () => handleRotate90(-1) },
+                { title: 'Rotate +90°',     symbol: '↻', onClick: () => handleRotate90(1)  },
+                { title: 'Flip Horizontal', symbol: '⇔', onClick: () => handleFlip('h')    },
+                { title: 'Flip Vertical',   symbol: '⇕', onClick: () => handleFlip('v')    },
+                { title: 'Duplicate',       symbol: '⧉', onClick: handleDuplicate          },
+                { title: 'Delete',          symbol: '🗑️', onClick: handleDeleteSelected,  danger: true },
+              ].map(({ title, symbol, onClick, danger }) => (
+                <Tooltip key={title} title={title}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={onClick}
+                    sx={{
+                      minWidth: 34, width: 34, px: 0, py: 0.5,
+                      fontSize: 15, lineHeight: 1,
+                      ...(danger && {
+                        borderColor: 'var(--color-error)',
+                        color: 'var(--color-error)',
+                        '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)', borderColor: 'var(--color-error)' },
+                      }),
+                    }}
+                  >
+                    {symbol}
+                  </Button>
+                </Tooltip>
+              ))}
+            </Box>
+          </>
+        )}
 
       </Box>
 
@@ -719,6 +769,41 @@ const Design = () => {
             roomData={roomData}
             transformMode={transformMode}
           />
+
+          {/* 2D / 3D toggle — top-right canvas overlay */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              display: 'flex',
+              border: '1px solid var(--grid-lines)',
+              borderRadius: 1,
+              overflow: 'hidden',
+              zIndex: 10,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+            }}
+          >
+            {['2D', '3D'].map((mode) => {
+              const active = mode === '2D' ? is2DMode : !is2DMode;
+              return (
+                <Button
+                  key={mode}
+                  size="small"
+                  onClick={() => setIs2DMode(mode === '2D')}
+                  sx={{
+                    px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: '0.8125rem',
+                    backgroundColor: active ? 'var(--brand-primary)' : 'var(--surface-1)',
+                    color: active ? 'var(--canvas-base)' : 'var(--text-med)',
+                    fontWeight: active ? 700 : 400,
+                    '&:hover': { backgroundColor: active ? 'var(--brand-primary)' : 'var(--surface-2)' },
+                  }}
+                >
+                  {mode}
+                </Button>
+              );
+            })}
+          </Box>
 
           {/* Room size indicator */}
           <Box
@@ -913,32 +998,13 @@ const Design = () => {
           ) : (
             <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-              {/* Object name + delete */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}
-                >
-                  {selectedItem.name}
-                </Typography>
-                <Tooltip title="Delete">
-                  <span>
-                    <Box
-                      onClick={handleDeleteSelected}
-                      sx={{
-                        cursor: 'pointer',
-                        color: 'var(--color-error)',
-                        fontSize: 15,
-                        '&:hover': { opacity: 0.7 },
-                      }}
-                    >
-                      🗑️
-                    </Box>
-                  </span>
-                </Tooltip>
-              </Box>
-
-              <Divider />
+              {/* Object name */}
+              <Typography
+                variant="caption"
+                sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}
+              >
+                {selectedItem.name}
+              </Typography>
 
               {/* Dimensions (position) */}
               <Box>
@@ -970,6 +1036,45 @@ const Design = () => {
                     label="Z Position"
                     value={selectedItem.position[2]}
                     onChange={(v) => handlePositionChange('z', v)}
+                  />
+                </Box>
+              </Box>
+
+              <Divider />
+
+              {/* Rotation */}
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'var(--text-med)',
+                    fontWeight: 600,
+                    display: 'block',
+                    mb: 1,
+                    textTransform: 'uppercase',
+                    fontSize: '0.625rem',
+                  }}
+                >
+                  Rotation
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <PropField
+                    label="Y (deg)"
+                    value={Math.round(((selectedItem.rotation?.[1] || 0) * 180) / Math.PI)}
+                    onChange={(v) => handleRotationChange('y', v)}
+                    step={15}
+                  />
+                  <PropField
+                    label="X (deg)"
+                    value={Math.round(((selectedItem.rotation?.[0] || 0) * 180) / Math.PI)}
+                    onChange={(v) => handleRotationChange('x', v)}
+                    step={15}
+                  />
+                  <PropField
+                    label="Z (deg)"
+                    value={Math.round(((selectedItem.rotation?.[2] || 0) * 180) / Math.PI)}
+                    onChange={(v) => handleRotationChange('z', v)}
+                    step={15}
                   />
                 </Box>
               </Box>
