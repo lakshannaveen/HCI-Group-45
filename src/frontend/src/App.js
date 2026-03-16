@@ -33,19 +33,25 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: "'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    h4: { fontWeight: 700 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
-    subtitle1: { fontWeight: 500 },
-    subtitle2: { fontWeight: 500 },
-    button: { textTransform: 'none', fontWeight: 500 },
+    fontSize: 14,
+    h4: { fontSize: '1.375rem', fontWeight: 700 },
+    h5: { fontSize: '1.125rem', fontWeight: 600 },
+    h6: { fontSize: '1rem',     fontWeight: 600 },
+    subtitle1: { fontSize: '0.9375rem', fontWeight: 500 },
+    subtitle2: { fontSize: '0.875rem',  fontWeight: 600 },
+    body1:     { fontSize: '0.875rem' },
+    body2:     { fontSize: '0.8125rem' },
+    caption:   { fontSize: '0.75rem',   lineHeight: 1.4 },
+    overline:  { fontSize: '0.625rem',  fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.4 },
+    button:    { textTransform: 'none', fontWeight: 500, fontSize: '0.875rem' },
   },
   shape: { borderRadius: 8 },
   components: {
     // ── Buttons ─────────────────────────────────────────────────────────────
     MuiButton: {
-      defaultProps: { disableElevation: true },
+      defaultProps: { disableElevation: true, size: 'small' },
       styleOverrides: {
+        sizeSmall: { height: 36, minHeight: 36 },
         containedPrimary: {
           backgroundColor: '#839705',
           color: '#121415',                               // WCAG AAA on olive
@@ -97,6 +103,7 @@ const theme = createTheme({
 
     // ── TextField (keeps label + fieldset overrides; background now from MuiOutlinedInput) ──
     MuiTextField: {
+      defaultProps: { size: 'small' },
       styleOverrides: {
         root: {
           '& .MuiInputLabel-root': { color: 'var(--text-med)' },
@@ -119,6 +126,22 @@ const theme = createTheme({
           },
         },
         track: { backgroundColor: 'var(--grid-lines)' },
+      },
+    },
+
+    // ── Form controls & selects ──────────────────────────────────────────────
+    MuiFormControl: {
+      defaultProps: { size: 'small' },
+    },
+    MuiSelect: {
+      defaultProps: { size: 'small' },
+    },
+
+    // ── Icon buttons ──────────────────────────────────────────────────────────
+    MuiIconButton: {
+      defaultProps: { size: 'small' },
+      styleOverrides: {
+        sizeSmall: { width: 32, height: 32 },
       },
     },
 
@@ -186,11 +209,16 @@ const theme = createTheme({
         root: {
           borderBottom: '1px solid var(--grid-lines)',
           color: 'var(--text-high)',
+          padding: '10px 16px',
+          fontSize: '0.875rem',
         },
         head: {
           color: 'var(--text-med)',
           fontWeight: 600,
           backgroundColor: 'var(--surface-2)',
+          padding: '8px 16px',
+          fontSize: '0.8rem',
+          letterSpacing: '0.03em',
         },
       },
     },

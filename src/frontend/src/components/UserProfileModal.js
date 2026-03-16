@@ -76,7 +76,7 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
   if (!open) return null;
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       {/* Header */}
       <Box
         sx={{
@@ -119,7 +119,7 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
             >
               <Typography
                 variant="caption"
-                sx={{ color: 'var(--text-low)', textAlign: 'center', fontSize: 9, lineHeight: 1.4 }}
+                sx={{ color: 'var(--text-low)', textAlign: 'center', fontSize: '0.625rem', lineHeight: 1.4 }}
               >
                 USER
                 <br />

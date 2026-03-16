@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import UserProfileModal from './UserProfileModal';
 
@@ -9,6 +9,8 @@ const TopNavbar = () => {
   const [user, setUser] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminPage = location.pathname === '/admin-dashboard';
 
   const handleLogout = async () => {
     try { await axiosInstance.post('/api/auth/logout'); } catch {}
@@ -67,21 +69,31 @@ const TopNavbar = () => {
         {/* Right: Admin Panel + User icon */}
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {user?.role === 'admin' && (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => navigate('/admin-dashboard')}
-            >
-              Admin Panel
-            </Button>
+            isAdminPage ? (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => navigate('/dashboard')}
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => navigate('/admin-dashboard')}
+              >
+                Admin Panel
+              </Button>
+            )
           )}
           <Button
             variant="outlined"
             size="small"
             onClick={() => setProfileOpen(true)}
             sx={{
-              minWidth: 40,
-              width: 40,
+              minWidth: 36,
+              width: 36,
               height: 36,
               p: 0,
               borderRadius: 1,

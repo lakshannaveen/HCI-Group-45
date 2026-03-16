@@ -324,7 +324,7 @@ const AdminDashboard = () => {
                 <Typography variant="h5" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
                   Furniture Inventory
                 </Typography>
-                <Button variant="contained" onClick={handleAddFurniture}>
+                <Button variant="contained" size="small" onClick={handleAddFurniture}>
                   + Add New Item
                 </Button>
               </Box>
@@ -377,7 +377,7 @@ const AdminDashboard = () => {
                         key={item._id}
                         sx={{ '&:hover': { backgroundColor: 'var(--surface-2)' } }}
                       >
-                        <TableCell sx={{ fontFamily: 'monospace', fontSize: 11 }}>
+                        <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.6875rem' }}>
                           {item._id.slice(-6)}
                         </TableCell>
                         <TableCell>
@@ -399,7 +399,7 @@ const AdminDashboard = () => {
                           </Box>
                         </TableCell>
                         <TableCell>{item.label}</TableCell>
-                        <TableCell sx={{ fontFamily: 'monospace', fontSize: 11 }}>
+                        <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.6875rem' }}>
                           {item.scale.join(' × ')}
                         </TableCell>
                         <TableCell>{item.type}</TableCell>

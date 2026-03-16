@@ -325,7 +325,7 @@ const Dashboard = () => {
                           backgroundColor: 'var(--brand-primary)',
                           color: 'var(--canvas-base)',
                           borderRadius: 10,
-                          fontSize: 9,
+                          fontSize: '0.625rem',
                           fontWeight: 700,
                           px: 0.6,
                           py: 0.1,
@@ -349,7 +349,7 @@ const Dashboard = () => {
                   {design.roomData && (
                     <Typography
                       variant="caption"
-                      sx={{ color: 'var(--brand-primary)', fontFamily: 'monospace', fontSize: 10 }}
+                      sx={{ color: 'var(--brand-primary)', fontFamily: 'monospace', fontSize: '0.625rem' }}
                     >
                       {design.roomData.width || '?'}m × {design.roomData.length || design.roomData.height || '?'}m
                     </Typography>

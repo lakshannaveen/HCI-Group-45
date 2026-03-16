@@ -417,7 +417,7 @@ const Design = () => {
           size="small"
           variant="text"
           onClick={() => navigate('/dashboard')}
-          sx={{ color: 'var(--text-med)', fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap' }}
+          sx={{ color: 'var(--text-med)', flexShrink: 0, whiteSpace: 'nowrap' }}
         >
           ← Dashboard
         </Button>
@@ -427,36 +427,21 @@ const Design = () => {
 
         {/* File ops: open · save · undo · redo */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Tooltip title="Open Design">
-            <span>
-              <Button size="small" variant="outlined"
-                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                onClick={() => setOpenDialogOpen(true)}>📁</Button>
-            </span>
-          </Tooltip>
-          <Tooltip title="Save Design">
-            <span>
-              <Button size="small" variant="outlined" disabled={loading}
-                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                onClick={handleSave}>
-                {loading ? <CircularProgress size={14} /> : '💾'}
-              </Button>
-            </span>
-          </Tooltip>
-          <Tooltip title="Undo (Ctrl+Z)">
-            <span>
-              <Button size="small" variant="outlined" disabled={historyIndex === 0}
-                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                onClick={handleUndo}>↩</Button>
-            </span>
-          </Tooltip>
-          <Tooltip title="Redo (Ctrl+Y)">
-            <span>
-              <Button size="small" variant="outlined" disabled={historyIndex >= history.length - 1}
-                sx={{ minWidth: 36, px: 1, py: 0.5, fontSize: 15 }}
-                onClick={handleRedo}>↪</Button>
-            </span>
-          </Tooltip>
+          {[
+            { title: 'Open Design',         symbol: '📁', onClick: () => setOpenDialogOpen(true), disabled: false },
+            { title: 'Save Design',         symbol: loading ? null : '💾', onClick: handleSave,  disabled: loading },
+            { title: 'Undo (Ctrl+Z)',       symbol: '↩',  onClick: handleUndo,  disabled: historyIndex === 0 },
+            { title: 'Redo (Ctrl+Y)',       symbol: '↪',  onClick: handleRedo,  disabled: historyIndex >= history.length - 1 },
+          ].map(({ title, symbol, onClick, disabled }) => (
+            <Tooltip key={title} title={title}>
+              <span>
+                <Button size="small" variant="outlined" disabled={disabled} onClick={onClick}
+                  sx={{ minWidth: 34, width: 34, px: 0, py: 0.5, fontSize: 16, lineHeight: 1 }}>
+                  {symbol ?? <CircularProgress size={14} />}
+                </Button>
+              </span>
+            </Tooltip>
+          ))}
         </Box>
 
         {/* 1px divider */}
@@ -469,7 +454,7 @@ const Design = () => {
           size="small"
           variant="outlined"
           placeholder="Design name…"
-          sx={{ width: 180, '& .MuiOutlinedInput-input': { py: 0.6, fontSize: 13 } }}
+          sx={{ width: 180, '& .MuiOutlinedInput-input': { py: 0.6, fontSize: '0.8125rem' } }}
         />
 
         {/* 1px divider */}
@@ -484,7 +469,7 @@ const Design = () => {
                 sx={{ '& .MuiSwitch-thumb': { width: 14, height: 14 } }} />
             }
             label={
-              <Typography variant="caption" sx={{ color: 'var(--text-med)', fontSize: 11 }}>
+              <Typography variant="caption" sx={{ color: 'var(--text-med)' }}>
                 Snap
               </Typography>
             }
@@ -506,7 +491,7 @@ const Design = () => {
               return (
                 <Button key={mode} size="small" onClick={() => setTransformMode(mode)} title={title}
                   sx={{
-                    px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: 15,
+                    px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: '0.875rem',
                     backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
                     color: active ? 'var(--canvas-base)' : 'var(--text-med)',
                     fontWeight: active ? 700 : 400,
@@ -534,7 +519,7 @@ const Design = () => {
             return (
               <Button key={mode} size="small" onClick={() => setIs2DMode(mode === '2D')}
                 sx={{
-                  px: 2.5, py: 0.5, borderRadius: 0, minWidth: 48,
+                  px: 1.5, py: 0.5, borderRadius: 0, minWidth: 36, fontSize: '0.8125rem',
                   backgroundColor: active ? 'var(--brand-primary)' : 'transparent',
                   color: active ? 'var(--canvas-base)' : 'var(--text-med)',
                   fontWeight: active ? 700 : 400,
@@ -633,7 +618,7 @@ const Design = () => {
                   color: 'var(--brand-primary)',
                   fontWeight: 700,
                   textTransform: 'uppercase',
-                  fontSize: 10,
+                  fontSize: '0.625rem',
                 }}
               >
                 {TOOLS.find((t) => t.id === activeTool)?.label || 'Library'}
@@ -643,7 +628,7 @@ const Design = () => {
                 sx={{
                   cursor: 'pointer',
                   color: 'var(--text-med)',
-                  fontSize: 13,
+                  fontSize: '0.8125rem',
                   lineHeight: 1,
                   p: 0.5,
                   '&:hover': { color: 'var(--text-high)' },
@@ -695,7 +680,7 @@ const Design = () => {
                       variant="caption"
                       sx={{
                         color: 'var(--text-med)',
-                        fontSize: 10,
+                        fontSize: '0.625rem',
                         display: 'block',
                         lineHeight: 1.2,
                       }}
@@ -745,7 +730,7 @@ const Design = () => {
               sx={{
                 color: 'var(--text-low)',
                 fontFamily: 'monospace',
-                fontSize: 10,
+                fontSize: '0.625rem',
                 backgroundColor: 'rgba(18,20,21,0.7)',
                 px: 0.75,
                 py: 0.25,
@@ -784,8 +769,8 @@ const Design = () => {
                 color: 'var(--text-high)',
                 fontWeight: 700,
                 textTransform: 'uppercase',
-                fontSize: 11,
-                letterSpacing: 0.5,
+                fontSize: '0.6875rem',
+                letterSpacing: '0.05em',
               }}
             >
               Properties
@@ -802,7 +787,7 @@ const Design = () => {
                     color: 'var(--text-med)',
                     fontWeight: 600,
                     textTransform: 'uppercase',
-                    fontSize: 10,
+                    fontSize: '0.625rem',
                   }}
                 >
                   Room
@@ -857,7 +842,7 @@ const Design = () => {
                       sx={{
                         color: 'var(--text-med)',
                         fontFamily: 'monospace',
-                        fontSize: 11,
+                        fontSize: '0.6875rem',
                       }}
                     >
                       {(roomData.color || '#e8e8e8').toUpperCase()}
@@ -893,7 +878,7 @@ const Design = () => {
                       sx={{
                         color: 'var(--text-med)',
                         fontFamily: 'monospace',
-                        fontSize: 11,
+                        fontSize: '0.6875rem',
                       }}
                     >
                       {(roomData.floorColor || '#c8b89a').toUpperCase()}
@@ -961,7 +946,7 @@ const Design = () => {
                     display: 'block',
                     mb: 1,
                     textTransform: 'uppercase',
-                    fontSize: 10,
+                    fontSize: '0.625rem',
                   }}
                 >
                   Dimensions
@@ -997,7 +982,7 @@ const Design = () => {
                     display: 'block',
                     mb: 1,
                     textTransform: 'uppercase',
-                    fontSize: 10,
+                    fontSize: '0.625rem',
                   }}
                 >
                   Color
@@ -1017,7 +1002,7 @@ const Design = () => {
                     onChange={(e) => updateSelected({ color: e.target.value })}
                     sx={{
                       flex: 1,
-                      '& input': { fontSize: 10, fontFamily: 'monospace', py: 0.75 },
+                      '& input': { fontSize: '0.625rem', fontFamily: 'monospace', py: 0.75 },
                     }}
                   />
                   <input
@@ -1050,7 +1035,7 @@ const Design = () => {
                     display: 'block',
                     mb: 1,
                     textTransform: 'uppercase',
-                    fontSize: 10,
+                    fontSize: '0.625rem',
                   }}
                 >
                   Size
