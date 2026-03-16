@@ -192,16 +192,6 @@ const AdminDashboard = () => {
             p: 2,
           }}
         >
-          {/* Brand mark */}
-          <Box sx={{ mb: 3, px: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{ color: 'var(--text-high)', fontWeight: 700, letterSpacing: '-0.01em' }}
-            >
-              Admin Panel
-            </Typography>
-          </Box>
-
           {/* Navigation links */}
           <List disablePadding sx={{ flexGrow: 1 }}>
             {ADMIN_SECTIONS.map((section) => {
@@ -213,13 +203,15 @@ const AdminDashboard = () => {
                   sx={{
                     borderRadius: '6px',
                     mb: 0.5,
-                    pl: active ? 1.5 : 2,
+                    px: 1.5,
                     cursor: 'pointer',
-                    backgroundColor: active ? 'var(--surface-2)' : 'transparent',
-                    borderLeft: active
-                      ? '3px solid var(--brand-primary)'
-                      : '3px solid transparent',
-                    '&:hover': { backgroundColor: 'var(--surface-2)' },
+                    backgroundColor: active ? 'var(--brand-primary-muted)' : 'transparent',
+                    border: active
+                      ? '1px solid var(--brand-primary)'
+                      : '1px solid transparent',
+                    '&:hover': {
+                      backgroundColor: active ? 'var(--brand-primary-muted)' : 'var(--surface-2)',
+                    },
                     transition: 'background-color 0.15s, border-color 0.15s',
                   }}
                 >

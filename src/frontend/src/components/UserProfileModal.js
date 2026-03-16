@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Typography, TextField, Divider, Dialog, DialogContent, Alert,
 } from '@mui/material';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import axiosInstance from '../utils/axios';
 
 export default function UserProfileModal({ open, onClose, onLogout }) {
@@ -89,6 +90,9 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
         <Typography variant="h6" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
           User Profile Settings
         </Typography>
+        <Typography variant="body2" sx={{ color: 'var(--text-med)', mt: 0.5 }}>
+          Manage your account information
+        </Typography>
       </Box>
 
       <DialogContent sx={{ p: 0, backgroundColor: 'var(--surface-1)' }}>
@@ -108,8 +112,8 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
               sx={{
                 width: 96,
                 height: 96,
-                border: '3px solid var(--grid-lines)',
-                borderRadius: 2,
+                border: '2px solid var(--grid-lines)',
+                borderRadius: '50%',
                 backgroundColor: 'var(--surface-2)',
                 display: 'flex',
                 alignItems: 'center',
@@ -117,14 +121,7 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
                 flexShrink: 0,
               }}
             >
-              <Typography
-                variant="caption"
-                sx={{ color: 'var(--text-low)', textAlign: 'center', fontSize: '0.625rem', lineHeight: 1.4 }}
-              >
-                USER
-                <br />
-                AVATAR
-              </Typography>
+              <AccountCircleOutlinedIcon sx={{ fontSize: 56, color: 'var(--text-low)' }} />
             </Box>
 
             <Typography
@@ -134,7 +131,7 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
               {user?.displayName || user?.username || '—'}
             </Typography>
             <Typography variant="caption" sx={{ color: 'var(--text-med)', mt: -1.5 }}>
-              {user?.role === 'admin' ? 'Administrator' : 'Designer'}
+              {user?.role === 'admin' ? 'Administrator' : 'Interior Designer'}
             </Typography>
 
             {/* Stats box */}

@@ -43,7 +43,7 @@ const TopNavbar = () => {
         {/* Left: Logo + Site name */}
         <Box
           sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(isAdminPage ? '/admin-dashboard' : '/dashboard')}
         >
           <img
             src="/logo.PNG"
@@ -55,13 +55,13 @@ const TopNavbar = () => {
               variant="h6"
               sx={{ color: 'var(--brand-primary)', fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}
             >
-              Athlier Home
+              {isAdminPage ? 'Admin Dashboard' : 'Athlier Home'}
             </Typography>
             <Typography
               variant="caption"
               sx={{ color: 'var(--text-med)', letterSpacing: '0.05em', lineHeight: 1 }}
             >
-              Design Studio
+              {isAdminPage ? 'System Management' : 'Design Studio'}
             </Typography>
           </Box>
         </Box>
