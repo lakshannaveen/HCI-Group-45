@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box, Button, Typography, TextField, Divider, Tooltip,
   Snackbar, Alert, Dialog, DialogTitle, DialogContent,
@@ -166,6 +166,7 @@ const Design = () => {
 
   const [message, setMessage]         = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const copiedItemRef = useRef(null);
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
 
@@ -428,6 +429,83 @@ const Design = () => {
     pushHistory(newItems);
     setSelectedId(newItem.id);
   };
+
+  // ── Keyboard shortcuts (copy/paste/delete/undo/redo) ─────────────────────
+  useEffect(() => {
+    const isTypingTarget = (target) => {
+      if (!target) return false;
+      const tag = target.tagName?.toLowerCase();
+      return target.isContentEditable || tag === 'input' || tag === 'textarea' || tag === 'select';
+    };
+
+    const cloneItemForClipboard = (item) => ({
+      ...item,
+      position: [...(item.position || [0, -2, 0])],
+      rotation: [...(item.rotation || [0, 0, 0])],
+      scale: [...(item.scale || [1, 1, 1])],
+    });
+
+    const handleKeyDown = (event) => {
+      if (isTypingTarget(event.target)) return;
+
+      const key = event.key.toLowerCase();
+      const isModifier = event.ctrlKey || event.metaKey;
+
+      // Delete selected item
+      if ((key === 'delete' || key === 'backspace') && selectedItem) {
+        event.preventDefault();
+        handleDeleteSelected();
+        return;
+      }
+
+      if (!isModifier) return;
+
+      // Copy selected item
+      if (key === 'c' && selectedItem) {
+        event.preventDefault();
+        copiedItemRef.current = cloneItemForClipboard(selectedItem);
+        showMessage('Item copied');
+        return;
+      }
+
+      // Paste copied item
+      if (key === 'v' && copiedItemRef.current) {
+        event.preventDefault();
+        const base = copiedItemRef.current;
+        const newItem = {
+          ...cloneItemForClipboard(base),
+          id: Date.now(),
+          name: `${base.name} (copy)`,
+          position: [
+            (base.position?.[0] ?? 0) + 0.5,
+            base.position?.[1] ?? -2,
+            (base.position?.[2] ?? 0) + 0.5,
+          ],
+        };
+        const newItems = [...items, newItem];
+        setItems(newItems);
+        pushHistory(newItems);
+        setSelectedId(newItem.id);
+        return;
+      }
+
+      // Undo
+      if (key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+        return;
+      }
+
+      // Redo (Ctrl/Cmd+Y or Ctrl/Cmd+Shift+Z)
+      if (key === 'y' || (key === 'z' && event.shiftKey)) {
+        event.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedItem, items, historyIndex, history.length]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
