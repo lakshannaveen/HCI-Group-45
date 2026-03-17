@@ -42,10 +42,17 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
     setError('');
     setSuccess('');
     try {
-      const payload = { displayName: form.displayName, email: form.email };
+      const payload = { displayName: form.displayName };
+      // Only include email if user typed something or they already have one
+      if (form.email !== '') payload.email = form.email;
       if (pwForm.newPw) {
         if (pwForm.newPw !== pwForm.confirm) {
           setError('New passwords do not match');
+          setLoading(false);
+          return;
+        }
+        if (!pwForm.current) {
+          setError('Current password is required to change password');
           setLoading(false);
           return;
         }
@@ -54,6 +61,7 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
       }
       const res = await axiosInstance.put('/api/auth/profile', payload);
       setUser(res.data);
+      setForm({ displayName: res.data.displayName || '', email: res.data.email || '' });
       setPwForm({ current: '', newPw: '', confirm: '' });
       setSuccess('Profile updated successfully!');
     } catch (err) {
@@ -197,12 +205,22 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 <TextField
+                  label="Username"
+                  value={user?.username || ''}
+                  size="small"
+                  fullWidth
+                  disabled
+                  helperText="Username cannot be changed"
+                  InputProps={{ readOnly: true }}
+                />
+                <TextField
                   label="Display Name"
                   value={form.displayName}
                   onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
                   size="small"
                   fullWidth
                   disabled={loading}
+                  placeholder={user?.username}
                 />
                 <TextField
                   label="Email Address"

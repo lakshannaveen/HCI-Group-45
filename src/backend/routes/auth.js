@@ -146,6 +146,9 @@ router.put('/profile', auth, [
     const updatedUser = await User.findById(req.user.id).select('-password');
     res.json(updatedUser);
   } catch (error) {
+    if (error.code === 11000 && error.keyPattern?.email) {
+      return res.status(409).json({ message: 'That email address is already in use' });
+    }
     res.status(500).json({ message: 'Server error' });
   }
 });
