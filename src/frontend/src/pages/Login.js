@@ -1,34 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  TextField, Button, Paper, Typography, Box, Alert,
-  Dialog, DialogContent, DialogTitle,
+  TextField, Button, Paper, Typography, Box,
+  Alert, Snackbar,
+  Dialog, DialogContent, DialogTitle, DialogActions,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 
 // ── Screen 2: Registration Modal ────────────────────────────────────────────
-function RegisterModal({ open, onClose }) {
+function RegisterModal({ open, onClose, onSuccess, onError }) {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
     setForm({ fullName: '', email: '', password: '', confirmPassword: '' });
-    setError('');
-    setSuccess('');
     onClose();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match');
+      onError('Passwords do not match');
       return;
     }
 
@@ -39,26 +36,25 @@ function RegisterModal({ open, onClose }) {
         .slice(0, 20);
 
     if (rawUsername.length < 3) {
-      setError('Full Name must produce at least 3 letters/numbers for the username.');
+      onError('Full Name must produce at least 3 letters/numbers for the username.');
       return;
     }
 
     setLoading(true);
-    setError('');
     try {
       await axios.post('/api/auth/register', {
         username: rawUsername,
         password: form.password,
         email: form.email || undefined,
       });
-      setSuccess('Account created successfully!');
-      setTimeout(() => handleClose(), 1800);
+      handleClose();
+      onSuccess('Account created! You can now log in.');
     } catch (err) {
       const msg =
         err.response?.data?.message ||
         err.response?.data?.errors?.[0]?.msg ||
         'Registration failed';
-      setError(msg);
+      onError(msg);
     } finally {
       setLoading(false);
     }
@@ -81,10 +77,8 @@ function RegisterModal({ open, onClose }) {
       </DialogTitle>
 
       <DialogContent sx={{ backgroundColor: 'var(--surface-1)' }}>
-        {error && <Alert severity="error" sx={{ mt: 2, mb: 1 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mt: 2, mb: 1 }}>{success}</Alert>}
-
         <Box
+          id="register-form"
           component="form"
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}
@@ -146,26 +140,29 @@ function RegisterModal({ open, onClose }) {
             />
           </Box>
 
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={loading}
-            sx={{ display: 'block', mx: 'auto', minWidth: 180 }}
-          >
-            {loading ? 'Creating…' : 'Create Account'}
-          </Button>
-
-          <Button
-            variant="text"
-            onClick={handleClose}
-            size="small"
-            disabled={loading}
-            sx={{ alignSelf: 'center', color: 'var(--text-med)' }}
-          >
-            Back to Login
-          </Button>
         </Box>
       </DialogContent>
+
+      <DialogActions
+        sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+      >
+        <Button
+          variant="text"
+          onClick={handleClose}
+          disabled={loading}
+          sx={{ color: 'var(--text-med)', mr: 'auto' }}
+        >
+          Back to Login
+        </Button>
+        <Button
+          type="submit"
+          form="register-form"
+          variant="contained"
+          disabled={loading}
+        >
+          {loading ? 'Creating…' : 'Create Account'}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
@@ -173,18 +170,13 @@ function RegisterModal({ open, onClose }) {
 // ── Screen 1: Login ──────────────────────────────────────────────────────────
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, text: '', severity: 'success' });
   const navigate = useNavigate();
 
-  // Auto-dismiss error after 3 seconds (per wireframe spec)
-  useEffect(() => {
-    if (!error) return;
-    const t = setTimeout(() => setError(''), 3000);
-    return () => clearTimeout(t);
-  }, [error]);
+  const showSnackbar = (text, severity = 'error') =>
+    setSnackbar({ open: true, text, severity });
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -192,23 +184,18 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
     try {
       await axios.post('/api/auth/login', formData);
-      setSuccess('Login successful! Redirecting…');
       const res = await axios.get('/api/auth/me');
       const user = res.data;
-      setTimeout(() => {
-        if (user.role === 'admin') navigate('/admin-dashboard');
-        else navigate('/dashboard');
-      }, 1000);
+      if (user.role === 'admin') navigate('/admin-dashboard');
+      else navigate('/dashboard');
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
         err.response?.data?.errors?.[0]?.msg ||
         'Login failed';
-      setError(errorMessage);
+      showSnackbar(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -234,20 +221,8 @@ const Login = () => {
           backgroundColor: 'var(--surface-1)',
           border: '1px solid var(--grid-lines)',
           borderRadius: 'var(--radius-lg)',
-          overflow: 'hidden',
         }}
       >
-        {/* Error banner — full-width at top of card, auto-dismisses */}
-        {error && (
-          <Alert
-            severity="error"
-            icon={false}
-            sx={{ borderRadius: 0, py: 1.5, fontSize: '0.875rem' }}
-          >
-            {error}
-          </Alert>
-        )}
-
         <Box sx={{ p: 4 }}>
           {/* Logo placeholder (centered) */}
           <Box
@@ -288,8 +263,6 @@ const Login = () => {
             Sign in to Athlier Home
           </Typography>
 
-          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-
           <Box component="form" onSubmit={handleSubmit}>
             {/* Username field */}
             <Typography
@@ -327,7 +300,7 @@ const Login = () => {
               required
               disabled={loading}
               placeholder="Enter your password"
-              sx={{ mb: 3 }}
+              sx={{ mb: 2 }}
             />
 
             <Button
@@ -364,7 +337,25 @@ const Login = () => {
       <RegisterModal
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
+        onSuccess={(text) => showSnackbar(text, 'success')}
+        onError={(text) => showSnackbar(text, 'error')}
       />
+
+      {/* Success snackbar (same pattern as other pages) */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

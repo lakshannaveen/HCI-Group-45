@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Typography, TextField, Divider, Dialog, DialogContent, Alert,
+  Box, Button, Typography, TextField, Divider,
+  Dialog, DialogTitle, DialogContent, DialogActions, Alert,
 } from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import axiosInstance from '../utils/axios';
@@ -43,7 +44,6 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
     setSuccess('');
     try {
       const payload = { displayName: form.displayName };
-      // Only include email if user typed something or they already have one
       if (form.email !== '') payload.email = form.email;
       if (pwForm.newPw) {
         if (pwForm.newPw !== pwForm.confirm) {
@@ -86,22 +86,20 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      {/* Header */}
-      <Box
+      <DialogTitle
         sx={{
+          color: 'var(--text-high)',
+          fontWeight: 700,
           borderBottom: '1px solid var(--grid-lines)',
-          px: 3,
-          py: 2,
+          pb: 2,
           backgroundColor: 'var(--surface-1)',
         }}
       >
-        <Typography variant="h6" sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
-          User Profile Settings
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'var(--text-med)', mt: 0.5 }}>
+        User Profile Settings
+        <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
           Manage your account information
         </Typography>
-      </Box>
+      </DialogTitle>
 
       <DialogContent sx={{ p: 0, backgroundColor: 'var(--surface-1)' }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: '220px 1px 1fr' }}>
@@ -288,19 +286,20 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
                 />
               </Box>
             </Box>
-
-            {/* Footer actions */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 'auto' }}>
-              <Button variant="outlined" onClick={handleClose} disabled={loading}>
-                Cancel
-              </Button>
-              <Button variant="contained" onClick={handleSave} disabled={loading}>
-                {loading ? 'Saving…' : 'Save Changes'}
-              </Button>
-            </Box>
           </Box>
         </Box>
       </DialogContent>
+
+      <DialogActions
+        sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+      >
+        <Button variant="outlined" onClick={handleClose} disabled={loading}>
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleSave} disabled={loading}>
+          {loading ? 'Saving…' : 'Save Changes'}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

@@ -26,6 +26,23 @@ router.get('/users', adminAuth, async (req, res) => {
   }
 });
 
+// Toggle user role (admin ↔ user)
+router.put('/users/:id/role', adminAuth, async (req, res) => {
+  try {
+    if (req.params.id === req.user.id.toString()) {
+      return res.status(400).json({ message: 'You cannot change your own role' });
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.role = user.role === 'admin' ? 'user' : 'admin';
+    await user.save();
+    const updated = await User.findById(req.params.id).select('-password');
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Delete user
 router.delete('/users/:id', adminAuth, async (req, res) => {
   try {

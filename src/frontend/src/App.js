@@ -261,11 +261,31 @@ const theme = createTheme({
     },
     MuiAlert: {
       styleOverrides: {
-        root: { borderRadius: 8 },
-        standardError:   { backgroundColor: 'rgba(207,102,121,0.12)', color: 'var(--color-error)' },
-        standardSuccess: { backgroundColor: 'rgba(129,199,132,0.12)', color: 'var(--color-success)' },
-        standardWarning: { backgroundColor: 'rgba(255,183,77,0.12)',  color: 'var(--color-warning)' },
-        standardInfo:    { backgroundColor: 'rgba(100,181,246,0.12)', color: 'var(--color-focus)' },
+        root: { borderRadius: 8, fontSize: '0.875rem' },
+        standardError: {
+          backgroundColor: 'rgba(207,102,121,0.12)',
+          color: 'var(--color-error)',
+          border: '1px solid rgba(207,102,121,0.35)',
+          '& .MuiAlert-icon': { color: 'var(--color-error)' },
+        },
+        standardSuccess: {
+          backgroundColor: 'var(--brand-primary-muted)',
+          color: 'var(--brand-primary)',
+          border: '1px solid rgba(131,151,5,0.4)',
+          '& .MuiAlert-icon': { color: 'var(--brand-primary)' },
+        },
+        standardWarning: {
+          backgroundColor: 'rgba(255,183,77,0.1)',
+          color: 'var(--color-warning)',
+          border: '1px solid rgba(255,183,77,0.25)',
+          '& .MuiAlert-icon': { color: 'var(--color-warning)' },
+        },
+        standardInfo: {
+          backgroundColor: 'rgba(100,181,246,0.1)',
+          color: 'var(--color-focus)',
+          border: '1px solid rgba(100,181,246,0.25)',
+          '& .MuiAlert-icon': { color: 'var(--color-focus)' },
+        },
       },
     },
     MuiChip: {

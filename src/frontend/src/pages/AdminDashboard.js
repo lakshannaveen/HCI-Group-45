@@ -11,6 +11,9 @@ import axios from '../utils/axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import Tooltip from '@mui/material/Tooltip';
 import TopNavbar from '../components/TopNavbar';
 
 const ADMIN_SECTIONS = [
@@ -21,6 +24,7 @@ const ADMIN_SECTIONS = [
 
 const AdminDashboard = () => {
   const [tabValue, setTabValue]             = useState(0);
+  const [currentUser, setCurrentUser]       = useState(null);
   const [users, setUsers]                   = useState([]);
   const [designs, setDesigns]               = useState([]);
   const [furniture, setFurniture]           = useState([]);
@@ -33,7 +37,13 @@ const AdminDashboard = () => {
   const [snackbarOpen, setSnackbarOpen]     = useState(false);
   // Confirm-delete dialog state: { type: 'user'|'design'|'furniture', id, label }
   const [confirmDelete, setConfirmDelete]   = useState(null);
+  // Confirm-role dialog state: { user }
+  const [confirmRole, setConfirmRole]       = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get('/api/auth/me').then((r) => setCurrentUser(r.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (tabValue === 0) fetchUsers();
@@ -86,6 +96,27 @@ const AdminDashboard = () => {
   const handleDeleteUser = (id) => {
     if (loading) return;
     setConfirmDelete({ type: 'user', id, label: 'Delete this user and all their designs?' });
+  };
+
+  const handleToggleRole = (user) => {
+    if (loading) return;
+    setConfirmRole({ user });
+  };
+
+  const handleConfirmRole = async () => {
+    if (!confirmRole) return;
+    const { user } = confirmRole;
+    setConfirmRole(null);
+    setLoading(true);
+    try {
+      const res = await axios.put(`/api/admin/users/${user._id}/role`);
+      setUsers((prev) => prev.map((u) => (u._id === user._id ? res.data : u)));
+      showMessage(`Role updated: ${res.data.username} is now ${res.data.role}`);
+    } catch (err) {
+      showMessage(err.response?.data?.message || 'Failed to update role', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteDesign = (id) => {
@@ -256,28 +287,81 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user._id}>
-                        <TableCell>{user.username}</TableCell>
-                        <TableCell>{user.email || '—'}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <IconButton
-                            onClick={() => handleDeleteUser(user._id)}
-                            disabled={loading}
-                            sx={{
-                              color: 'var(--color-error)',
-                              '&:hover': { backgroundColor: 'rgba(207,102,121,0.1)' },
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {users.map((user) => {
+                      const isSelf = currentUser?._id === user._id;
+                      const isAdmin = user.role === 'admin';
+                      return (
+                        <TableRow key={user._id}>
+                          <TableCell>{user.username}</TableCell>
+                          <TableCell>{user.email || '—'}</TableCell>
+                          <TableCell>
+                            <Box
+                              component="span"
+                              sx={{
+                                display: 'inline-block',
+                                px: 1,
+                                py: 0.25,
+                                borderRadius: 1,
+                                fontSize: '0.6875rem',
+                                fontWeight: 600,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.04em',
+                                backgroundColor: isAdmin
+                                  ? 'var(--brand-primary-muted)'
+                                  : 'var(--surface-2)',
+                                color: isAdmin
+                                  ? 'var(--brand-primary)'
+                                  : 'var(--text-med)',
+                                border: isAdmin
+                                  ? '1px solid var(--brand-primary)'
+                                  : '1px solid var(--grid-lines)',
+                              }}
+                            >
+                              {user.role}
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                              <Tooltip title={isSelf ? 'Cannot change your own role' : isAdmin ? 'Revoke Admin' : 'Make Admin'}>
+                                <span>
+                                  <IconButton
+                                    onClick={() => handleToggleRole(user)}
+                                    disabled={loading || isSelf}
+                                    sx={{
+                                      color: isAdmin ? 'var(--brand-primary)' : 'var(--text-low)',
+                                      '&:hover': { backgroundColor: 'var(--brand-primary-muted)' },
+                                      '&.Mui-disabled': { opacity: 0.3 },
+                                    }}
+                                  >
+                                    {isAdmin
+                                      ? <AdminPanelSettingsOutlinedIcon fontSize="small" />
+                                      : <PersonOutlineIcon fontSize="small" />}
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                              <Tooltip title={isSelf ? 'Cannot delete yourself' : 'Delete user'}>
+                                <span>
+                                  <IconButton
+                                    onClick={() => handleDeleteUser(user._id)}
+                                    disabled={loading || isSelf}
+                                    sx={{
+                                      color: 'var(--color-error)',
+                                      '&:hover': { backgroundColor: 'rgba(207,102,121,0.1)' },
+                                      '&.Mui-disabled': { opacity: 0.3 },
+                                    }}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -488,18 +572,31 @@ const AdminDashboard = () => {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+        <DialogTitle
+          sx={{
+            color: 'var(--text-high)',
+            fontWeight: 700,
+            borderBottom: '1px solid var(--grid-lines)',
+            pb: 2,
+            backgroundColor: 'var(--surface-1)',
+          }}
+        >
           Confirm Deletion
+          <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+            This action is permanent and cannot be undone
+          </Typography>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ backgroundColor: 'var(--surface-1)', pt: '16px !important' }}>
           <Typography variant="body2" sx={{ color: 'var(--text-med)' }}>
             {confirmDelete?.label}
           </Typography>
           <Typography variant="caption" sx={{ color: 'var(--color-error)', display: 'block', mt: 1 }}>
-            This action is permanent and cannot be undone.
+            All associated data will be permanently removed.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1 }}>
+        <DialogActions
+          sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+        >
           <Button variant="outlined" onClick={() => setConfirmDelete(null)} disabled={loading}>
             Cancel
           </Button>
@@ -518,68 +615,131 @@ const AdminDashboard = () => {
         </DialogActions>
       </Dialog>
 
-      {/* ── Furniture Add/Edit Dialog ── */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+      {/* ── Confirm-role dialog ── */}
+      <Dialog
+        open={Boolean(confirmRole)}
+        onClose={() => setConfirmRole(null)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle
-          sx={{ color: 'var(--text-high)', borderBottom: '1px solid var(--grid-lines)' }}
+          sx={{
+            color: 'var(--text-high)',
+            fontWeight: 700,
+            borderBottom: '1px solid var(--grid-lines)',
+            pb: 2,
+            backgroundColor: 'var(--surface-1)',
+          }}
         >
-          {currentFurniture?._id ? 'Edit Furniture' : 'Add New Item'}
+          {confirmRole?.user.role === 'admin' ? 'Revoke Admin Access' : 'Grant Admin Access'}
+          <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+            {confirmRole?.user.role === 'admin'
+              ? 'This will downgrade the user to a regular account'
+              : 'This will grant full dashboard access to this user'}
+          </Typography>
         </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <TextField
-            fullWidth label="Type (identifier)"
-            value={currentFurniture?.type || ''}
-            onChange={(e) =>
-              setCurrentFurniture({ ...currentFurniture, type: e.target.value })
+        <DialogContent sx={{ backgroundColor: 'var(--surface-1)', pt: '16px !important' }}>
+          <Typography variant="body2" sx={{ color: 'var(--text-med)' }}>
+            {confirmRole?.user.role === 'admin'
+              ? <>Remove admin privileges from <strong style={{ color: 'var(--text-high)' }}>{confirmRole?.user.username}</strong>? They will become a regular user.</>
+              : <>Grant admin privileges to <strong style={{ color: 'var(--text-high)' }}>{confirmRole?.user.username}</strong>? They will have full access to this dashboard.</>
             }
-            margin="normal"
-          />
-          <TextField
-            fullWidth label="Label (display name)"
-            value={currentFurniture?.label || ''}
-            onChange={(e) =>
-              setCurrentFurniture({ ...currentFurniture, label: e.target.value })
-            }
-            margin="normal"
-          />
-          <TextField
-            fullWidth label="Icon (emoji)"
-            value={currentFurniture?.icon || ''}
-            onChange={(e) =>
-              setCurrentFurniture({ ...currentFurniture, icon: e.target.value })
-            }
-            margin="normal"
-          />
-          <TextField
-            fullWidth label="Color (hex)"
-            value={currentFurniture?.color || ''}
-            onChange={(e) =>
-              setCurrentFurniture({ ...currentFurniture, color: e.target.value })
-            }
-            margin="normal"
-          />
-          <TextField
-            fullWidth label="Scale (W, H, D — comma separated)"
-            value={currentFurniture?.scale?.join(', ') || ''}
-            onChange={(e) =>
-              setCurrentFurniture({
-                ...currentFurniture,
-                scale: e.target.value.split(',').map(Number),
-              })
-            }
-            margin="normal"
-            helperText="e.g. 1.2, 2.0, 0.6"
-          />
+          </Typography>
         </DialogContent>
-        <DialogActions sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2 }}>
-          <Button variant="outlined" onClick={() => setOpen(false)} disabled={loading}>
+        <DialogActions
+          sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+        >
+          <Button variant="outlined" onClick={() => setConfirmRole(null)} disabled={loading}>
             Cancel
           </Button>
           <Button
             variant="contained"
-            onClick={handleSaveFurniture}
+            onClick={handleConfirmRole}
             disabled={loading}
+            sx={{
+              backgroundColor: confirmRole?.user.role === 'admin' ? 'var(--color-error)' : 'var(--brand-primary)',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: confirmRole?.user.role === 'admin' ? '#b5566a' : 'var(--brand-primary-hover)',
+              },
+            }}
           >
+            {confirmRole?.user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ── Furniture Add/Edit Dialog ── */}
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle
+          sx={{
+            color: 'var(--text-high)',
+            fontWeight: 700,
+            borderBottom: '1px solid var(--grid-lines)',
+            pb: 2,
+            backgroundColor: 'var(--surface-1)',
+          }}
+        >
+          {currentFurniture?._id ? 'Edit Furniture Item' : 'Add New Furniture Item'}
+          <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+            {currentFurniture?._id
+              ? 'Update the furniture item properties'
+              : 'Configure a new furniture item for the catalogue'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ backgroundColor: 'var(--surface-1)' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Type (identifier)"
+              size="small"
+              value={currentFurniture?.type || ''}
+              onChange={(e) => setCurrentFurniture({ ...currentFurniture, type: e.target.value })}
+              helperText="e.g. chair, sofa, bed — used for filtering"
+            />
+            <TextField
+              fullWidth
+              label="Label (display name)"
+              size="small"
+              value={currentFurniture?.label || ''}
+              onChange={(e) => setCurrentFurniture({ ...currentFurniture, label: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              label="Icon (emoji)"
+              size="small"
+              value={currentFurniture?.icon || ''}
+              onChange={(e) => setCurrentFurniture({ ...currentFurniture, icon: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              label="Color (hex)"
+              size="small"
+              value={currentFurniture?.color || ''}
+              onChange={(e) => setCurrentFurniture({ ...currentFurniture, color: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              label="Scale (W, H, D — comma separated)"
+              size="small"
+              value={currentFurniture?.scale?.join(', ') || ''}
+              onChange={(e) =>
+                setCurrentFurniture({
+                  ...currentFurniture,
+                  scale: e.target.value.split(',').map(Number),
+                })
+              }
+              helperText="e.g. 1.2, 2.0, 0.6"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+        >
+          <Button variant="outlined" onClick={() => setOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleSaveFurniture} disabled={loading}>
             {loading ? 'Saving…' : 'Save'}
           </Button>
         </DialogActions>

@@ -33,9 +33,10 @@ function RoomConfigModal({ open, onClose, onCreate }) {
       <DialogTitle
         sx={{
           color: 'var(--text-high)',
+          fontWeight: 700,
           borderBottom: '1px solid var(--grid-lines)',
           pb: 2,
-          fontWeight: 700,
+          backgroundColor: 'var(--surface-1)',
         }}
       >
         New Room Setup
@@ -123,22 +124,23 @@ function RoomConfigModal({ open, onClose, onCreate }) {
               </Select>
             </FormControl>
           </Box>
-
-          {/* Footer actions — right-aligned */}
-          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 1 }}>
-            <Button variant="outlined" onClick={handleClose} disabled={loading}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleCreate}
-              disabled={loading || !form.length || !form.width}
-            >
-              Create
-            </Button>
-          </Box>
         </Box>
       </DialogContent>
+
+      <DialogActions
+        sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+      >
+        <Button variant="outlined" onClick={handleClose} disabled={loading}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleCreate}
+          disabled={loading || !form.length || !form.width}
+        >
+          Create
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
@@ -402,15 +404,28 @@ const Dashboard = () => {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>
+        <DialogTitle
+          sx={{
+            color: 'var(--text-high)',
+            fontWeight: 700,
+            borderBottom: '1px solid var(--grid-lines)',
+            pb: 2,
+            backgroundColor: 'var(--surface-1)',
+          }}
+        >
           Delete Design?
+          <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+            This action is permanent and cannot be undone
+          </Typography>
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ color: 'var(--text-med)' }}>
-            This action is permanent and cannot be undone.
+        <DialogContent sx={{ backgroundColor: 'var(--surface-1)', pt: '16px !important' }}>
+          <Typography variant="body2" sx={{ color: 'var(--color-error)' }}>
+            The design and all its furniture placements will be permanently removed.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1 }}>
+        <DialogActions
+          sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, gap: 1, backgroundColor: 'var(--surface-1)' }}
+        >
           <Button variant="outlined" onClick={() => setDeleteConfirmId(null)} disabled={loading}>
             Cancel
           </Button>
