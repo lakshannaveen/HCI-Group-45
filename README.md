@@ -15,7 +15,7 @@ A web application for designing furniture layouts in rooms using 2D and 3D visua
 
 - **Frontend**: React.js with Material-UI
 - **Backend**: Node.js with Express.js
-- **Database**: MongoDB
+- **Database**: MongoDB Atlas
 - **Authentication**: JWT tokens
 
 ## Project Structure
