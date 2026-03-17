@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   TransformControls,
   OrbitControls,
@@ -332,6 +332,104 @@ const DEFAULT_ITEMS = [
   { id: 3, name: 'Sofa',   position: [ 0, -2, -2], scale: [1, 1, 1], color: '#9b59b6' },
 ];
 
+// ─── Keyboard camera controls (WASD) ────────────────────────────────────────
+function KeyboardCameraControls({ controlsRef, is2DMode, isEnabled = true }) {
+  const { camera } = useThree();
+  const pressedRef = useRef({ w: false, a: false, s: false, d: false });
+
+  useEffect(() => {
+    const shouldIgnoreTarget = (target) => {
+      if (!target) return false;
+      const tagName = target.tagName?.toLowerCase();
+      return (
+        target.isContentEditable ||
+        tagName === 'input' ||
+        tagName === 'textarea' ||
+        tagName === 'select'
+      );
+    };
+
+    const onKeyDown = (event) => {
+      if (shouldIgnoreTarget(event.target)) return;
+      const key = event.key.toLowerCase();
+      if (key in pressedRef.current) pressedRef.current[key] = true;
+    };
+
+    const onKeyUp = (event) => {
+      const key = event.key.toLowerCase();
+      if (key in pressedRef.current) pressedRef.current[key] = false;
+    };
+
+    const onBlur = () => {
+      pressedRef.current = { w: false, a: false, s: false, d: false };
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onBlur);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
+    };
+  }, []);
+
+  useFrame((_, delta) => {
+    if (!isEnabled) return;
+    const controls = controlsRef?.current;
+    if (!controls || !camera) return;
+
+    const { w, a, s, d } = pressedRef.current;
+    if (!w && !a && !s && !d) return;
+
+    let changed = false;
+    const panStep = (is2DMode ? 10 : 8) * delta;
+
+    if (a) {
+      camera.position.x -= panStep;
+      controls.target.x -= panStep;
+      changed = true;
+    }
+    if (d) {
+      camera.position.x += panStep;
+      controls.target.x += panStep;
+      changed = true;
+    }
+
+    const zoomStep = (is2DMode ? 20 : 10) * delta;
+    if (w) {
+      if (is2DMode) {
+        camera.zoom = Math.min(120, camera.zoom + zoomStep);
+        camera.updateProjectionMatrix();
+      } else {
+        const towardTarget = controls.target.clone().sub(camera.position);
+        const distance = towardTarget.length();
+        if (distance > 1.0) {
+          const step = Math.min(zoomStep, distance - 1.0);
+          camera.position.addScaledVector(towardTarget.normalize(), step);
+        }
+      }
+      changed = true;
+    }
+
+    if (s) {
+      if (is2DMode) {
+        camera.zoom = Math.max(8, camera.zoom - zoomStep);
+        camera.updateProjectionMatrix();
+      } else {
+        const awayFromTarget = camera.position.clone().sub(controls.target).normalize();
+        camera.position.addScaledVector(awayFromTarget, zoomStep);
+      }
+      changed = true;
+    }
+
+    if (changed) controls.update();
+  });
+
+  return null;
+}
+
 // ─── Main exported component ──────────────────────────────────────────────────
 /**
  * Modes:
@@ -357,6 +455,7 @@ function FurnitureItem({
   const [internalIs2D,       setInternalIs2D]       = useState(false);
   // FIX BUG-2: track whether any object is being dragged so we can disable OrbitControls
   const [isAnyDragging, setIsAnyDragging]           = useState(false);
+  const orbitControlsRef = useRef(null);
 
   const items          = isControlled ? externalItems        : internalItems;
   const snapEnabled    = externalSnap !== undefined ? externalSnap : internalSnap;
@@ -436,6 +535,12 @@ function FurnitureItem({
 
       {/* 3D canvas */}
       <Canvas shadows style={{ flex: 1 }} onPointerMissed={() => handleSelect(null)}>
+        <KeyboardCameraControls
+          controlsRef={orbitControlsRef}
+          is2DMode={is2DMode}
+          isEnabled={!isAnyDragging}
+        />
+
         {is2DMode ? (
           <OrthographicCamera
             makeDefault
@@ -495,6 +600,7 @@ function FurnitureItem({
 
         {/* FIX BUG-2: disable OrbitControls while any TransformControls gizmo is active */}
         <OrbitControls
+          ref={orbitControlsRef}
           enabled={!isAnyDragging}
           enableZoom
           enablePan
