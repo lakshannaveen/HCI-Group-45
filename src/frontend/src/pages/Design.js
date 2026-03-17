@@ -430,7 +430,7 @@ const Design = () => {
     setSelectedId(newItem.id);
   };
 
-  // ── Keyboard shortcuts (copy/paste/delete/undo/redo) ─────────────────────
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
   useEffect(() => {
     const isTypingTarget = (target) => {
       if (!target) return false;
@@ -449,18 +449,67 @@ const Design = () => {
       if (isTypingTarget(event.target)) return;
 
       const key = event.key.toLowerCase();
+      const raw = event.key;
       const isModifier = event.ctrlKey || event.metaKey;
 
-      // Delete selected item
+      // Escape → deselect
+      if (raw === 'Escape') {
+        setSelectedId(null);
+        return;
+      }
+
+      // Delete / Backspace → delete selected
       if ((key === 'delete' || key === 'backspace') && selectedItem) {
         event.preventDefault();
         handleDeleteSelected();
         return;
       }
 
-      if (!isModifier) return;
+      // Arrow keys → nudge selected item (0.5u; 0.1u with Shift)
+      if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown'].includes(key) && selectedItem) {
+        event.preventDefault();
+        const step = event.shiftKey ? 0.1 : 0.5;
+        const [x, y, z] = selectedItem.position;
+        const offset = {
+          arrowleft:  [-step, 0,     0    ],
+          arrowright: [ step, 0,     0    ],
+          arrowup:    [ 0,    0,    -step ],
+          arrowdown:  [ 0,    0,     step ],
+        }[key];
+        updateSelected({ position: [x + offset[0], y + offset[1], z + offset[2]] });
+        return;
+      }
 
-      // Copy selected item
+      // [ / ] → rotate selected ±90°
+      if (raw === '[' && selectedItem) { event.preventDefault(); handleRotate90(-1); return; }
+      if (raw === ']' && selectedItem) { event.preventDefault(); handleRotate90(1);  return; }
+
+      if (!isModifier) {
+        // R → toggle Move / Rotate mode
+        if (key === 'r') { setTransformMode((m) => (m === 'translate' ? 'rotate' : 'translate')); return; }
+        // G → toggle grid snap
+        if (key === 'g') { setSnapToGridEnabled((s) => !s); return; }
+        // 2 / 3 → switch 2D / 3D view
+        if (raw === '2') { setIs2DMode(true);  return; }
+        if (raw === '3') { setIs2DMode(false); return; }
+        return;
+      }
+
+      // Ctrl/Cmd+S → save
+      if (key === 's') {
+        event.preventDefault();
+        handleSave();
+        return;
+      }
+
+      // Ctrl/Cmd+D → duplicate selected
+      if (key === 'd' && selectedItem) {
+        event.preventDefault();
+        handleDuplicate();
+        return;
+      }
+
+      // Ctrl/Cmd+C → copy selected
       if (key === 'c' && selectedItem) {
         event.preventDefault();
         copiedItemRef.current = cloneItemForClipboard(selectedItem);
@@ -468,7 +517,7 @@ const Design = () => {
         return;
       }
 
-      // Paste copied item
+      // Ctrl/Cmd+V → paste
       if (key === 'v' && copiedItemRef.current) {
         event.preventDefault();
         const base = copiedItemRef.current;
@@ -489,14 +538,14 @@ const Design = () => {
         return;
       }
 
-      // Undo
+      // Ctrl/Cmd+Z → undo
       if (key === 'z' && !event.shiftKey) {
         event.preventDefault();
         handleUndo();
         return;
       }
 
-      // Redo (Ctrl/Cmd+Y or Ctrl/Cmd+Shift+Z)
+      // Ctrl/Cmd+Y or Ctrl/Cmd+Shift+Z → redo
       if (key === 'y' || (key === 'z' && event.shiftKey)) {
         event.preventDefault();
         handleRedo();
@@ -505,7 +554,7 @@ const Design = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedItem, items, historyIndex, history.length]);
+  }, [selectedItem, items, historyIndex, history.length, loading]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -552,7 +601,7 @@ const Design = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {[
             { title: 'Open Design',         symbol: '📁', onClick: () => setOpenDialogOpen(true), disabled: false },
-            { title: 'Save Design',         symbol: loading ? null : '💾', onClick: handleSave,  disabled: loading },
+            { title: 'Save (Ctrl+S)',       symbol: loading ? null : '💾', onClick: handleSave,  disabled: loading },
             { title: 'Undo (Ctrl+Z)',       symbol: '↩',  onClick: handleUndo,  disabled: historyIndex === 0 },
             { title: 'Redo (Ctrl+Y)',       symbol: '↪',  onClick: handleRedo,  disabled: historyIndex >= history.length - 1 },
           ].map(({ title, symbol, onClick, disabled }) => (
@@ -584,7 +633,7 @@ const Design = () => {
         <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
 
         {/* Snap toggle */}
-        <Tooltip title="Snap objects to 0.5-unit grid">
+        <Tooltip title="Snap objects to 0.5-unit grid (G)">
           <FormControlLabel
             control={
               <Switch size="small" checked={snapToGridEnabled}
@@ -604,7 +653,7 @@ const Design = () => {
         <Box sx={{ width: '1px', height: 22, backgroundColor: 'var(--grid-lines)', flexShrink: 0 }} />
 
         {/* Move / Rotate toggle */}
-        <Tooltip title="Switch between Move and Rotate">
+        <Tooltip title="Switch between Move and Rotate (R)">
           <Box sx={{ display: 'flex', border: '1px solid var(--grid-lines)', borderRadius: 1, overflow: 'hidden' }}>
             {[
               { mode: 'translate', label: '↕', title: 'Move' },
@@ -635,7 +684,7 @@ const Design = () => {
                 { title: 'Rotate +90°',     symbol: '↻', onClick: () => handleRotate90(1)  },
                 { title: 'Flip Horizontal', symbol: '⇔', onClick: () => handleFlip('h')    },
                 { title: 'Flip Vertical',   symbol: '⇕', onClick: () => handleFlip('v')    },
-                { title: 'Duplicate',       symbol: '⧉', onClick: handleDuplicate          },
+                { title: 'Duplicate (Ctrl+D)', symbol: '⧉', onClick: handleDuplicate        },
                 { title: 'Delete',          symbol: '🗑️', onClick: handleDeleteSelected,  danger: true },
               ].map(({ title, symbol, onClick, danger }) => (
                 <Tooltip key={title} title={title}>
