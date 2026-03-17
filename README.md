@@ -57,11 +57,19 @@ furniture-designer-mern/
    - Update the connection string in `src/backend/server.js` if needed
 
 4. **Environment Variables**
+
+   **Backend Environment Variables**  
    Create a `.env` file in `src/backend/`:
    ```
-   MONGODB_URI=mongodb://localhost:27017/furniture-designer
-   JWT_SECRET=your-secret-key
-   PORT=5000
+   PORT=5007
+   MONGODB_URI=mongodb+srv://lakshannaveen578_db_user:xDQptYLGCilshBjc@cluster0.sli39ob.mongodb.net/furniture-designer?retryWrites=true&w=majority
+   JWT_SECRET=2030
+   ```
+
+   **Frontend Environment Variables**  
+   Create a `.env` file in `src/frontend/`:
+   ```
+   REACT_APP_API_URL=http://localhost:5007
    ```
 
 ## Running the Application
