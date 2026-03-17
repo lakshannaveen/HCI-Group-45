@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box, Button, Typography, TextField, Divider, Tooltip,
-  Snackbar, Alert, Dialog, DialogTitle, DialogContent,
+  Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions,
   List, ListItem, ListItemText, ListItemButton, CircularProgress,
   Switch, FormControlLabel,
 } from '@mui/material';
@@ -76,11 +76,21 @@ function OpenDesignDialog({ open, onClose, onOpen }) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle
-        sx={{ color: 'var(--text-high)', borderBottom: '1px solid var(--grid-lines)', fontWeight: 700 }}
+        sx={{
+          color: 'var(--text-high)',
+          fontWeight: 700,
+          borderBottom: '1px solid var(--grid-lines)',
+          pb: 2,
+          backgroundColor: 'var(--surface-1)',
+        }}
       >
         Open Design
+        <Typography variant="body2" sx={{ color: 'var(--text-med)', fontWeight: 400, mt: 0.5 }}>
+          Select a saved design to continue editing
+        </Typography>
       </DialogTitle>
-      <DialogContent sx={{ p: 0, backgroundColor: 'var(--surface-1)' }}>
+
+      <DialogContent sx={{ p: 0, backgroundColor: 'var(--surface-1)', pt: '0 !important' }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress size={28} />
@@ -123,6 +133,14 @@ function OpenDesignDialog({ open, onClose, onOpen }) {
           </List>
         )}
       </DialogContent>
+
+      <DialogActions
+        sx={{ borderTop: '1px solid var(--grid-lines)', px: 3, py: 2, backgroundColor: 'var(--surface-1)' }}
+      >
+        <Button variant="outlined" onClick={onClose}>
+          Close
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
@@ -977,6 +995,7 @@ const Design = () => {
               py: 1.25,
               borderBottom: '1px solid var(--grid-lines)',
               flexShrink: 0,
+              backgroundColor: 'var(--surface-1)',
             }}
           >
             <Typography
@@ -989,7 +1008,10 @@ const Design = () => {
                 letterSpacing: '0.05em',
               }}
             >
-              Properties
+              {selectedItem ? selectedItem.name : 'Properties'}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'var(--text-med)', fontSize: '0.6875rem', mt: 0.25 }}>
+              {selectedItem ? 'Object properties' : 'Room & scene settings'}
             </Typography>
           </Box>
 
@@ -997,17 +1019,6 @@ const Design = () => {
             <>
               {/* Room properties when nothing is selected */}
               <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'var(--text-med)',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    fontSize: '0.625rem',
-                  }}
-                >
-                  Room
-                </Typography>
                 <TextField
                   label="Width (m)"
                   type="number"
@@ -1123,207 +1134,86 @@ const Design = () => {
               </Box>
             </>
           ) : (
-            <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-
-              {/* Object name */}
-              <Typography
-                variant="caption"
-                sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}
-              >
-                {selectedItem.name}
-              </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
 
               {/* Dimensions (position) */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'var(--text-med)',
-                    fontWeight: 600,
-                    display: 'block',
-                    mb: 1,
-                    textTransform: 'uppercase',
-                    fontSize: '0.625rem',
-                  }}
-                >
-                  Dimensions
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <PropField
-                    label="X Position"
-                    value={selectedItem.position[0]}
-                    onChange={(v) => handlePositionChange('x', v)}
-                  />
-                  <PropField
-                    label="Y Position"
-                    value={selectedItem.position[1]}
-                    onChange={(v) => handlePositionChange('y', v)}
-                  />
-                  <PropField
-                    label="Z Position"
-                    value={selectedItem.position[2]}
-                    onChange={(v) => handlePositionChange('z', v)}
-                  />
+              <Box sx={{ borderBottom: '1px solid var(--grid-lines)' }}>
+                <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.625rem', letterSpacing: '0.04em' }}>
+                    Position
+                  </Typography>
+                </Box>
+                <Box sx={{ px: 2, pb: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <PropField label="X" value={selectedItem.position[0]} onChange={(v) => handlePositionChange('x', v)} />
+                  <PropField label="Y" value={selectedItem.position[1]} onChange={(v) => handlePositionChange('y', v)} />
+                  <PropField label="Z" value={selectedItem.position[2]} onChange={(v) => handlePositionChange('z', v)} />
                 </Box>
               </Box>
-
-              <Divider />
 
               {/* Rotation */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'var(--text-med)',
-                    fontWeight: 600,
-                    display: 'block',
-                    mb: 1,
-                    textTransform: 'uppercase',
-                    fontSize: '0.625rem',
-                  }}
-                >
-                  Rotation
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <PropField
-                    label="Y (deg)"
-                    value={Math.round(((selectedItem.rotation?.[1] || 0) * 180) / Math.PI)}
-                    onChange={(v) => handleRotationChange('y', v)}
-                    step={15}
-                  />
-                  <PropField
-                    label="X (deg)"
-                    value={Math.round(((selectedItem.rotation?.[0] || 0) * 180) / Math.PI)}
-                    onChange={(v) => handleRotationChange('x', v)}
-                    step={15}
-                  />
-                  <PropField
-                    label="Z (deg)"
-                    value={Math.round(((selectedItem.rotation?.[2] || 0) * 180) / Math.PI)}
-                    onChange={(v) => handleRotationChange('z', v)}
-                    step={15}
-                  />
+              <Box sx={{ borderBottom: '1px solid var(--grid-lines)' }}>
+                <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.625rem', letterSpacing: '0.04em' }}>
+                    Rotation
+                  </Typography>
+                </Box>
+                <Box sx={{ px: 2, pb: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <PropField label="Y (deg)" value={Math.round(((selectedItem.rotation?.[1] || 0) * 180) / Math.PI)} onChange={(v) => handleRotationChange('y', v)} step={15} />
+                  <PropField label="X (deg)" value={Math.round(((selectedItem.rotation?.[0] || 0) * 180) / Math.PI)} onChange={(v) => handleRotationChange('x', v)} step={15} />
+                  <PropField label="Z (deg)" value={Math.round(((selectedItem.rotation?.[2] || 0) * 180) / Math.PI)} onChange={(v) => handleRotationChange('z', v)} step={15} />
                 </Box>
               </Box>
-
-              <Divider />
 
               {/* Color */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'var(--text-med)',
-                    fontWeight: 600,
-                    display: 'block',
-                    mb: 1,
-                    textTransform: 'uppercase',
-                    fontSize: '0.625rem',
-                  }}
-                >
-                  Color
-                </Typography>
-
-                {/* Fill */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: 'var(--text-low)', width: 36, flexShrink: 0 }}
-                  >
-                    Fill
+              <Box sx={{ borderBottom: '1px solid var(--grid-lines)' }}>
+                <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.625rem', letterSpacing: '0.04em' }}>
+                    Color
                   </Typography>
-                  <TextField
-                    size="small"
-                    value={(selectedItem.color || '#888888').toUpperCase()}
-                    onChange={(e) => updateSelected({ color: e.target.value })}
-                    sx={{
-                      flex: 1,
-                      '& input': { fontSize: '0.625rem', fontFamily: 'monospace', py: 0.75 },
-                    }}
-                  />
-                  <input
-                    type="color"
-                    value={selectedItem.color || '#888888'}
-                    onChange={(e) => updateSelected({ color: e.target.value })}
-                    style={{
-                      width: 28,
-                      height: 28,
-                      border: '1px solid var(--grid-lines)',
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                      padding: 2,
-                      flexShrink: 0,
-                    }}
-                  />
                 </Box>
-
+                <Box sx={{ px: 2, pb: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <TextField
+                      size="small"
+                      value={(selectedItem.color || '#888888').toUpperCase()}
+                      onChange={(e) => updateSelected({ color: e.target.value })}
+                      sx={{ flex: 1, '& input': { fontSize: '0.625rem', fontFamily: 'monospace', py: 0.75 } }}
+                    />
+                    <input
+                      type="color"
+                      value={selectedItem.color || '#888888'}
+                      onChange={(e) => updateSelected({ color: e.target.value })}
+                      style={{ width: 28, height: 28, border: '1px solid var(--grid-lines)', borderRadius: 4, cursor: 'pointer', padding: 2, flexShrink: 0 }}
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6, pt: 0.5 }}>
+                    {COLOR_SWATCHES.map((c) => (
+                      <Box
+                        key={c}
+                        onClick={() => updateSelected({ color: c })}
+                        sx={{
+                          width: 22, height: 22, borderRadius: '50%', backgroundColor: c, cursor: 'pointer',
+                          border: selectedItem.color === c ? '2px solid var(--brand-primary)' : '2px solid transparent',
+                          transition: 'transform 0.1s', '&:hover': { transform: 'scale(1.2)' },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
               </Box>
-
-              <Divider />
 
               {/* Size */}
               <Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'var(--text-med)',
-                    fontWeight: 600,
-                    display: 'block',
-                    mb: 1,
-                    textTransform: 'uppercase',
-                    fontSize: '0.625rem',
-                  }}
-                >
-                  Size
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <PropField
-                    label="Width"
-                    value={selectedItem.scale[0]}
-                    onChange={(v) => handleScaleChange('x', v)}
-                    step={0.05}
-                    min={0.1}
-                  />
-                  <PropField
-                    label="Height"
-                    value={selectedItem.scale[1]}
-                    onChange={(v) => handleScaleChange('y', v)}
-                    step={0.05}
-                    min={0.1}
-                  />
-                  <PropField
-                    label="Depth"
-                    value={selectedItem.scale[2]}
-                    onChange={(v) => handleScaleChange('z', v)}
-                    step={0.05}
-                    min={0.1}
-                  />
+                <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: 'var(--text-med)', fontWeight: 600, textTransform: 'uppercase', fontSize: '0.625rem', letterSpacing: '0.04em' }}>
+                    Size
+                  </Typography>
                 </Box>
-              </Box>
-
-              <Divider />
-
-              {/* Colour swatches */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
-                {COLOR_SWATCHES.map((c) => (
-                  <Box
-                    key={c}
-                    onClick={() => updateSelected({ color: c })}
-                    sx={{
-                      width: 22,
-                      height: 22,
-                      borderRadius: '50%',
-                      backgroundColor: c,
-                      cursor: 'pointer',
-                      border:
-                        selectedItem.color === c
-                          ? '2px solid var(--brand-primary)'
-                          : '2px solid transparent',
-                      transition: 'transform 0.1s',
-                      '&:hover': { transform: 'scale(1.2)' },
-                    }}
-                  />
-                ))}
+                <Box sx={{ px: 2, pb: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <PropField label="Width"  value={selectedItem.scale[0]} onChange={(v) => handleScaleChange('x', v)} step={0.05} min={0.1} />
+                  <PropField label="Height" value={selectedItem.scale[1]} onChange={(v) => handleScaleChange('y', v)} step={0.05} min={0.1} />
+                  <PropField label="Depth"  value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
+                </Box>
               </Box>
             </Box>
           )}
