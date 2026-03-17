@@ -15,7 +15,7 @@ A web application for designing furniture layouts in rooms using 2D and 3D visua
 
 - **Frontend**: React.js with Material-UI
 - **Backend**: Node.js with Express.js
-- **Database**: MongoDB
+- **Database**: MongoDB Atlas
 - **Authentication**: JWT tokens
 
 ## Project Structure
@@ -57,19 +57,53 @@ furniture-designer-mern/
    - Update the connection string in `src/backend/server.js` if needed
 
 4. **Environment Variables**
+
+   **Backend Environment Variables**  
    Create a `.env` file in `src/backend/`:
    ```
-   MONGODB_URI=mongodb://localhost:27017/furniture-designer
-   JWT_SECRET=your-secret-key
-   PORT=5000
+   PORT=5007
+   MONGODB_URI=mongodb+srv://lakshannaveen578_db_user:xDQptYLGCilshBjc@cluster0.sli39ob.mongodb.net/furniture-designer?retryWrites=true&w=majority
+   JWT_SECRET=2030
    ```
 
-5. **Run the application**
-   ```bash
-   npm start
+   **Frontend Environment Variables**  
+   Create a `.env` file in `src/frontend/`:
+   ```
+   REACT_APP_API_URL=http://localhost:5007
    ```
 
-   This will start both the backend server (http://localhost:5000) and React frontend (http://localhost:3000).
+## Running the Application
+
+### Option 1: Run Both Frontend and Backend Together
+From the root directory:
+```bash
+npm start
+```
+This will start:
+- Backend server at http://localhost:5000
+- Frontend React app at http://localhost:3000
+
+### Option 2: Run Frontend and Backend Separately
+
+**To run the Backend:**
+```bash
+# From root directory
+npm run server
+# OR
+cd src/backend
+npm start
+```
+
+**To run the Frontend:**
+```bash
+# From root directory
+npm run client
+# OR
+cd src/frontend
+npm start
+```
+
+Make sure MongoDB is running before starting the backend.
 
 ## API Endpoints
 
@@ -97,15 +131,3 @@ furniture-designer-mern/
 
 - Backend: `npm run server` (from root) or `cd src/backend && npm start`
 - Frontend: `npm run client` (from root) or `cd src/frontend && npm start`
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is licensed under the ISC License.
