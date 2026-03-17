@@ -64,12 +64,38 @@ furniture-designer-mern/
    PORT=5000
    ```
 
-5. **Run the application**
-   ```bash
-   npm start
-   ```
+## Running the Application
 
-   This will start both the backend server (http://localhost:5000) and React frontend (http://localhost:3000).
+### Option 1: Run Both Frontend and Backend Together
+From the root directory:
+```bash
+npm start
+```
+This will start:
+- Backend server at http://localhost:5000
+- Frontend React app at http://localhost:3000
+
+### Option 2: Run Frontend and Backend Separately
+
+**To run the Backend:**
+```bash
+# From root directory
+npm run server
+# OR
+cd src/backend
+npm start
+```
+
+**To run the Frontend:**
+```bash
+# From root directory
+npm run client
+# OR
+cd src/frontend
+npm start
+```
+
+Make sure MongoDB is running before starting the backend.
 
 ## API Endpoints
 
@@ -97,15 +123,3 @@ furniture-designer-mern/
 
 - Backend: `npm run server` (from root) or `cd src/backend && npm start`
 - Frontend: `npm run client` (from root) or `cd src/frontend && npm start`
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is licensed under the ISC License.
