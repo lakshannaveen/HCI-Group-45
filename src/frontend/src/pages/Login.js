@@ -151,7 +151,7 @@ const Login = () => {
             />
 
             {/* Forget Password link */}
-            <Typography align="center" variant="body2" sx={{ mb: 2 }}>
+            <Typography align="left" variant="body2" sx={{ mb: 2 }}>
               <a
                 href="mailto:athlieircontact@gmail.com"
                 style={{
