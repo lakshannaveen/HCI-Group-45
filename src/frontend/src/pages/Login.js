@@ -150,6 +150,20 @@ const Login = () => {
               sx={{ mb: 2 }}
             />
 
+            {/* Forget Password link */}
+            <Typography align="center" variant="body2" sx={{ mb: 2 }}>
+              <a
+                href="mailto:athlieircontact@gmail.com"
+                style={{
+                  color: 'var(--brand-primary)',
+                  textDecoration: 'underline',
+                  fontWeight: 500,
+                }}
+              >
+                Forget Password
+              </a>
+            </Typography>
+
             <Button
               type="submit"
               fullWidth
