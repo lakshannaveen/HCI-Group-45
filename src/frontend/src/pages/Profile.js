@@ -1,7 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, TextField, Divider, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { 
+  Box, 
+  Button, 
+  Typography, 
+  TextField, 
+  Divider, 
+  Alert, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions,
+  Paper,
+  Avatar,
+  Chip,
+  IconButton,
+  InputAdornment,
+  Tooltip
+} from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 
@@ -13,6 +39,11 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +92,7 @@ export default function Profile() {
       setForm({ displayName: res.data.displayName || '', email: res.data.email || '' });
       setPwForm({ current: '', newPw: '', confirm: '' });
       setSuccess('Profile updated successfully!');
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -86,77 +118,592 @@ export default function Profile() {
     navigate('/');
   };
 
+  const togglePasswordVisibility = (field) => {
+    setShowPassword(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
   return (
-    <Box sx={{ p: 3 }}>
-      <Button
-        variant="text"
-        startIcon={<ArrowBackIosNewIcon sx={{ fontSize: 18 }} />}
-        onClick={() => navigate('/dashboard')}
-        sx={{ mb: 2, color: 'var(--text-med)', px: 0 }}
+    <Box sx={{ 
+      p: { xs: 2, md: 4 }, 
+      minHeight: '100vh',
+      backgroundColor: 'var(--bg-primary)',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      {/* Header with back button */}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        mb: 4,
+        maxWidth: 1200,
+        width: '100%',
+        mx: 'auto'
+      }}>
+        <Button
+          variant="text"
+          startIcon={<ArrowBackIosNewIcon sx={{ fontSize: 18 }} />}
+          onClick={() => navigate('/dashboard')}
+          sx={{ 
+            color: 'var(--text-med)',
+            '&:hover': {
+              backgroundColor: 'rgba(255,255,255,0.05)'
+            }
+          }}
+        >
+          Back to Dashboard
+        </Button>
+        
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            fontWeight: 600,
+            color: 'var(--text-high)',
+            letterSpacing: '-0.02em'
+          }}
+        >
+          Profile Settings
+        </Typography>
+        
+        <Box sx={{ width: 120 }} /> {/* Spacer for alignment */}
+      </Box>
+
+      {/* Main content */}
+      <Paper
+        elevation={0}
+        sx={{
+          backgroundColor: 'var(--surface-1)',
+          border: '1px solid var(--grid-lines)',
+          borderRadius: 3,
+          overflow: 'hidden',
+          maxWidth: 1200,
+          width: '100%',
+          mx: 'auto'
+        }}
       >
-        Back
-      </Button>
+        {/* Mobile layout: stack vertically, desktop: grid */}
+        <Box sx={{
+          display: { xs: 'block', md: 'grid' },
+          gridTemplateColumns: '300px 1px 1fr'
+        }}>
+          {/* Left sidebar - Profile summary */}
+          <Box sx={{ 
+            p: 3,
+            backgroundColor: 'var(--surface-2)',
+            borderRight: { md: '1px solid var(--grid-lines)' },
+            borderBottom: { xs: '1px solid var(--grid-lines)', md: 'none' }
+          }}>
+            <Box sx={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2
+            }}>
+              {/* Avatar with status indicator */}
+              <Box sx={{ position: 'relative' }}>
+                <Avatar
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    backgroundColor: 'var(--surface-3)',
+                    border: '3px solid var(--brand-primary)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  <AccountCircleOutlinedIcon sx={{ fontSize: 70, color: 'var(--text-med)' }} />
+                </Avatar>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 8,
+                    right: 8,
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    backgroundColor: '#4caf50',
+                    border: '2px solid var(--surface-2)'
+                  }}
+                />
+              </Box>
 
-      <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>User Profile Settings</Typography>
+              {/* User info */}
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    color: 'var(--text-high)',
+                    fontWeight: 600,
+                    mb: 0.5
+                  }}
+                >
+                  {user?.displayName || user?.username || '—'}
+                </Typography>
+                
+                <Chip
+                  label={user?.role === 'admin' ? 'Administrator' : 'Interior Designer'}
+                  size="small"
+                  sx={{
+                    backgroundColor: user?.role === 'admin' 
+                      ? 'rgba(103, 126, 207, 0.15)' 
+                      : 'rgba(128, 187, 150, 0.15)',
+                    color: user?.role === 'admin' 
+                      ? 'var(--brand-primary)' 
+                      : '#80bb96',
+                    border: '1px solid',
+                    borderColor: user?.role === 'admin' 
+                      ? 'var(--brand-primary)' 
+                      : '#80bb96',
+                    fontWeight: 500,
+                    fontSize: '0.75rem'
+                  }}
+                />
+              </Box>
 
-      <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid var(--grid-lines)', backgroundColor: 'var(--surface-1)' }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: '220px 1px 1fr' }}>
-          <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
-            <Box sx={{ width: 96, height: 96, border: '2px solid var(--grid-lines)', borderRadius: '50%', backgroundColor: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <AccountCircleOutlinedIcon sx={{ fontSize: 56, color: 'var(--text-low)' }} />
+              {/* Stats card */}
+              <Paper
+                elevation={0}
+                sx={{
+                  width: '100%',
+                  backgroundColor: 'var(--surface-1)',
+                  border: '1px solid var(--grid-lines)',
+                  borderRadius: 2,
+                  p: 2.5,
+                  mt: 2,
+                  textAlign: 'center'
+                }}
+              >
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    color: 'var(--text-med)',
+                    display: 'block',
+                    mb: 1,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    fontSize: '0.7rem'
+                  }}
+                >
+                  Total Designs Saved
+                </Typography>
+                <Typography 
+                  variant="h3" 
+                  sx={{ 
+                    color: 'var(--brand-primary)',
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    mb: 0.5
+                  }}
+                >
+                  {designCount}
+                </Typography>
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    color: 'var(--text-low)',
+                    fontSize: '0.7rem'
+                  }}
+                >
+                  Lifetime creations
+                </Typography>
+              </Paper>
+
+              {/* Logout button */}
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<LogoutOutlinedIcon />}
+                onClick={openLogoutConfirm}
+                sx={{
+                  mt: 3,
+                  borderColor: 'var(--color-error)',
+                  color: 'var(--color-error)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(207,102,121,0.08)',
+                    borderColor: 'var(--color-error)'
+                  },
+                  py: 1.2
+                }}
+              >
+                Logout
+              </Button>
             </Box>
-
-            <Typography variant="subtitle2" sx={{ color: 'var(--text-high)', fontWeight: 700, textAlign: 'center' }}>{user?.displayName || user?.username || '—'}</Typography>
-            <Typography variant="caption" sx={{ color: 'var(--text-med)', mt: -1.5 }}>{user?.role === 'admin' ? 'Administrator' : 'Interior Designer'}</Typography>
-
-            <Box sx={{ border: '1px solid var(--grid-lines)', borderRadius: 1, backgroundColor: 'var(--surface-2)', p: 2, width: '100%', textAlign: 'center' }}>
-              <Typography variant="caption" sx={{ color: 'var(--text-med)', display: 'block', mb: 0.5 }}>Total Designs Saved</Typography>
-              <Typography variant="h4" sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}>{designCount}</Typography>
-            </Box>
-
-            <Button fullWidth variant="outlined" onClick={openLogoutConfirm} sx={{ borderColor: 'var(--color-error)', color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)', borderColor: 'var(--color-error)' } }}>Logout</Button>
-
-            <Dialog open={confirmLogoutOpen} onClose={() => setConfirmLogoutOpen(false)} maxWidth="xs" fullWidth>
-              <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>Confirm Logout</DialogTitle>
-              <DialogContent sx={{ color: 'var(--text-med)' }}>Are you sure you want to logout?</DialogContent>
-              <DialogActions sx={{ px: 2, pb: 2 }}>
-                <Button onClick={() => setConfirmLogoutOpen(false)} variant="outlined">Cancel</Button>
-                <Button onClick={confirmLogout} variant="contained" color="error">Logout</Button>
-              </DialogActions>
-            </Dialog>
           </Box>
 
-          <Divider orientation="vertical" flexItem sx={{ borderColor: 'var(--grid-lines)' }} />
+          {/* Vertical divider - only visible on desktop */}
+          <Divider 
+            orientation="vertical" 
+            flexItem 
+            sx={{ 
+              borderColor: 'var(--grid-lines)',
+              display: { xs: 'none', md: 'block' }
+            }} 
+          />
 
-          <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            {error && <Alert severity="error" sx={{ mb: 0 }}>{error}</Alert>}
-            {success && <Alert severity="success" sx={{ mb: 0 }}>{success}</Alert>}
+          {/* Right content - Forms */}
+          <Box sx={{ p: 4 }}>
+            {/* Alerts */}
+            {error && (
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  mb: 3,
+                  borderRadius: 2,
+                  '& .MuiAlert-icon': { color: 'var(--color-error)' }
+                }}
+              >
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert 
+                severity="success" 
+                sx={{ 
+                  mb: 3,
+                  borderRadius: 2,
+                  backgroundColor: 'rgba(128, 187, 150, 0.1)',
+                  color: '#80bb96'
+                }}
+              >
+                {success}
+              </Alert>
+            )}
 
-            <Box>
-              <Typography variant="subtitle2" sx={{ color: 'var(--text-high)', fontWeight: 700, pb: 1, mb: 1.5, borderBottom: '1px solid var(--grid-lines)' }}>Profile Details</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <TextField label="Username" value={user?.username || ''} size="small" fullWidth disabled helperText="Username cannot be changed" InputProps={{ readOnly: true }} />
-                <TextField label="Display Name" value={form.displayName} onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))} size="small" fullWidth disabled={loading} placeholder={user?.username} />
-                <TextField label="Email Address" type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} size="small" fullWidth disabled={loading} />
+            {/* Profile Details Section */}
+            <Box sx={{ mb: 4 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                mb: 2.5
+              }}>
+                <PersonOutlineOutlinedIcon sx={{ color: 'var(--brand-primary)' }} />
+                <Typography 
+                  variant="subtitle1" 
+                  sx={{ 
+                    color: 'var(--text-high)',
+                    fontWeight: 600
+                  }}
+                >
+                  Profile Details
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                <TextField
+                  label="Username"
+                  value={user?.username || ''}
+                  size="medium"
+                  fullWidth
+                  disabled
+                  helperText="Username cannot be changed"
+                  InputProps={{
+                    readOnly: true,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <BadgeOutlinedIcon sx={{ color: 'var(--text-low)' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'var(--surface-2)',
+                      '& fieldset': {
+                        borderColor: 'var(--grid-lines)'
+                      }
+                    }
+                  }}
+                />
+
+                <TextField
+                  label="Display Name"
+                  value={form.displayName}
+                  onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
+                  size="medium"
+                  fullWidth
+                  disabled={loading}
+                  placeholder={user?.username}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonOutlineOutlinedIcon sx={{ color: 'var(--text-low)' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'var(--surface-2)',
+                      '& fieldset': {
+                        borderColor: 'var(--grid-lines)'
+                      }
+                    }
+                  }}
+                />
+
+                <TextField
+                  label="Email Address"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  size="medium"
+                  fullWidth
+                  disabled={loading}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailOutlinedIcon sx={{ color: 'var(--text-low)' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'var(--surface-2)',
+                      '& fieldset': {
+                        borderColor: 'var(--grid-lines)'
+                      }
+                    }
+                  }}
+                />
               </Box>
             </Box>
 
-            <Box>
-              <Typography variant="subtitle2" sx={{ color: 'var(--text-high)', fontWeight: 700, pb: 1, mb: 1.5, borderBottom: '1px solid var(--grid-lines)' }}>Change Password</Typography>
-              <Box sx={{ border: '1px solid var(--grid-lines)', borderRadius: 1, backgroundColor: 'var(--surface-2)', p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <TextField label="Current Password" type="password" value={pwForm.current} onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))} size="small" fullWidth disabled={loading} />
-                <TextField label="New Password" type="password" value={pwForm.newPw} onChange={(e) => setPwForm((f) => ({ ...f, newPw: e.target.value }))} size="small" fullWidth disabled={loading} />
-                <TextField label="Confirm New Password" type="password" value={pwForm.confirm} onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))} size="small" fullWidth disabled={loading} />
+            {/* Change Password Section */}
+            <Box sx={{ mb: 4 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                mb: 2.5
+              }}>
+                <LockOutlinedIcon sx={{ color: 'var(--brand-primary)' }} />
+                <Typography 
+                  variant="subtitle1" 
+                  sx={{ 
+                    color: 'var(--text-high)',
+                    fontWeight: 600
+                  }}
+                >
+                  Change Password
+                </Typography>
               </Box>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  backgroundColor: 'var(--surface-2)',
+                  border: '1px solid var(--grid-lines)',
+                  borderRadius: 2,
+                  p: 3
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  <TextField
+                    label="Current Password"
+                    type={showPassword.current ? 'text' : 'password'}
+                    value={pwForm.current}
+                    onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
+                    size="medium"
+                    fullWidth
+                    disabled={loading}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => togglePasswordVisibility('current')}
+                            edge="end"
+                            size="small"
+                            sx={{ color: 'var(--text-low)' }}
+                          >
+                            {showPassword.current ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'var(--surface-1)',
+                        '& fieldset': {
+                          borderColor: 'var(--grid-lines)'
+                        }
+                      }
+                    }}
+                  />
+
+                  <TextField
+                    label="New Password"
+                    type={showPassword.new ? 'text' : 'password'}
+                    value={pwForm.newPw}
+                    onChange={(e) => setPwForm((f) => ({ ...f, newPw: e.target.value }))}
+                    size="medium"
+                    fullWidth
+                    disabled={loading}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => togglePasswordVisibility('new')}
+                            edge="end"
+                            size="small"
+                            sx={{ color: 'var(--text-low)' }}
+                          >
+                            {showPassword.new ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'var(--surface-1)',
+                        '& fieldset': {
+                          borderColor: 'var(--grid-lines)'
+                        }
+                      }
+                    }}
+                  />
+
+                  <TextField
+                    label="Confirm New Password"
+                    type={showPassword.confirm ? 'text' : 'password'}
+                    value={pwForm.confirm}
+                    onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
+                    size="medium"
+                    fullWidth
+                    disabled={loading}
+                    error={pwForm.newPw && pwForm.confirm && pwForm.newPw !== pwForm.confirm}
+                    helperText={
+                      pwForm.newPw && pwForm.confirm && pwForm.newPw !== pwForm.confirm
+                        ? 'Passwords do not match'
+                        : ''
+                    }
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => togglePasswordVisibility('confirm')}
+                            edge="end"
+                            size="small"
+                            sx={{ color: 'var(--text-low)' }}
+                          >
+                            {showPassword.confirm ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'var(--surface-1)',
+                        '& fieldset': {
+                          borderColor: 'var(--grid-lines)'
+                        }
+                      }
+                    }}
+                  />
+                </Box>
+              </Paper>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', borderTop: '1px solid var(--grid-lines)', pt: 2 }}>
-              <Button variant="outlined" onClick={() => navigate(-1)} disabled={loading}>Cancel</Button>
-              <Button variant="contained" onClick={handleSave} disabled={loading}>{loading ? 'Saving…' : 'Save Changes'}</Button>
+            {/* Action Buttons */}
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              justifyContent: 'flex-end',
+              borderTop: '1px solid var(--grid-lines)',
+              pt: 3
+            }}>
+              <Button
+                variant="outlined"
+                startIcon={<CloseOutlinedIcon />}
+                onClick={() => navigate(-1)}
+                disabled={loading}
+                sx={{
+                  borderColor: 'var(--grid-lines)',
+                  color: 'var(--text-med)',
+                  '&:hover': {
+                    borderColor: 'var(--text-med)',
+                    backgroundColor: 'rgba(255,255,255,0.05)'
+                  },
+                  px: 3,
+                  py: 1
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<SaveOutlinedIcon />}
+                onClick={handleSave}
+                disabled={loading}
+                sx={{
+                  backgroundColor: 'var(--brand-primary)',
+                  '&:hover': {
+                    backgroundColor: 'var(--brand-hover)'
+                  },
+                  '&.Mui-disabled': {
+                    backgroundColor: 'rgba(103, 126, 207, 0.3)'
+                  },
+                  px: 4,
+                  py: 1
+                }}
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </Button>
             </Box>
           </Box>
         </Box>
-      </Box>
+      </Paper>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog 
+        open={confirmLogoutOpen} 
+        onClose={() => setConfirmLogoutOpen(false)} 
+        maxWidth="xs" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'var(--surface-1)',
+            border: '1px solid var(--grid-lines)',
+            borderRadius: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          color: 'var(--text-high)', 
+          fontWeight: 600,
+          pb: 1
+        }}>
+          Confirm Logout
+        </DialogTitle>
+        <DialogContent sx={{ color: 'var(--text-med)' }}>
+          Are you sure you want to logout? Any unsaved changes will be lost.
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setConfirmLogoutOpen(false)} 
+            variant="outlined"
+            sx={{
+              borderColor: 'var(--grid-lines)',
+              color: 'var(--text-med)'
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={confirmLogout} 
+            variant="contained" 
+            color="error"
+            sx={{
+              backgroundColor: 'var(--color-error)',
+              '&:hover': {
+                backgroundColor: '#b84c5e'
+              }
+            }}
+          >
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
