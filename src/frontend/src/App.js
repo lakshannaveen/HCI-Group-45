@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Design from './pages/Design';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
 
 const theme = createTheme({
   palette: {
@@ -319,6 +320,7 @@ function App() {
           <Route path="/design" element={<Design />} />
           <Route path="/design/:id" element={<Design />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </ThemeProvider>
