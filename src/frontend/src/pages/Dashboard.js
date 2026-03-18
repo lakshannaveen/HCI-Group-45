@@ -4,9 +4,9 @@ import {
   Dialog, DialogContent, DialogTitle, DialogActions,
   TextField, Select, MenuItem, FormControl, InputLabel,
   InputAdornment, Snackbar, Alert,
-  IconButton, Menu,
 } from '@mui/material';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import axios from '../utils/axios';
 import TopNavbar from '../components/TopNavbar';
@@ -152,7 +152,6 @@ const Dashboard = () => {
   const [roomConfigOpen, setRoomConfigOpen] = useState(false);
   const [message, setMessage] = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [menuState, setMenuState] = useState({ el: null, id: null });
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const navigate = useNavigate();
 
@@ -272,52 +271,50 @@ const Dashboard = () => {
                   elevation={0}
                   sx={{
                     p: 3,
-                    backgroundColor: 'var(--surface-1)',
+                    background: 'linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%)',
                     border: '1px solid var(--grid-lines)',
+                    borderRadius: 3,
                     cursor: 'pointer',
-                    transition: 'border-color 0.15s, background-color 0.15s',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                       borderColor: 'var(--brand-primary)',
-                      backgroundColor: 'var(--surface-2)',
+                      background: 'linear-gradient(135deg, var(--surface-2) 0%, var(--brand-primary-light, rgba(99, 102, 241, 0.05)) 100%)',
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
                     },
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 1.5,
+                    justifyContent: 'space-between',
                     position: 'relative',
                     width: '100%',
-                    aspectRatio: '1 / 1',
+                    minHeight: 280,
+                    overflow: 'hidden',
                   }}
                   onClick={() => navigate(`/design/${design._id}`)}
                 >
-                  {/* Three-dot menu button */}
-                  <IconButton
-                    size="small"
-                    sx={{ position: 'absolute', top: 6, right: 6, color: 'var(--text-low)' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setMenuState({ el: e.currentTarget, id: design._id });
-                    }}
-                  >
-                    <MoreHorizIcon fontSize="small" />
-                  </IconButton>
+                  {/* (Removed three-dot menu - replaced by visible action buttons) */}
 
                   {/* Design icon */}
                   <Box
                     sx={{
-                      width: 80,
-                      height: 80,
-                      backgroundColor: design.roomData?.wallColor || design.roomData?.color || 'var(--surface-2)',
-                      border: '1px solid var(--grid-lines)',
-                      borderRadius: 1,
+                      width: 100,
+                      height: 100,
+                      background: `linear-gradient(135deg, ${design.roomData?.wallColor || design.roomData?.color || 'var(--surface-2)'} 0%, rgba(255,255,255,0.1) 100%)`,
+                      border: '2px solid var(--grid-lines)',
+                      borderRadius: 2,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 36,
+                      fontSize: 48,
                       flexShrink: 0,
                       position: 'relative',
-                      mt: 1,
+                      mt: 2,
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
+                      transition: 'transform 0.3s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                      },
                     }}
                   >
                     🏠
@@ -325,16 +322,20 @@ const Dashboard = () => {
                       <Box
                         sx={{
                           position: 'absolute',
-                          top: 4,
-                          right: 4,
-                          backgroundColor: 'var(--brand-primary)',
-                          color: 'var(--canvas-base)',
-                          borderRadius: 10,
-                          fontSize: '0.625rem',
+                          top: -8,
+                          right: -8,
+                          background: 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark, #6366f1) 100%)',
+                          color: 'white',
+                          borderRadius: '50%',
+                          width: 28,
+                          height: 28,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.75rem',
                           fontWeight: 700,
-                          px: 0.6,
-                          py: 0.1,
-                          lineHeight: 1.4,
+                          border: '2px solid var(--surface-1)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
                         }}
                       >
                         {design.furniture.length}
@@ -343,56 +344,92 @@ const Dashboard = () => {
                   </Box>
 
                   {/* Design title */}
-                  <Typography
-                    variant="body2"
-                    sx={{ color: 'var(--text-high)', fontWeight: 600, textAlign: 'center', wordBreak: 'break-word' }}
-                  >
-                    {design.name}
-                  </Typography>
+                  <Box sx={{ textAlign: 'center', mb: 1 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: 'var(--text-high)',
+                        fontWeight: 700,
+                        textAlign: 'center',
+                        wordBreak: 'break-word',
+                        mb: 0.5,
+                        fontSize: '1.1rem',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {design.name}
+                    </Typography>
 
-                  {/* Room dimensions */}
-                  {design.roomData && (
+                    {/* Room dimensions */}
+                    {design.roomData && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'var(--brand-primary)',
+                          fontFamily: 'monospace',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: 1,
+                          display: 'inline-block',
+                        }}
+                      >
+                        {design.roomData.width || '?'}m × {design.roomData.length || design.roomData.height || '?'}m
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Card actions */}
+                  <Box sx={{ display: 'flex', gap: 1, width: '100%', justifyContent: 'center', mt: 1 }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<EditIcon />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/design/${design._id}`);
+                      }}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="error"
+                      startIcon={<DeleteIcon />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirmId(design._id);
+                      }}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Delete
+                    </Button>
+                  </Box>
+
+                  {/* Footer info */}
+                  <Box sx={{ width: '100%', textAlign: 'center', mt: 'auto', pt: 1 }}>
                     <Typography
                       variant="caption"
-                      sx={{ color: 'var(--brand-primary)', fontFamily: 'monospace', fontSize: '0.625rem' }}
+                      sx={{
+                        color: 'var(--text-low)',
+                        fontSize: '0.7rem',
+                        opacity: 0.8,
+                      }}
                     >
-                      {design.roomData.width || '?'}m × {design.roomData.length || design.roomData.height || '?'}m
+                      Created {new Date(design.createdAt).toLocaleDateString()}
                     </Typography>
-                  )}
-
-                  <Typography variant="caption" sx={{ color: 'var(--text-low)' }}>
-                    {new Date(design.createdAt).toLocaleDateString()}
-                  </Typography>
+                  </Box>
                 </Paper>
               </Grid>
             ))}
           </Grid>
 
-          {/* Three-dot context menu */}
-          <Menu
-            anchorEl={menuState.el}
-            open={Boolean(menuState.el)}
-            onClose={() => setMenuState({ el: null, id: null })}
-          >
-            <MenuItem
-              onClick={() => {
-                setMenuState({ el: null, id: null });
-                navigate(`/design/${menuState.id}`);
-              }}
-            >
-              Edit
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                const id = menuState.id;
-                setMenuState({ el: null, id: null });
-                setDeleteConfirmId(id);
-              }}
-              sx={{ color: 'var(--color-error)' }}
-            >
-              Delete
-            </MenuItem>
-          </Menu>
+          {/* context menu removed; actions are now visible on each card */}
           </>
         )}
       </Box>
