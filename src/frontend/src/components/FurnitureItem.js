@@ -934,7 +934,7 @@ function FurnitureItem({
         style={{ flex: 1 }}
         onPointerMissed={() => handleSelect(null)}
       >
-        <color attach="background" args={['#1e232a']} />
+        <color attach="background" args={['#121415']} />
         <KeyboardCameraControls
           controlsRef={orbitControlsRef}
           is2DMode={is2DMode}
