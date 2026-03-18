@@ -1031,7 +1031,7 @@ const Design = () => {
                   inputProps={{ step: 0.5, min: 1 }}
                 />
                 <TextField
-                  label="Depth (m)"
+                  label="Length (m)"
                   type="number"
                   size="small"
                   fullWidth
@@ -1212,7 +1212,7 @@ const Design = () => {
                 <Box sx={{ px: 2, pb: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
                   <PropField label="Width"  value={selectedItem.scale[0]} onChange={(v) => handleScaleChange('x', v)} step={0.05} min={0.1} />
                   <PropField label="Height" value={selectedItem.scale[1]} onChange={(v) => handleScaleChange('y', v)} step={0.05} min={0.1} />
-                  <PropField label="Depth"  value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
+                  <PropField label="Length"  value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
                 </Box>
               </Box>
             </Box>
