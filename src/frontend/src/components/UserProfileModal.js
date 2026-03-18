@@ -14,6 +14,7 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -165,18 +166,29 @@ export default function UserProfileModal({ open, onClose, onLogout }) {
               </Typography>
             </Box>
 
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={onLogout}
-              sx={{
-                borderColor: 'var(--color-error)',
-                color: 'var(--color-error)',
-                '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)', borderColor: 'var(--color-error)' },
-              }}
-            >
-              Logout
-            </Button>
+            <>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => setConfirmLogoutOpen(true)}
+                sx={{
+                  borderColor: 'var(--color-error)',
+                  color: 'var(--color-error)',
+                  '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)', borderColor: 'var(--color-error)' },
+                }}
+              >
+                Logout
+              </Button>
+
+              <Dialog open={confirmLogoutOpen} onClose={() => setConfirmLogoutOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>Confirm Logout</DialogTitle>
+                <DialogContent sx={{ color: 'var(--text-med)' }}>Are you sure you want to logout?</DialogContent>
+                <DialogActions sx={{ px: 2, pb: 2 }}>
+                  <Button onClick={() => setConfirmLogoutOpen(false)} variant="outlined">Cancel</Button>
+                  <Button onClick={() => { setConfirmLogoutOpen(false); onClose(); onLogout(); }} variant="contained" color="error">Logout</Button>
+                </DialogActions>
+              </Dialog>
+            </>
           </Box>
 
           {/* Vertical divider */}

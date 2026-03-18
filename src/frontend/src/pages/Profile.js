@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, TextField, Divider, Alert } from '@mui/material';
+import { Box, Button, Typography, TextField, Divider, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from 'react-router-dom';
@@ -77,6 +77,15 @@ export default function Profile() {
     navigate('/');
   };
 
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+
+  const openLogoutConfirm = () => setConfirmLogoutOpen(true);
+  const confirmLogout = async () => {
+    setConfirmLogoutOpen(false);
+    try { await axiosInstance.post('/api/auth/logout'); } catch {}
+    navigate('/');
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Button
@@ -105,7 +114,16 @@ export default function Profile() {
               <Typography variant="h4" sx={{ color: 'var(--brand-primary)', fontWeight: 700 }}>{designCount}</Typography>
             </Box>
 
-            <Button fullWidth variant="outlined" onClick={handleLogout} sx={{ borderColor: 'var(--color-error)', color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)', borderColor: 'var(--color-error)' } }}>Logout</Button>
+            <Button fullWidth variant="outlined" onClick={openLogoutConfirm} sx={{ borderColor: 'var(--color-error)', color: 'var(--color-error)', '&:hover': { backgroundColor: 'rgba(207,102,121,0.08)', borderColor: 'var(--color-error)' } }}>Logout</Button>
+
+            <Dialog open={confirmLogoutOpen} onClose={() => setConfirmLogoutOpen(false)} maxWidth="xs" fullWidth>
+              <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>Confirm Logout</DialogTitle>
+              <DialogContent sx={{ color: 'var(--text-med)' }}>Are you sure you want to logout?</DialogContent>
+              <DialogActions sx={{ px: 2, pb: 2 }}>
+                <Button onClick={() => setConfirmLogoutOpen(false)} variant="outlined">Cancel</Button>
+                <Button onClick={confirmLogout} variant="contained" color="error">Logout</Button>
+              </DialogActions>
+            </Dialog>
           </Box>
 
           <Divider orientation="vertical" flexItem sx={{ borderColor: 'var(--grid-lines)' }} />

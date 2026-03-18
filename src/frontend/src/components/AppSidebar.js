@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 /**
@@ -14,6 +14,8 @@ const AppSidebar = ({ navItems = [], onLogout }) => {
   const location = useLocation();
 
   const isActive = (path) => location.pathname.startsWith(path);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
     <Box
@@ -94,7 +96,7 @@ const AppSidebar = ({ navItems = [], onLogout }) => {
         <>
           <Divider sx={{ my: 2 }} />
           <ListItem
-            onClick={onLogout}
+            onClick={() => setConfirmOpen(true)}
             sx={{
               borderRadius: '6px',
               cursor: 'pointer',
@@ -110,6 +112,17 @@ const AppSidebar = ({ navItems = [], onLogout }) => {
               }}
             />
           </ListItem>
+
+          <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
+            <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>Confirm Logout</DialogTitle>
+            <DialogContent sx={{ color: 'var(--text-med)' }}>
+              Are you sure you want to logout?
+            </DialogContent>
+            <DialogActions sx={{ px: 2, pb: 2 }}>
+              <Button onClick={() => setConfirmOpen(false)} variant="outlined">Cancel</Button>
+              <Button onClick={() => { setConfirmOpen(false); onLogout(); }} variant="contained" color="error">Logout</Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </Box>

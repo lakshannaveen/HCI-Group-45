@@ -86,6 +86,13 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = async () => {
+    setConfirmLogout(true);
+  };
+
+  const [confirmLogout, setConfirmLogout] = useState(false);
+
+  const performLogout = async () => {
+    setConfirmLogout(false);
     try {
       await axios.post('/api/auth/logout');
       navigate('/');
@@ -620,6 +627,21 @@ const AdminDashboard = () => {
           >
             Delete
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ── Confirm logout dialog ── */}
+      <Dialog
+        open={confirmLogout}
+        onClose={() => setConfirmLogout(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: 'var(--text-high)', fontWeight: 700 }}>Confirm Logout</DialogTitle>
+        <DialogContent sx={{ color: 'var(--text-med)' }}>Are you sure you want to logout?</DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2 }}>
+          <Button onClick={() => setConfirmLogout(false)} variant="outlined">Cancel</Button>
+          <Button onClick={performLogout} variant="contained" color="error">Logout</Button>
         </DialogActions>
       </Dialog>
 
