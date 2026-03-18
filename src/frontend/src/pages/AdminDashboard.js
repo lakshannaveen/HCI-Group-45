@@ -32,6 +32,7 @@ const AdminDashboard = () => {
   const [furnitureCategory, setFurnitureCategory] = useState('');
   const [open, setOpen]                     = useState(false);
   const [currentFurniture, setCurrentFurniture] = useState(null);
+  const [scaleStr, setScaleStr]             = useState('1, 1, 1');
   const [loading, setLoading]               = useState(false);
   const [message, setMessage]               = useState({ text: '', severity: 'success' });
   const [snackbarOpen, setSnackbarOpen]     = useState(false);
@@ -157,22 +158,29 @@ const AdminDashboard = () => {
 
   const handleAddFurniture = () => {
     setCurrentFurniture({ type: '', label: '', icon: '', color: '#839705', scale: [1, 1, 1] });
+    setScaleStr('1, 1, 1');
     setOpen(true);
   };
 
   const handleEditFurniture = (item) => {
     setCurrentFurniture(item);
+    setScaleStr(item.scale?.join(', ') || '1, 1, 1');
     setOpen(true);
   };
 
   const handleSaveFurniture = async () => {
+    // Parse scaleStr now so clicking Save without blurring still captures the latest value
+    const parsedScale = scaleStr.split(',').map(Number).filter((n) => !isNaN(n));
+    const furnitureToSave = parsedScale.length === 3
+      ? { ...currentFurniture, scale: parsedScale }
+      : currentFurniture;
     setLoading(true);
     try {
-      if (currentFurniture._id) {
-        await axios.put(`/api/admin/furniture/${currentFurniture._id}`, currentFurniture);
+      if (furnitureToSave._id) {
+        await axios.put(`/api/admin/furniture/${furnitureToSave._id}`, furnitureToSave);
         showMessage('Furniture updated successfully');
       } else {
-        await axios.post('/api/admin/furniture', currentFurniture);
+        await axios.post('/api/admin/furniture', furnitureToSave);
         showMessage('Furniture added successfully');
       }
       setOpen(false);
@@ -722,13 +730,12 @@ const AdminDashboard = () => {
               fullWidth
               label="Scale (W, H, D — comma separated)"
               size="small"
-              value={currentFurniture?.scale?.join(', ') || ''}
-              onChange={(e) =>
-                setCurrentFurniture({
-                  ...currentFurniture,
-                  scale: e.target.value.split(',').map(Number),
-                })
-              }
+              value={scaleStr}
+              onChange={(e) => setScaleStr(e.target.value)}
+              onBlur={(e) => {
+                const parsed = e.target.value.split(',').map(Number).filter((n) => !isNaN(n));
+                if (parsed.length === 3) setCurrentFurniture({ ...currentFurniture, scale: parsed });
+              }}
               helperText="e.g. 1.2, 2.0, 0.6"
             />
           </Box>
