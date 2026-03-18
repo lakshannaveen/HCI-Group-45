@@ -398,14 +398,21 @@ const Dashboard = () => {
 
                     <Button
                       size="small"
-                      variant="contained"
-                      color="error"
+                      variant="outlined"
                       startIcon={<DeleteIcon />}
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteConfirmId(design._id);
                       }}
-                      sx={{ textTransform: 'none' }}
+                      sx={{
+                        textTransform: 'none',
+                        borderColor: 'var(--color-error)',
+                        color: 'var(--color-error)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(207,102,121,0.08)',
+                          borderColor: 'var(--color-error)'
+                        }
+                      }}
                     >
                       Delete
                     </Button>
