@@ -35,6 +35,10 @@ const Login = () => {
       await axios.post('/api/auth/login', formData);
       const res = await axios.get('/api/auth/me');
       const user = res.data;
+      // Show a success toast before redirecting
+      showSnackbar('Login successful', 'success');
+      // Give the user a moment to see the toast
+      await new Promise((resolve) => setTimeout(resolve, 800));
       if (user.role === 'admin') navigate('/admin-dashboard');
       else navigate('/dashboard');
     } catch (err) {
