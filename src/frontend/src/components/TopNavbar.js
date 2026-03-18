@@ -3,11 +3,10 @@ import { Box, Button, Typography } from '@mui/material';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
-import UserProfileModal from './UserProfileModal';
 
 const TopNavbar = () => {
   const [user, setUser] = useState(null);
-  const [profileOpen, setProfileOpen] = useState(false);
+  
   const navigate = useNavigate();
   const location = useLocation();
   const isAdminPage = location.pathname === '/admin-dashboard';
@@ -92,7 +91,7 @@ const TopNavbar = () => {
           <Button
             variant="outlined"
             size="small"
-            onClick={() => setProfileOpen(true)}
+            onClick={() => navigate('/profile')}
             sx={{
               minWidth: 36,
               width: 36,
@@ -110,7 +109,6 @@ const TopNavbar = () => {
         </Box>
       </Box>
 
-      <UserProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} onLogout={handleLogout} />
     </>
   );
 };

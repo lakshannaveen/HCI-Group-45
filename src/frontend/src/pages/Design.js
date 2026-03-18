@@ -45,12 +45,26 @@ const TOOLS = [
 // ─── Numeric field for properties panel ──────────────────────────────────────
 function PropField({ label, value, onChange, step = 0.1, min }) {
   const safeVal = (value != null && !isNaN(value)) ? value : 0;
+  const [localVal, setLocalVal] = React.useState(String(parseFloat(safeVal.toFixed(2))));
+
+  // Sync when external value changes (e.g. undo/redo, selection change)
+  React.useEffect(() => {
+    setLocalVal(String(parseFloat(safeVal.toFixed(2))));
+  }, [safeVal]);
+
   return (
     <TextField
       label={label}
       type="number"
-      value={parseFloat(safeVal.toFixed(2))}
-      onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+      value={localVal}
+      onChange={(e) => {
+        setLocalVal(e.target.value);
+        const parsed = parseFloat(e.target.value);
+        if (!isNaN(parsed)) onChange(parsed);
+      }}
+      onBlur={() => {
+        setLocalVal(String(parseFloat(safeVal.toFixed(2))));
+      }}
       size="small"
       fullWidth
       inputProps={{ step, ...(min !== undefined ? { min } : {}) }}
@@ -346,8 +360,10 @@ const Design = () => {
 
   const getLibraryItems = () => {
     if (!activeFilter) return furnitureCatalogue;
-    if (Array.isArray(activeFilter)) return furnitureCatalogue.filter((f) => activeFilter.includes(f.type));
-    return furnitureCatalogue.filter((f) => f.type === activeFilter);
+    const matchesFilter = (itemType, keywords) =>
+      keywords.some((k) => itemType.split(/[\s-]+/).includes(k));
+    if (Array.isArray(activeFilter)) return furnitureCatalogue.filter((f) => matchesFilter(f.type, activeFilter));
+    return furnitureCatalogue.filter((f) => matchesFilter(f.type, [activeFilter]));
   };
 
   // ── Furniture operations ───────────────────────────────────────────────────
@@ -1031,7 +1047,7 @@ const Design = () => {
                   inputProps={{ step: 0.5, min: 1 }}
                 />
                 <TextField
-                  label="Depth (m)"
+                  label="Length (m)"
                   type="number"
                   size="small"
                   fullWidth
@@ -1212,7 +1228,7 @@ const Design = () => {
                 <Box sx={{ px: 2, pb: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
                   <PropField label="Width"  value={selectedItem.scale[0]} onChange={(v) => handleScaleChange('x', v)} step={0.05} min={0.1} />
                   <PropField label="Height" value={selectedItem.scale[1]} onChange={(v) => handleScaleChange('y', v)} step={0.05} min={0.1} />
-                  <PropField label="Depth"  value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
+                  <PropField label="Length"  value={selectedItem.scale[2]} onChange={(v) => handleScaleChange('z', v)} step={0.05} min={0.1} />
                 </Box>
               </Box>
             </Box>
